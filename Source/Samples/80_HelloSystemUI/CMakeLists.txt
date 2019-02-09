@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2019 the Urho3D project.
+# Copyright (c) 2017-2019 Rokas Kupstys.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,17 +20,18 @@
 # THE SOFTWARE.
 #
 
-file (GLOB_RECURSE SOURCE_FILES *.h *.cpp)
-add_library(STB STATIC ${SOURCE_FILES})
-target_compile_definitions(STB PUBLIC -DSTB_VORBIS_HEADER_ONLY=1)
-target_include_directories(STB
-    INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    PUBLIC    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/STB>
-              $<INSTALL_INTERFACE:${DEST_THIRDPARTY_HEADERS_DIR}/STB>
-)
-
-install (DIRECTORY include/ DESTINATION ${DEST_THIRDPARTY_HEADERS_DIR}/ FILES_MATCHING PATTERN *.h)
-
-#if (NOT URHO3D_MERGE_STATIC_LIBS)
-#    install(TARGETS STB EXPORT Urho3D ARCHIVE DESTINATION ${DEST_ARCHIVE_DIR})
+#if (NOT URHO3D_SYSTEMUI)
+#    return ()
 #endif ()
+
+# Define target name
+set (TARGET_NAME 80_HelloSystemUI)
+
+# Define source files
+define_source_files (EXTRA_H_FILES ${COMMON_SAMPLE_H_FILES})
+
+# Setup target with resource copying
+setup_main_executable ()
+
+# Setup test cases
+setup_test ()

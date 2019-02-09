@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2019 the Urho3D project.
+# Copyright (c) 2017 the Atomic project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,17 +20,13 @@
 # THE SOFTWARE.
 #
 
-file (GLOB_RECURSE SOURCE_FILES *.h *.cpp)
-add_library(STB STATIC ${SOURCE_FILES})
-target_compile_definitions(STB PUBLIC -DSTB_VORBIS_HEADER_ONLY=1)
-target_include_directories(STB
-    INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    PUBLIC    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/STB>
-              $<INSTALL_INTERFACE:${DEST_THIRDPARTY_HEADERS_DIR}/STB>
-)
+# When syncing repository with upstream be sure to delete stb_rectpack.h. This will make imgui use main instance of
+# stb_rectpack already included in the engine.
+set (TARGET_NAME ImGui)
 
-install (DIRECTORY include/ DESTINATION ${DEST_THIRDPARTY_HEADERS_DIR}/ FILES_MATCHING PATTERN *.h)
+add_library (${TARGET_NAME} STATIC imgui.cpp imgui_draw.cpp)
+target_link_libraries (${TARGET_NAME} STB)
+target_compile_definitions(${TARGET_NAME} PUBLIC -DIMGUI_DISABLE_OBSOLETE_FUNCTIONS=1)
+target_include_directories(${TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-#if (NOT URHO3D_MERGE_STATIC_LIBS)
-#    install(TARGETS STB EXPORT Urho3D ARCHIVE DESTINATION ${DEST_ARCHIVE_DIR})
-#endif ()
+set (STATIC_LIBRARY_TARGETS ${STATIC_LIBRARY_TARGETS} ${TARGET_NAME} PARENT_SCOPE)
