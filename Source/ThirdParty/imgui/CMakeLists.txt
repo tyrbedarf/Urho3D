@@ -24,7 +24,7 @@
 # stb_rectpack already included in the engine.
 set (TARGET_NAME ImGui)
 
-add_library (${TARGET_NAME} STATIC imgui.cpp imgui_draw.cpp)
+add_library (${TARGET_NAME} STATIC imgui.cpp imgui_draw.cpp imgui_demo.cpp)
 target_link_libraries (${TARGET_NAME} STB)
 target_compile_definitions(${TARGET_NAME} PUBLIC -DIMGUI_DISABLE_OBSOLETE_FUNCTIONS=1)
 target_include_directories(${TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

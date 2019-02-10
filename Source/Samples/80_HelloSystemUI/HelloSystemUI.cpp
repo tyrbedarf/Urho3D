@@ -76,6 +76,9 @@ void HelloSystemUi::RenderUi(StringHash eventType, VariantMap& eventData)
 	ImGui::SetNextWindowSize(ImVec2(200, 300), ImGuiCond_FirstUseEver);
 	ImGui::SetNextWindowPos(ImVec2(200, 300), ImGuiCond_FirstUseEver);
 
+	if (show_demo_window)
+		ImGui::ShowTestWindow(&show_demo_window);
+
 	if (ImGui::Begin("Sample SystemUI", &window_open,
 		ImGuiWindowFlags_NoSavedSettings |
 		ImGuiWindowFlags_ShowBorders))

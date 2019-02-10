@@ -65,4 +65,5 @@ private:
 	// State
 	bool checkbox_test;
 	bool window_open;
+	bool show_demo_window;
 };
