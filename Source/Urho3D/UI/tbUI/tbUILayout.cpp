@@ -43,7 +43,8 @@ tbUILayoutParams::~tbUILayoutParams()
 }
 
 
-UILayout::UILayout(Context* context, UI_AXIS axis, bool createWidget) : tbUIWidget(context, false)
+UILayout::UILayout(Context* context, UI_AXIS axis, bool createWidget) :
+	tbUIWidget(context, false)
 {
     if (createWidget)
     {
@@ -51,6 +52,7 @@ UILayout::UILayout(Context* context, UI_AXIS axis, bool createWidget) : tbUIWidg
         widget_->SetDelegate(this);
         widget_->SetGravity(WIDGET_GRAVITY_ALL);
         widget_->SetAxis((AXIS) axis);
+		assert(GetSubsystem<tbUI>() != 0);
         GetSubsystem<tbUI>()->WrapWidget(this, widget_);
     }
 }

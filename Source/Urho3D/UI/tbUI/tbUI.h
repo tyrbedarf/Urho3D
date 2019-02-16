@@ -31,142 +31,142 @@
 namespace Urho3D
 {
 
-class VertexBuffer;
-class tbUIRenderer;
-class tbUIWidget;
-class tbUIView;
-class tbUIPopupWindow;
+	class VertexBuffer;
+	class tbUIRenderer;
+	class tbUIWidget;
+	class tbUIView;
+	class tbUIPopupWindow;
 
-class URHO3D_API tbUI : public Object, private tb::TBWidgetListener
-{
-    friend class tbUIView;
-    URHO3D_OBJECT(tbUI, Object)
+	class URHO3D_API tbUI : public Object, private tb::TBWidgetListener
+	{
+		friend class tbUIView;
+		URHO3D_OBJECT(tbUI, Object)
 
-public:
+	public:
 
-    /// Construct.
-    tbUI(Context* context);
-    /// Destruct.
-    virtual ~tbUI();
+		/// Construct.
+		tbUI(Context* context);
+		/// Destruct.
+		virtual ~tbUI();
 
-    tb::TBWidget* GetRootWidget() { return rootWidget_; }
-    bool LoadResourceFile(tb::TBWidget* widget, const String& filename);
+		tb::TBWidget* GetRootWidget() { return rootWidget_; }
+		bool LoadResourceFile(tb::TBWidget* widget, const String& filename);
 
-    void SetKeyboardDisabled(bool disabled) {keyboardDisabled_ = disabled; }
-    void SetInputDisabled(bool disabled) { inputDisabled_ = disabled; }
+		void SetKeyboardDisabled(bool disabled) { keyboardDisabled_ = disabled; }
+		void SetInputDisabled(bool disabled) { inputDisabled_ = disabled; }
 
-    void Render(bool resetRenderTargets = true);
+		void Render(bool resetRenderTargets = true);
 
-    void Initialize(const String& languageFile);
+		void Initialize(const String& languageFile);
 
-    void Shutdown();
+		void Shutdown();
 
-    void LoadSkin(const String& skin, const String& overrideSkin = String::EMPTY);
-    bool GetSkinLoaded() { return skinLoaded_; }
+		void LoadSkin(const String& skin, const String& overrideSkin = String::EMPTY);
+		bool GetSkinLoaded() { return skinLoaded_; }
 
-    /// Load the default skin, will also look in resoures for UI/Skin/skin.ui.txt and
-    /// UI/Skin/Override/skin.ui.txt for base skin and possible override (TODO: baked in UI setting for load from project)
-    void LoadDefaultPlayerSkin();
+		/// Load the default skin, will also look in resoures for UI/Skin/skin.ui.txt and
+		/// UI/Skin/Override/skin.ui.txt for base skin and possible override (TODO: baked in UI setting for load from project)
+		void LoadDefaultPlayerSkin();
 
 
-    void AddFont(const String& fontFile, const String &name);
-    void SetDefaultFont(const String& name, int size);
+		void AddFont(const String& fontFile, const String &name);
+		void SetDefaultFont(const String& name, int size);
 
-    bool IsWidgetWrapped(tb::TBWidget* widget);
+		bool IsWidgetWrapped(tb::TBWidget* widget);
 
-    // wrap an existing widget we new'd from script
-    void WrapWidget(tbUIWidget* widget, tb::TBWidget* tbwidget);
+		// wrap an existing widget we new'd from script
+		void WrapWidget(tbUIWidget* widget, tb::TBWidget* tbwidget);
 
-    // given a TB widget, creating a UIWidget
-    tbUIWidget* WrapWidget(tb::TBWidget* widget);
+		// given a TB widget, creating a UIWidget
+		tbUIWidget* WrapWidget(tb::TBWidget* widget);
 
-    bool UnwrapWidget(tb::TBWidget* widget);
+		bool UnwrapWidget(tb::TBWidget* widget);
 
-    unsigned DebugGetWrappedWidgetCount() { return widgetWrap_.Size(); }
+		unsigned DebugGetWrappedWidgetCount() { return widgetWrap_.Size(); }
 
-    void PruneUnreachableWidgets();
+		void PruneUnreachableWidgets();
 
-    void GetTBIDString(unsigned id, String& value);
+		void GetTBIDString(unsigned id, String& value);
 
-    /// Get whether the console is currently visible
-    bool GetConsoleIsVisible() const { return consoleVisible_; }
+		/// Get whether the console is currently visible
+		bool GetConsoleIsVisible() const { return consoleVisible_; }
 
-    bool GetFocusedWidget();
+		bool GetFocusedWidget();
 
-    /// request exit on next frame
-    void RequestExit() { exitRequested_ = true; inputDisabled_ = true; }
+		/// request exit on next frame
+		void RequestExit() { exitRequested_ = true; inputDisabled_ = true; }
 
-    tbUIRenderer* GetRenderer() { return renderer_; }
+		tbUIRenderer* GetRenderer() { return renderer_; }
 
-    tbUIWidget* GetWidgetAt(int x, int y, bool include_children);
+		tbUIWidget* GetWidgetAt(int x, int y, bool include_children);
 
-    bool GetBlockChangedEvents() const { return changedEventsBlocked_ > 0; }
+		bool GetBlockChangedEvents() const { return changedEventsBlocked_ > 0; }
 
-    void SetBlockChangedEvents(bool blocked = true);
+		void SetBlockChangedEvents(bool blocked = true);
 
-    tbUIWidget* GetHoveredWidget();
+		tbUIWidget* GetHoveredWidget();
 
-    // Debugging
-    static void DebugShowSettingsWindow(tbUIWidget* parent);
+		// Debugging
+		static void DebugShowSettingsWindow(tbUIWidget* parent);
 
-    /// Get the currently focused view
-    tbUIView* GetFocusedView() const { return focusedView_; }
+		/// Get the currently focused view
+		tbUIView* GetFocusedView() const { return focusedView_; }
 
-private:
+	private:
 
-    static WeakPtr<Context> uiContext_;
-    static void TBFileReader(const char* filename, void** data, unsigned* length);
-    static void TBIDRegisterStringCallback(unsigned id, const char* value);
+		static WeakPtr<Context> uiContext_;
+		static void TBFileReader(const char* filename, void** data, unsigned* length);
+		static void TBIDRegisterStringCallback(unsigned id, const char* value);
 
-    void HandlePostUpdate(StringHash eventType, VariantMap& eventData);
-    void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
-    void HandleExitRequested(StringHash eventType, VariantMap& eventData);
+		void HandlePostUpdate(StringHash eventType, VariantMap& eventData);
+		void HandleRenderUpdate(StringHash eventType, VariantMap& eventData);
+		void HandleExitRequested(StringHash eventType, VariantMap& eventData);
 
-    // TBWidgetListener
-    void OnWidgetDelete(tb::TBWidget *widget);
-    bool OnWidgetDying(tb::TBWidget *widget);
-    void OnWidgetFocusChanged(tb::TBWidget *widget, bool focused);
-    bool OnWidgetInvokeEvent(tb::TBWidget *widget, const tb::TBWidgetEvent &ev);
-    void OnWindowClose(tb::TBWindow *window);
+		// TBWidgetListener
+		void OnWidgetDelete(tb::TBWidget *widget);
+		bool OnWidgetDying(tb::TBWidget *widget);
+		void OnWidgetFocusChanged(tb::TBWidget *widget, bool focused);
+		bool OnWidgetInvokeEvent(tb::TBWidget *widget, const tb::TBWidgetEvent &ev);
+		void OnWindowClose(tb::TBWindow *window);
 
-    /// Add a UIView to UI subsystem, happens immediately at UIView creation
-    void AddUIView(tbUIView* uiView);
-    /// Set the currently focused view
-    void SetFocusedView(tbUIView* uiView);
-    /// Removes a UIView from the UI subsystem, readding a view is not encouraged
-    void RemoveUIView(tbUIView* uiView);
+		/// Add a UIView to UI subsystem, happens immediately at UIView creation
+		void AddUIView(tbUIView* uiView);
+		/// Set the currently focused view
+		void SetFocusedView(tbUIView* uiView);
+		/// Removes a UIView from the UI subsystem, readding a view is not encouraged
+		void RemoveUIView(tbUIView* uiView);
 
-    tb::TBWidget* rootWidget_;
-    tbUIRenderer* renderer_;
+		tb::TBWidget* rootWidget_;
+		tbUIRenderer* renderer_;
 
-    WeakPtr<Graphics> graphics_;
+		WeakPtr<Graphics> graphics_;
 
-    HashMap<tb::TBWidget*, SharedPtr<tbUIWidget> > widgetWrap_;
-    HashMap<unsigned, String> tbidToString_;
+		HashMap<tb::TBWidget*, SharedPtr<tbUIWidget> > widgetWrap_;
+		HashMap<unsigned, String> tbidToString_;
 
-    WeakPtr<tbUIPopupWindow> tooltip_;
+		WeakPtr<tbUIPopupWindow> tooltip_;
 
-    int changedEventsBlocked_;
+		int changedEventsBlocked_;
 
-    bool inputDisabled_;
-    bool keyboardDisabled_;
-    bool initialized_;
-    bool skinLoaded_;
-    bool consoleVisible_;
-    bool exitRequested_;
+		bool inputDisabled_;
+		bool keyboardDisabled_;
+		bool initialized_;
+		bool skinLoaded_;
+		bool consoleVisible_;
+		bool exitRequested_;
 
-    float tooltipHoverTime_;
+		float tooltipHoverTime_;
 
-    Vector<SharedPtr<tbUIView>> uiViews_;
+		Vector<SharedPtr<tbUIView>> uiViews_;
 
-    WeakPtr<tbUIView> focusedView_;
+		WeakPtr<tbUIView> focusedView_;
 
-    // Events
-    void HandleScreenMode(StringHash eventType, VariantMap& eventData);
-    void HandleUpdate(StringHash eventType, VariantMap& eventData);
-    void HandleConsoleClosed(StringHash eventType, VariantMap& eventData);
-};
+		// Events
+		void HandleScreenMode(StringHash eventType, VariantMap& eventData);
+		void HandleUpdate(StringHash eventType, VariantMap& eventData);
+		void HandleConsoleClosed(StringHash eventType, VariantMap& eventData);
+	};
 
-void RegisterTBUILibrary(Context* context);
+	void RegisterTBUILibrary(Context* context);
 
 }

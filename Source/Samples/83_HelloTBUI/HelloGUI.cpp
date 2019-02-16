@@ -68,6 +68,10 @@ void HelloGui::Start()
 
 void HelloGui::CreateUI()
 {
+	tbUI* ui = GetSubsystem<tbUI>();
+	ui->Initialize("TB/resources/language/lng_en.tb.txt");
+	ui->LoadDefaultPlayerSkin();
+
 	UILayout* layout = new UILayout(context_);
 	layout->SetAxis(UI_AXIS_Y);
 

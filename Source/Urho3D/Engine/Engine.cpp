@@ -160,6 +160,7 @@ Engine::Engine(Context* context) :
 #endif
 
 #ifdef URHO3D_TURBO_BADGER
+	context_->RegisterSubsystem(new tbUI(context_));
 	RegisterTBUILibrary(context_);
 #endif // URHO3D_TURBO_BADGER
 
