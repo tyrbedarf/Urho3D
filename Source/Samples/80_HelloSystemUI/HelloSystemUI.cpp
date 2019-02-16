@@ -72,16 +72,15 @@ void HelloSystemUi::SubscribeToEvents()
 
 void HelloSystemUi::RenderUi(StringHash eventType, VariantMap& eventData)
 {
-	// Important to start a new frame!
-	ImGui::SetNextWindowSize(ImVec2(200, 300), ImGuiCond_FirstUseEver);
-	ImGui::SetNextWindowPos(ImVec2(200, 300), ImGuiCond_FirstUseEver);
-
 	if (show_demo_window)
 		ImGui::ShowTestWindow(&show_demo_window);
 
-	if (ImGui::Begin("Sample SystemUI", &window_open,
-		ImGuiWindowFlags_NoSavedSettings |
-		ImGuiWindowFlags_ShowBorders))
+	if (!window_open)
+		return;
+
+	ImGui::SetNextWindowSize(ImVec2(200, 300), ImGuiCond_FirstUseEver);
+	ImGui::SetNextWindowPos(ImVec2(200, 300), ImGuiCond_FirstUseEver);
+	if (ImGui::Begin("Sample SystemUI", &window_open))
 	{
 		if (ImGui::Button("Toggle console"))
 		{
@@ -89,10 +88,14 @@ void HelloSystemUi::RenderUi(StringHash eventType, VariantMap& eventData)
 		}
 
 		ImGui::Text("This is text");
-		ImGui::Checkbox("Checkbox?", &checkbox_test);
-	}
 
-	ImGui::End();
+		if(!checkbox_test)
+			ImGui::Checkbox("Check box?", &checkbox_test);
+		else
+			ImGui::Checkbox("Box checked!", &checkbox_test);
+
+		ImGui::End();
+	}
 }
 
 void HelloSystemUi::HandleKeyDown(StringHash eventType, VariantMap& eventData)

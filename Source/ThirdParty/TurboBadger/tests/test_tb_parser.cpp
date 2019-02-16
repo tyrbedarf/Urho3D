@@ -15,9 +15,7 @@ TB_TEST_GROUP(tb_parser)
 	TBNode node;
 	TB_TEST(Init)
 	{
-		TB_VERIFY(node.ReadFile("demo01/ui_resources/test_tb_parser.tb.txt"));
-
-		//TB_VERIFY(node.ReadFile(TB_TEST_FILE("test_tb_parser.tb.txt")));
+		TB_VERIFY(node.ReadFile(TB_TEST_FILE("test_tb_parser.tb.txt")));
 	}
 
 	TB_TEST(strings)
@@ -193,14 +191,6 @@ TB_TEST_GROUP(tb_parser)
 	TB_TEST(conditions)
 	{
 		TB_VERIFY(node.GetValueInt("conditions>value", 0) == 42);
-	}
-
-	TB_TEST(local_ref)
-	{
-		TB_VERIFY_STR(node.GetValueString("defines_test>test1", ""), "#ffdd00");
-		TB_VERIFY_STR(node.GetValueString("defines_test>test2", ""), "#ffdd00");
-		TB_VERIFY_STR(node.GetValueString("defines_test>broken", ""), "@>defines>colors>broken");
-		TB_VERIFY_STR(node.GetValueString("defines_test>cycle", ""), "@>defines_test>cycle");
 	}
 
 	// More coverage in test_tb_node_ref_tree.cpp...

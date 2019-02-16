@@ -63,6 +63,10 @@
 #include "../Urho2D/Urho2D.h"
 #endif
 
+#ifdef URHO3D_TURBO_BADGER
+#include "../UI/tbUI/tbUI.h"
+#endif
+
 #if defined(__EMSCRIPTEN__) && defined(URHO3D_TESTING)
 #include <emscripten/emscripten.h>
 #endif
@@ -154,6 +158,10 @@ Engine::Engine(Context* context) :
 #ifdef URHO3D_NAVIGATION
     RegisterNavigationLibrary(context_);
 #endif
+
+#ifdef URHO3D_TURBO_BADGER
+	RegisterTBUILibrary(context_);
+#endif // URHO3D_TURBO_BADGER
 
     SubscribeToEvent(E_EXITREQUESTED, URHO3D_HANDLER(Engine, HandleExitRequested));
 }

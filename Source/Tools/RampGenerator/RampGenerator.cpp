@@ -31,8 +31,7 @@
 #include <windows.h>
 #endif
 
-#include <STB/stb_image_write.h>
-
+#include "../../ThirdParty/STB/include/STB/stb_image_write.h"
 #include <Urho3D/DebugNew.h>
 
 using namespace Urho3D;

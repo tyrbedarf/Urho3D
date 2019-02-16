@@ -22,11 +22,16 @@
 
 # When syncing repository with upstream be sure to delete stb_rectpack.h. This will make imgui use main instance of
 # stb_rectpack already included in the engine.
-set (TARGET_NAME ImGui)
+#set (TARGET_NAME ImGui)
 
-add_library (${TARGET_NAME} STATIC imgui.cpp imgui_draw.cpp imgui_demo.cpp)
-target_link_libraries (${TARGET_NAME} STB)
-target_compile_definitions(${TARGET_NAME} PUBLIC -DIMGUI_DISABLE_OBSOLETE_FUNCTIONS=1)
-target_include_directories(${TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+#add_library (${TARGET_NAME} STATIC imgui.cpp imgui_draw.cpp imgui_demo.cpp)
+#target_link_libraries (${TARGET_NAME} STB)
+#target_compile_definitions(${TARGET_NAME} PUBLIC -DIMGUI_DISABLE_OBSOLETE_FUNCTIONS=1)
+#target_include_directories(${TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-set (STATIC_LIBRARY_TARGETS ${STATIC_LIBRARY_TARGETS} ${TARGET_NAME} PARENT_SCOPE)
+#set (STATIC_LIBRARY_TARGETS ${STATIC_LIBRARY_TARGETS} ${TARGET_NAME} PARENT_SCOPE)
+
+set(TARGET_NAME ImGui)
+define_source_files(RECURSE GROUP)
+setup_library()
+install_header_files (DIRECTORY ./ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/ImGui FILES_MATCHING PATTERN *.h BUILD_TREE_ONLY) 

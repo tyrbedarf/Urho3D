@@ -31,9 +31,9 @@
 
 #include <SDL/SDL_surface.h>
 #define STB_IMAGE_IMPLEMENTATION
-#include <STB/stb_image.h>
+#include "../../ThirdParty/STB/include/STB/stb_image.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include <STB/stb_image_write.h>
+#include "../../ThirdParty/STB/include/STB/stb_image_write.h"
 #ifdef URHO3D_WEBP
 #include <webp/decode.h>
 #include <webp/encode.h>

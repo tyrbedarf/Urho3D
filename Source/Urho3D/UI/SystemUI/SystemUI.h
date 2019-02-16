@@ -32,7 +32,8 @@
 #include "../../Graphics/Texture2D.h"
 #include "../../UI/SystemUI/SystemUIEvents.h"
 
-#include "../ThirdParty/imgui/imgui.h"
+// #include "../ThirdParty/imgui/imgui.h"
+#include <ImGui/imgui.h>
 
 
 namespace Urho3D
@@ -72,6 +73,8 @@ namespace Urho3D
 		ImFont* AddFont(
 			const Urho3D::String& font_path, float size = 0,
 			const std::initializer_list<unsigned short>& ranges = {}, bool merge = false);
+
+		void Start();
 
 	protected:
 		float uiScale_ = 1.f;

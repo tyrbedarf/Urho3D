@@ -84,7 +84,7 @@ namespace IMGUI_STB_NAMESPACE
 #define STBRP_STATIC
 #define STB_RECT_PACK_IMPLEMENTATION
 #endif
-#include "stb_rect_pack.h"
+#include "../STB/include/STB/stb_rect_pack.h"
 
 #define STBTT_malloc(x,u)  ((void)(u), ImGui::MemAlloc(x))
 #define STBTT_free(x,u)    ((void)(u), ImGui::MemFree(x))
@@ -95,7 +95,7 @@ namespace IMGUI_STB_NAMESPACE
 #else
 #define STBTT_DEF extern
 #endif
-#include "stb_truetype.h"
+#include "../STB/include/STB/stb_truetype.h"
 
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
@@ -1509,13 +1509,13 @@ bool    ImFontAtlasBuildWithStbTruetype(ImFontAtlas* atlas)
                 dst_font->Glyphs.resize(dst_font->Glyphs.Size + 1);
                 ImFont::Glyph& glyph = dst_font->Glyphs.back();
                 glyph.Codepoint = (ImWchar)codepoint;
-                glyph.X0 = q.x0 + off_x; 
-                glyph.Y0 = q.y0 + off_y; 
-                glyph.X1 = q.x1 + off_x; 
+                glyph.X0 = q.x0 + off_x;
+                glyph.Y0 = q.y0 + off_y;
+                glyph.X1 = q.x1 + off_x;
                 glyph.Y1 = q.y1 + off_y;
-                glyph.U0 = q.s0; 
-                glyph.V0 = q.t0; 
-                glyph.U1 = q.s1; 
+                glyph.U0 = q.s0;
+                glyph.V0 = q.t0;
+                glyph.U1 = q.s1;
                 glyph.V1 = q.t1;
                 glyph.XAdvance = (pc.xadvance + cfg.GlyphExtraSpacing.x);  // Bake spacing into XAdvance
 

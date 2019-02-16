@@ -15,7 +15,7 @@
 
 void TBDebugOut(const char *str)
 {
-	OutputDebugString(str);
+    OutputDebugString(str);
 }
 
 #endif // TB_RUNTIME_DEBUG_INFO
@@ -26,39 +26,42 @@ namespace tb {
 
 double TBSystem::GetTimeMS()
 {
-	return timeGetTime();
+    return timeGetTime();
 }
 
 // Implementation currently done in port_glut.cpp.
 // Windows timer suck. Glut timers suck too (can't be canceled) but that will do for now.
-void TBSystem::RescheduleTimer(double fire_time)
-{
-}
+//void TBSystem::RescheduleTimer(double fire_time)
+//{
+//}
 
 int TBSystem::GetLongClickDelayMS()
 {
-	return 500;
+    return 500;
 }
 
 int TBSystem::GetPanThreshold()
 {
-	return 5 * GetDPI() / 96;
+    return 5 * GetDPI() / 96;
 }
 
 int TBSystem::GetPixelsPerLine()
 {
-	return 40 * GetDPI() / 96;
+    return 40 * GetDPI() / 96;
 }
 
 int TBSystem::GetDPI()
 {
-	HDC hdc = GetDC(nullptr);
-	int DPI_x = GetDeviceCaps(hdc, LOGPIXELSX);
-	ReleaseDC(nullptr, hdc);
+    return 96;
+    /*
+    HDC hdc = GetDC(nullptr);
+    int DPI_x = GetDeviceCaps(hdc, LOGPIXELSX);
+    ReleaseDC(nullptr, hdc);
 #if 0 // TEST CODE!
-	DPI_x *= 2;
+    DPI_x *= 2;
 #endif
-	return DPI_x;
+    return DPI_x;
+    */
 }
 
 }; // namespace tb

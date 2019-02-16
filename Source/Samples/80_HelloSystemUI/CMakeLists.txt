@@ -20,9 +20,9 @@
 # THE SOFTWARE.
 #
 
-#if (NOT URHO3D_SYSTEMUI)
-#    return ()
-#endif ()
+if (NOT URHO3D_IMGUI)
+    return ()
+endif ()
 
 # Define target name
 set (TARGET_NAME 80_HelloSystemUI)

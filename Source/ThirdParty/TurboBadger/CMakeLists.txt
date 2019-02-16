@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2015 the Urho3D project.
+# Copyright (c) 2017 the Atomic project.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,20 +20,11 @@
 # THE SOFTWARE.
 #
 
-# Define target name
-set (TARGET_NAME TurboBadger)
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}" ../FreeType/include ../SDL/include)
 
-if(APPLE)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions -Wall -Wextra -Wno-unused-parameter")
-  add_definitions(-DMACOSX)
-endif(APPLE)
+set(TARGET_NAME TurboBadger)
+add_definitions(-DTB_FONT_RENDERER_FREETYPE)
 
-file (GLOB CPP_FILES *.cpp image/*.cpp animation/*.cpp parser/*.cpp renderers/*.cpp utf8/*.cpp tests/*.cpp)
-file (GLOB H_FILES *.h image/*.h animation/*.h parser/*.h renderers/*.h utf8/*.h tests/*.h)
-set (SOURCE_FILES ${CPP_FILES} ${H_FILES})
-set (INCLUDE_DIRS . image animation parser renderers utf8 tests)
-
+define_source_files (RECURSE GROUP)
 setup_library ()
-install_header_files (DIRECTORY . DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/TurboBadger FILES_MATCHING PATTERN *.h)  # Note: the trailing slash is significant
-
-set (STATIC_LIBRARY_TARGETS ${STATIC_LIBRARY_TARGETS} ${TARGET_NAME} PARENT_SCOPE)
+install_header_files (DIRECTORY ./ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/TurboBadger FILES_MATCHING PATTERN *.h BUILD_TREE_ONLY)

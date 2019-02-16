@@ -61,7 +61,7 @@ namespace ImGuiStb
 #define STB_TEXTEDIT_STRING             ImGuiTextEditState
 #define STB_TEXTEDIT_CHARTYPE           ImWchar
 #define STB_TEXTEDIT_GETWIDTH_NEWLINE   -1.0f
-#include "stb_textedit.h"
+#include "../STB/include/STB/stb_textedit.h"
 
 } // namespace ImGuiStb
 
@@ -813,7 +813,7 @@ namespace ImGui
 // ImFontAtlas internals
 IMGUI_API bool              ImFontAtlasBuildWithStbTruetype(ImFontAtlas* atlas);
 IMGUI_API void              ImFontAtlasBuildRegisterDefaultCustomRects(ImFontAtlas* atlas);
-IMGUI_API void              ImFontAtlasBuildSetupFont(ImFontAtlas* atlas, ImFont* font, ImFontConfig* font_config, float ascent, float descent); 
+IMGUI_API void              ImFontAtlasBuildSetupFont(ImFontAtlas* atlas, ImFont* font, ImFontConfig* font_config, float ascent, float descent);
 IMGUI_API void              ImFontAtlasBuildPackCustomRects(ImFontAtlas* atlas, void* spc);
 IMGUI_API void              ImFontAtlasBuildRenderDefaultTexData(ImFontAtlas* atlas);
 

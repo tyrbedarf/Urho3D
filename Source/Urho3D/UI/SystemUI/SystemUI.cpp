@@ -30,6 +30,9 @@
 #include "Graphics/Graphics.h"
 #include "Resource/ResourceCache.h"
 #include "UI/SystemUI/SystemUI.h"
+#include "Engine/EngineEvents.h"
+
+#include "Core/Main.h"
 
 #include <SDL/SDL.h>
 
@@ -81,9 +84,6 @@ namespace Urho3D
 		SubscribeToEvent(E_ENDRENDERING, std::bind(&SystemUI::OnEndRendering, this, _2));
 		SubscribeToEvent(E_SDLRAWINPUT, std::bind(&SystemUI::OnRawEvent, this, _2));
 		SubscribeToEvent(E_SCREENMODE, std::bind(&SystemUI::UpdateProjectionMatrix, this));
-
-		// context_->RegisterSubsystem(new Console(context_));
-		// context_->RegisterSubsystem(new DebugHud(context_));
 	}
 
 	SystemUI::~SystemUI()
@@ -91,10 +91,29 @@ namespace Urho3D
 		ImGui::Shutdown();
 	}
 
+	void SystemUI::Start()
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		if (io.Fonts->Fonts.empty())
+		{
+			io.Fonts->AddFontDefault();
+			ReallocateFontTexture();
+		}
+		UpdateProjectionMatrix();
+		// Initializes ImGui. ImGui::Render() can not be called unless imgui is initialized. This call avoids initialization
+		// check on every frame in E_ENDRENDERING.
+		ImGui::NewFrame();
+		ImGui::Render();
+	}
+
 	void SystemUI::UpdateProjectionMatrix()
 	{
-		// Update screen size
 		auto graphics = GetSubsystem<Graphics>();
+		if (!graphics) {
+			return;
+		}
+
+		// Update screen size
 		ImGui::GetIO().DisplaySize = ImVec2((float)graphics->GetWidth(), (float)graphics->GetHeight());
 
 		// Update projection matrix

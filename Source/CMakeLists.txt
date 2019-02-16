@@ -40,6 +40,8 @@ if (MINGW)
     check_struct_has_member (RTL_OSVERSIONINFOW dwOSVersionInfoSize minwindef.h\;winnt.h HAVE_RTL_OSVERSIONINFOW)
 endif ()
 
+include (Options)
+
 # Setup RPATH settings
 if (URHO3D_LIB_TYPE STREQUAL SHARED AND NOT WIN32 AND NOT ANDROID AND NOT IOS AND NOT TVOS AND NOT WEB)
     # Add RPATH entries when building
@@ -68,7 +70,7 @@ if (URHO3D_LIB_TYPE STREQUAL SHARED AND NOT WIN32 AND NOT ANDROID AND NOT IOS AN
 endif ()
 
 # Add targets
-foreach (TARGET FreeType LZ4 PugiXml rapidjson SDL StanHull STB imgui TurboBadger)
+foreach (TARGET FreeType LZ4 PugiXml rapidjson SDL StanHull STB)
     add_subdirectory (ThirdParty/${TARGET})
 endforeach ()
 

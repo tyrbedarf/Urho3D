@@ -8,49 +8,79 @@
 #ifdef TB_FILE_POSIX
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
 
 namespace tb {
 
-class TBPosixFile : public TBFile
+TBFileExternalReaderFunction TBFile::reader_function = NULL;
+
+class TBMemoryFile : public TBFile
 {
 public:
-	TBPosixFile(FILE *f) : file(f) {}
-	virtual ~TBPosixFile() { fclose(file); }
+    TBMemoryFile(void* _data, unsigned _size):
+        data(_data),
+        size(_size),
+        currentPos(0)
+    {
 
-	virtual long Size()
-	{
-		long oldpos = ftell(file);
-		fseek(file, 0, SEEK_END);
-		long num_bytes = ftell(file);
-		fseek(file, oldpos, SEEK_SET);
-		return num_bytes;
-	}
-	virtual size_t Read(void *buf, size_t elemSize, size_t count)
-	{
-		return fread(buf, elemSize, count, file);
-	}
+    }
+
+    virtual ~TBMemoryFile()
+    {
+        if (data)
+            free(data);
+    }
+
+    virtual long Size()
+    {
+        return (long) size;
+    }
+    virtual size_t Read(void *buf, size_t elemSize, size_t count)
+    {
+        size_t totalRead = elemSize * count;
+
+        if (currentPos + totalRead > size)
+        {
+            if (currentPos >= size)
+                return 0;
+
+            totalRead = size - currentPos;
+        }
+
+        unsigned char* cdata = ((unsigned char*) data) + currentPos;
+
+        memcpy(buf, cdata, totalRead);
+
+        currentPos += totalRead;
+
+        return totalRead;
+
+    }
 private:
-	FILE *file;
+    void* data;
+    size_t size;
+    size_t currentPos;
 };
 
 // static
 TBFile *TBFile::Open(const char *filename, TBFileMode mode)
 {
-	FILE *f = nullptr;
-	switch (mode)
-	{
-	case MODE_READ:
-		f = fopen(filename, "rb");
-		break;
-	default:
-		break;
-	}
-	if (!f)
-		return nullptr;
-	TBPosixFile *tbf = new TBPosixFile(f);
-	if (!tbf)
-		fclose(f);
-	return tbf;
+    assert(reader_function);
+
+    void* data = nullptr;
+    unsigned size = 0;
+
+    reader_function(filename, &data, &size);
+
+    if (!data || !size)
+        return nullptr;
+
+    TBMemoryFile* tbmf = new TBMemoryFile(data, size);
+
+    return tbmf;
+
+
 }
 
 }; // namespace tb

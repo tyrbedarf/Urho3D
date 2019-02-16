@@ -86,4 +86,11 @@ private:
     RefCount* refCount_;
 };
 
+/// Macro to be included in RefCounted derived classes for efficient RTTI
+#define URHO3D_REFCOUNTED(typeName) \
+    public: \
+        virtual Urho3D::ClassID GetClassID() const { return GetClassIDStatic(); } \
+        static Urho3D::ClassID GetClassIDStatic() { static const int typeID = 0; return (Urho3D::ClassID) &typeID; } \
+        virtual const String& GetTypeName() const { return GetTypeNameStatic(); } \
+        static const String& GetTypeNameStatic() { static const String _typeName(#typeName); return _typeName; }
 }
