@@ -6,6 +6,8 @@
 [![Join the chat at https://gitter.im/urho3d/Urho3D](https://badges.gitter.im/urho3d/Urho3D.svg)](https://gitter.im/urho3d/Urho3D?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 **Urho3D** is a free lightweight, cross-platform 2D and 3D game engine implemented in C++ and released under the MIT license. Greatly inspired by OGRE and Horde3D.
+This Fork tries to combine all the great stuff the Urho-Community already created and merge it into one Urho-Repo. For example
+- The TurboBadger implementation was taken form https://github.com/tyrbedarf/AtomicGameEngine 
 
 Main website: [https://urho3d.github.io/](https://urho3d.github.io/)
 
