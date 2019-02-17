@@ -34,96 +34,96 @@ using namespace tb;
 namespace Urho3D
 {
 
-tbUILayoutParams::tbUILayoutParams(Context* context) : Object(context)
-{
-}
+	tbUILayoutParams::tbUILayoutParams(Context* context) : Object(context)
+	{
+	}
 
-tbUILayoutParams::~tbUILayoutParams()
-{
-}
-
-
-UILayout::UILayout(Context* context, UI_AXIS axis, bool createWidget) :
-	tbUIWidget(context, false)
-{
-    if (createWidget)
-    {
-        widget_ = new TBLayout();
-        widget_->SetDelegate(this);
-        widget_->SetGravity(WIDGET_GRAVITY_ALL);
-        widget_->SetAxis((AXIS) axis);
-		assert(GetSubsystem<tbUI>() != 0);
-        GetSubsystem<tbUI>()->WrapWidget(this, widget_);
-    }
-}
-
-UILayout::~UILayout()
-{
-}
-
-void UILayout::SetSpacing(int spacing)
-{
-    if (!widget_)
-        return;
-
-    ((tb::TBLayout*)widget_)->SetSpacing(spacing);
-}
-
-void UILayout::SetLayoutPosition(UI_LAYOUT_POSITION position)
-{
-    if (!widget_)
-        return;
-
-    ((tb::TBLayout*)widget_)->SetLayoutPosition( (LAYOUT_POSITION) position);
-}
-
-void UILayout::SetLayoutDistributionPosition(UI_LAYOUT_DISTRIBUTION_POSITION distribution_pos)
-{
-    if (!widget_)
-        return;
-
-    ((tb::TBLayout*)widget_)->SetLayoutDistributionPosition( (LAYOUT_DISTRIBUTION_POSITION) distribution_pos);
-
-}
-
-void UILayout::SetLayoutSize(UI_LAYOUT_SIZE size)
-{
-    if (!widget_)
-        return;
-
-    ((tb::TBLayout*)widget_)->SetLayoutSize((LAYOUT_SIZE) size);
-
-}
-
-void UILayout::SetAxis(UI_AXIS axis)
-{
-    if (!widget_)
-        return;
-
-    ((tb::TBLayout*)widget_)->SetAxis((AXIS) axis);
-}
-
-void UILayout::SetLayoutDistribution(UI_LAYOUT_DISTRIBUTION distribution)
-{
-    if (!widget_)
-        return;
-
-    ((tb::TBLayout*)widget_)->SetLayoutDistribution((LAYOUT_DISTRIBUTION) distribution);
-}
+	tbUILayoutParams::~tbUILayoutParams()
+	{
+	}
 
 
-bool UILayout::OnEvent(const tb::TBWidgetEvent &ev)
-{
-    return tbUIWidget::OnEvent(ev);
-}
+	tbUILayout::tbUILayout(Context* context, UI_AXIS axis, bool createWidget) :
+		tbUIWidget(context, false)
+	{
+		if (createWidget)
+		{
+			widget_ = new TBLayout();
+			widget_->SetDelegate(this);
+			widget_->SetGravity(WIDGET_GRAVITY_ALL);
+			widget_->SetAxis((AXIS)axis);
+			assert(GetSubsystem<tbUI>() != 0);
+			GetSubsystem<tbUI>()->WrapWidget(this, widget_);
+		}
+	}
 
-/// one step to configure the main 5 fields in a UILayout
-void UILayout::SetLayoutConfig ( const String &settings )
-{
-    if (!widget_)
-        return;
+	tbUILayout::~tbUILayout()
+	{
+	}
 
-    ((tb::TBLayout*)widget_)->SetLayoutConfig(settings.CString());
-}
+	void tbUILayout::SetSpacing(int spacing)
+	{
+		if (!widget_)
+			return;
+
+		((tb::TBLayout*)widget_)->SetSpacing(spacing);
+	}
+
+	void tbUILayout::SetLayoutPosition(UI_LAYOUT_POSITION position)
+	{
+		if (!widget_)
+			return;
+
+		((tb::TBLayout*)widget_)->SetLayoutPosition((LAYOUT_POSITION)position);
+	}
+
+	void tbUILayout::SetLayoutDistributionPosition(UI_LAYOUT_DISTRIBUTION_POSITION distribution_pos)
+	{
+		if (!widget_)
+			return;
+
+		((tb::TBLayout*)widget_)->SetLayoutDistributionPosition((LAYOUT_DISTRIBUTION_POSITION)distribution_pos);
+
+	}
+
+	void tbUILayout::SetLayoutSize(UI_LAYOUT_SIZE size)
+	{
+		if (!widget_)
+			return;
+
+		((tb::TBLayout*)widget_)->SetLayoutSize((LAYOUT_SIZE)size);
+
+	}
+
+	void tbUILayout::SetAxis(UI_AXIS axis)
+	{
+		if (!widget_)
+			return;
+
+		((tb::TBLayout*)widget_)->SetAxis((AXIS)axis);
+	}
+
+	void tbUILayout::SetLayoutDistribution(UI_LAYOUT_DISTRIBUTION distribution)
+	{
+		if (!widget_)
+			return;
+
+		((tb::TBLayout*)widget_)->SetLayoutDistribution((LAYOUT_DISTRIBUTION)distribution);
+	}
+
+
+	bool tbUILayout::OnEvent(const tb::TBWidgetEvent &ev)
+	{
+		return tbUIWidget::OnEvent(ev);
+	}
+
+	/// one step to configure the main 5 fields in a UILayout
+	void tbUILayout::SetLayoutConfig(const String &settings)
+	{
+		if (!widget_)
+			return;
+
+		((tb::TBLayout*)widget_)->SetLayoutConfig(settings.CString());
+	}
 
 }

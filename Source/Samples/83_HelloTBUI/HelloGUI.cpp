@@ -72,7 +72,9 @@ void HelloGui::CreateUI()
 	ui->Initialize("TB/resources/language/lng_en.tb.txt");
 	ui->LoadDefaultPlayerSkin();
 
-	UILayout* layout = new UILayout(context_);
+	uiView_ = new tbUIView(context_);
+
+	tbUILayout* layout = new tbUILayout(context_);
 	layout->SetAxis(UI_AXIS_Y);
 
 	tbUICheckBox* checkBox = new tbUICheckBox(context_);
@@ -99,6 +101,7 @@ void HelloGui::CreateUI()
 
 	window_->ResizeToFitContent();
 
+	uiView_->AddChild(window_);
 	window_->Center();
 }
 

@@ -110,7 +110,6 @@ namespace tb
 
 namespace Urho3D
 {
-
 	void RegisterTBUILibrary(Context* context)
 	{
 		tbUIComponent::RegisterObject(context);
@@ -252,15 +251,15 @@ namespace Urho3D
 	{
 		ResourceCache* cache = GetSubsystem<ResourceCache>();
 
-		String skin = "TB/resources/default_skin/skin.tb.txt";
+		String skin = "TB/resources/skin/skin.tb.txt";
 		String overrideSkin;
 
 		// see if we have an override skin
-		SharedPtr<File> skinFile = cache->GetFile("TB/resources/default_skin/skin.tb.txt", false);
+		SharedPtr<File> skinFile = cache->GetFile("TB/resources/skin/skin.tb.txt", false);
 		if (skinFile.NotNull())
 		{
 			skinFile->Close();
-			skin = "TB/resources/default_skin/skin.tb.txt";
+			skin = "TB/resources/skin/skin.tb.txt";
 		}
 
 		// see if we have an override skin
@@ -274,10 +273,10 @@ namespace Urho3D
 
 		LoadSkin(skin, overrideSkin);
 
-		if (skin == "TB/resources/default_skin/skin.tb.txt")
+		if (skin == "TB/resources/skin/skin.tb.txt")
 		{
-			AddFont("fonts/BlueHighway.ttf", "BlueHighway");
-			SetDefaultFont("BlueHighway", 12);
+			AddFont("Fonts/BlueHighway.ttf", "BlueHighway");
+			SetDefaultFont("BlueHighway", 20);
 		}
 	}
 
@@ -480,7 +479,7 @@ namespace Urho3D
 			if (hoveredWidget && !tooltip_ && (hoveredWidget->GetShortened() || hoveredWidget->GetTooltip().Length() > 0))
 			{
 				tooltip_ = new tbUIPopupWindow(context_, true, hoveredWidget, "tooltip");
-				UILayout* tooltipLayout = new UILayout(context_, UI_AXIS_Y, true);
+				tbUILayout* tooltipLayout = new tbUILayout(context_, UI_AXIS_Y, true);
 				if (hoveredWidget->GetShortened())
 				{
 					tbUITextField* fullTextField = new tbUITextField(context_, true);
@@ -802,7 +801,7 @@ namespace Urho3D
 
 		if (widget->IsOfType<TBLayout>())
 		{
-			UILayout* layout = new UILayout(context_, (UI_AXIS)widget->GetAxis(), false);
+			tbUILayout* layout = new tbUILayout(context_, (UI_AXIS)widget->GetAxis(), false);
 			layout->SetWidget(widget);
 			WrapWidget(layout, widget);
 			return layout;

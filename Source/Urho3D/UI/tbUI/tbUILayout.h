@@ -113,14 +113,14 @@ private:
 };
 
 
-class URHO3D_API UILayout : public tbUIWidget
+class URHO3D_API tbUILayout : public tbUIWidget
 {
-    URHO3D_OBJECT(UILayout, tbUIWidget)
+    URHO3D_OBJECT(tbUILayout, tbUIWidget)
 
 public:
 
-    UILayout(Context* context, UI_AXIS axis = UI_AXIS_X, bool createWidget = true);
-    virtual ~UILayout();
+	tbUILayout(Context* context, UI_AXIS axis = UI_AXIS_X, bool createWidget = true);
+    virtual ~tbUILayout();
 
     void SetSpacing(int spacing);
 

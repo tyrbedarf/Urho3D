@@ -35,109 +35,107 @@ using namespace tb;
 namespace Urho3D
 {
 
-tbUIButton::tbUIButton(Context* context, bool createWidget) : tbUIWidget(context, false),
-    emulationButton_(-1),
-    urlEnabled_(true)
-{
-    if (createWidget)
-    {
-        widget_ = new TBButton();
-        widget_->SetDelegate(this);
-        GetSubsystem<tbUI>()->WrapWidget(this, widget_);
-    }
-}
+	tbUIButton::tbUIButton(Context* context, bool createWidget) : tbUIWidget(context, false),
+		emulationButton_(-1),
+		urlEnabled_(true)
+	{
+		if (createWidget)
+		{
+			widget_ = new TBButton();
+			widget_->SetDelegate(this);
+			GetSubsystem<tbUI>()->WrapWidget(this, widget_);
+		}
+	}
 
-tbUIButton::~tbUIButton()
-{
+	tbUIButton::~tbUIButton()
+	{
 
-}
+	}
 
-void tbUIButton::SetSqueezable(bool value)
-{
-    if (!widget_)
-        return;
+	void tbUIButton::SetSqueezable(bool value)
+	{
+		if (!widget_)
+			return;
 
-    ((TBButton*)widget_)->SetSqueezable(value);
-}
+		((TBButton*)widget_)->SetSqueezable(value);
+	}
 
-void tbUIButton::SetToggleMode(bool toggle)
-{
-    if (!widget_)
-        return;
+	void tbUIButton::SetToggleMode(bool toggle)
+	{
+		if (!widget_)
+			return;
 
-    ((TBButton*)widget_)->SetToggleMode(toggle);
+		((TBButton*)widget_)->SetToggleMode(toggle);
 
-}
+	}
 
-bool tbUIButton::GetToggleMode() const
-{
-    if (!widget_)
-        return false;
+	bool tbUIButton::GetToggleMode() const
+	{
+		if (!widget_)
+			return false;
 
-    return ((TBButton*)widget_)->GetToggleMode();
-}
+		return ((TBButton*)widget_)->GetToggleMode();
+	}
 
-void tbUIButton::SetEmulationButton(int emulationButton)
-{
-    emulationButton_ = emulationButton;
-}
+	void tbUIButton::SetEmulationButton(int emulationButton)
+	{
+		emulationButton_ = emulationButton;
+	}
 
-bool tbUIButton::OnEvent(const tb::TBWidgetEvent &ev)
-{
-    if (ev.type == EVENT_TYPE_CLICK)
-    {
-        if (urlEnabled_)
-        {
-            // First see if we have a url specified, if not and the button uses the TBButton.link skin try text
-            String url = GetURL();
-            String skinname = widget_->GetSkinBgElement() ? widget_->GetSkinBgElement()->name.CStr() : String::EMPTY;
-            if (!url.Length() && skinname == "TBButton.link")
-            {
-                String text = GetText();
+	bool tbUIButton::OnEvent(const tb::TBWidgetEvent &ev)
+	{
+		if (ev.type == EVENT_TYPE_CLICK)
+		{
+			if (urlEnabled_)
+			{
+				// First see if we have a url specified, if not and the button uses the TBButton.link skin try text
+				String url = GetURL();
+				String skinname = widget_->GetSkinBgElement() ? widget_->GetSkinBgElement()->name.CStr() : String::EMPTY;
+				if (!url.Length() && skinname == "TBButton.link")
+				{
+					String text = GetText();
 
-                if (text.StartsWith("http://") || text.StartsWith("https://") || text.StartsWith("file://"))
-                {
-                    url = text;
-                }
-            }
+					if (text.StartsWith("http://") || text.StartsWith("https://") || text.StartsWith("file://"))
+					{
+						url = text;
+					}
+				}
 
-            if (url.Length())
-            {
-                FileSystem* fileSystem = GetSubsystem<FileSystem>();
-                fileSystem->SystemOpen(url);
-            }
-        }
-    }
-    if (ev.type == EVENT_TYPE_POINTER_DOWN && emulationButton_ >= 0)
-    {
-        GetSubsystem<Input>()->SimulateButtonDown(emulationButton_);
-    }
-    if (ev.type == EVENT_TYPE_POINTER_UP && emulationButton_ >= 0)
-    {
-        GetSubsystem<Input>()->SimulateButtonUp(emulationButton_);
-    }
-    return tbUIWidget::OnEvent(ev);
-}
+				if (url.Length())
+				{
+					FileSystem* fileSystem = GetSubsystem<FileSystem>();
+					fileSystem->SystemOpen(url);
+				}
+			}
+		}
+		if (ev.type == EVENT_TYPE_POINTER_DOWN && emulationButton_ >= 0)
+		{
+			GetSubsystem<Input>()->SimulateButtonDown(emulationButton_);
+		}
+		if (ev.type == EVENT_TYPE_POINTER_UP && emulationButton_ >= 0)
+		{
+			GetSubsystem<Input>()->SimulateButtonUp(emulationButton_);
+		}
+		return tbUIWidget::OnEvent(ev);
+	}
 
-/// Set the URL which is opened when this button is clicked, this overrides the text attr
-void tbUIButton::SetURL (const String& url)
-{
-    if (!widget_)
-        return;
+	/// Set the URL which is opened when this button is clicked, this overrides the text attr
+	void tbUIButton::SetURL(const String& url)
+	{
+		if (!widget_)
+			return;
 
-    ((TBButton*)widget_)->SetURL(url.CString());
+		((TBButton*)widget_)->SetURL(url.CString());
 
-}
+	}
 
-/// Get the URL which is opened when this button is clicked
-String tbUIButton::GetURL()
-{
-    if (!widget_)
-        return String::EMPTY;
+	/// Get the URL which is opened when this button is clicked
+	String tbUIButton::GetURL()
+	{
+		if (!widget_)
+			return String::EMPTY;
 
-    return ((TBButton*)widget_)->GetURL().CStr();
+		return ((TBButton*)widget_)->GetURL().CStr();
 
-}
-
-
+	}
 }

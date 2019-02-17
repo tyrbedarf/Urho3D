@@ -30,7 +30,6 @@
 
 namespace Urho3D
 {
-
 	class VertexBuffer;
 	class tbUIRenderer;
 	class tbUIWidget;

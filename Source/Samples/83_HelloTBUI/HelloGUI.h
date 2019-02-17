@@ -56,4 +56,5 @@ private:
 	void HandleWidgetDeleted(StringHash eventType, VariantMap& eventData);
 
 	WeakPtr<tbUIWindow> window_;
+	WeakPtr<tbUIView> uiView_;
 };

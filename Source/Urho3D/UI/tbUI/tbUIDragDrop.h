@@ -28,7 +28,7 @@ namespace Urho3D
 {
 
 class tbUIWidget;
-class UILayout;
+class tbUILayout;
 class tbUIImageWidget;
 class tbUITextField;
 class tbUIDragObject;
@@ -60,7 +60,7 @@ private:
     void DragEnd();
 
     // attached to mouse UI
-    SharedPtr<UILayout> dragLayout_;
+    SharedPtr<tbUILayout> dragLayout_;
     SharedPtr<tbUIImageWidget> dragImage_;
     SharedPtr<tbUITextField> dragText_;
 

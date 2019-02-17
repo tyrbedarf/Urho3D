@@ -725,6 +725,11 @@ void Engine::Render()
 
     GetSubsystem<Renderer>()->Render();
     GetSubsystem<UI>()->Render();
+
+#ifdef URHO3D_TURBO_BADGER
+	GetSubsystem<tbUI>()->Render();
+#endif
+
     graphics->EndFrame();
 }
 

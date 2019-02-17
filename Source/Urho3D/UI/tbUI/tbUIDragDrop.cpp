@@ -64,7 +64,7 @@ tbUIDragDrop::tbUIDragDrop(Context* context) : Object(context)
     dragText_->SetFontDescription(fd);
     dragText_->SetGravity(UI_GRAVITY_TOP);
 
-    dragLayout_ = new UILayout(context);
+    dragLayout_ = new tbUILayout(context);
     dragLayout_->AddChild(dragText_);
 
     dragLayout_->SetLayoutSize(UI_LAYOUT_SIZE_PREFERRED);

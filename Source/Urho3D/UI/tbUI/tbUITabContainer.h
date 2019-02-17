@@ -27,7 +27,7 @@
 namespace Urho3D
 {
 
-class UILayout;
+class tbUILayout;
 
 class URHO3D_API tbUITabContainer : public tbUIWidget
 {
@@ -43,7 +43,7 @@ public:
 
     tbUIWidget* GetCurrentPageWidget();
 
-    UILayout* GetTabLayout();
+	tbUILayout* GetTabLayout();
 
     int GetCurrentPage(); /// returns the current page number
     bool DeletePage( int page ); /// deletes a tab + page, returns true if successful
