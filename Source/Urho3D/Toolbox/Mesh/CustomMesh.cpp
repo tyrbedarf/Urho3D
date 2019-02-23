@@ -132,14 +132,97 @@ namespace Urho3D
 		vertices[index].p = v;
 	}
 
-	Model* ProceduralMesh::GetModel()
+	SharedPtr<Model> ProceduralMesh::GetModel()
 	{
-		return nullptr;
-	}
+		SharedPtr<Model> model = SharedPtr<Model>(new Model(context_));
+		SharedPtr<VertexBuffer> vertexBuffer = SharedPtr<VertexBuffer>(new VertexBuffer(context_));
+		SharedPtr<IndexBuffer> indexBuffer = SharedPtr<IndexBuffer>(new IndexBuffer(context_));
+		SharedPtr<Geometry> geometry = SharedPtr<Geometry>(new Geometry(context_));
+		BoundingBox boundingBox_;
 
-	Geometry* ProceduralMesh::GetGeometry()
-	{
-		return nullptr;
+		PODVector<VertexElement> elements;
+		elements.Push(VertexElement(TYPE_VECTOR3, SEM_POSITION));
+		elements.Push(VertexElement(TYPE_VECTOR3, SEM_NORMAL));
+		elements.Push(VertexElement(TYPE_VECTOR2, SEM_TEXCOORD));
+		// ToDo: Calculate Tangents
+		// elements.Push(VertexElement(TYPE_VECTOR4, SEM_TANGENT));
+
+		vertexBuffer->SetShadowed(true);
+		vertexBuffer->SetSize(triangles.size() * 3, elements);
+		Vector<float> vertexData(vertices.size() * 8);
+		Vector<unsigned short> indexData;
+		for (int i = 0; i < triangles.size(); i++)
+		{
+			Triangle t = triangles[i];
+			Vector3 a = vertices[t.v[0]].p;
+			Vector3 b = vertices[t.v[1]].p;
+			Vector3 c = vertices[t.v[2]].p;
+
+			// Vertices
+			vertexData[t.v[0] + 0] = a.x_;
+			vertexData[t.v[0] + 1] = a.y_;
+			vertexData[t.v[0] + 2] = a.z_;
+
+			vertexData[t.v[1] + 0] = b.x_;
+			vertexData[t.v[1] + 1] = b.y_;
+			vertexData[t.v[1] + 2] = b.z_;
+
+			vertexData[t.v[2] + 0] = c.x_;
+			vertexData[t.v[2] + 1] = c.y_;
+			vertexData[t.v[2] + 2] = c.z_;
+
+			// Normals
+			vertexData[t.v[0] + 3] = t.n.x_;
+			vertexData[t.v[0] + 4] = t.n.y_;
+			vertexData[t.v[0] + 5] = t.n.z_;
+
+			vertexData[t.v[1] + 3] = t.n.x_;
+			vertexData[t.v[1] + 4] = t.n.y_;
+			vertexData[t.v[1] + 5] = t.n.z_;
+
+			vertexData[t.v[2] + 3] = t.n.x_;
+			vertexData[t.v[2] + 4] = t.n.y_;
+			vertexData[t.v[2] + 5] = t.n.z_;
+
+			// UVs
+			vertexData[t.v[0] + 6] = t.uvs[0].x_;
+			vertexData[t.v[0] + 7] = t.uvs[0].y_;
+
+			vertexData[t.v[1] + 6] = t.uvs[1].x_;
+			vertexData[t.v[1] + 7] = t.uvs[1].y_;
+
+			vertexData[t.v[2] + 6] = t.uvs[2].x_;
+			vertexData[t.v[2] + 7] = t.uvs[2].y_;
+		}
+
+		vertexBuffer->SetData(vertexData.Buffer());
+
+		indexBuffer->SetShadowed(true);
+		indexBuffer->SetSize(triangles.size() * 3, false);
+		indexBuffer->SetData(indexData.Buffer());
+
+		geometry->SetNumVertexBuffers(1);
+		geometry->SetVertexBuffer(0, vertexBuffer);
+		geometry->SetIndexBuffer(indexBuffer);
+		geometry->SetDrawRange(TRIANGLE_LIST, 0, triangles.size() * 3);
+
+		Vector<SharedPtr<VertexBuffer>> vertexBuffers;
+		Vector<SharedPtr<IndexBuffer>> indexBuffers;
+		vertexBuffers.Push(vertexBuffer);
+		indexBuffers.Push(indexBuffer);
+
+		PODVector<unsigned> morphRangeStarts;
+		PODVector<unsigned> morphRangeCounts;
+		morphRangeStarts.Push(0);
+		morphRangeCounts.Push(0);
+
+		model->SetNumGeometries(1);
+		model->SetGeometry(0, 0, geometry);
+		model->SetBoundingBox(boundingBox_);
+		model->SetVertexBuffers(vertexBuffers, morphRangeStarts, morphRangeCounts);
+		model->SetIndexBuffers(indexBuffers);
+
+		return model;
 	}
 
 	Vector3 ProceduralMesh::ProjectVertex(Vector3 point, Vector3 normal)

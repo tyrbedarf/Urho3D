@@ -38,7 +38,7 @@
 #include <Urho3D/Resource/ResourceCache.h>
 #include <Urho3D/Scene/Scene.h>
 
-#include "HelloGui.h"
+#include "HelloTBUI.h"
 
 #include <Urho3D/DebugNew.h>
 
@@ -57,8 +57,10 @@ void HelloGui::Start()
 	// Create "Hello GUI"
 	CreateUI();
 
-	// Finally subscribe to the update event. Note that by subscribing events at this point we have already missed some events
-	// like the ScreenMode event sent by the Graphics subsystem when opening the application window. To catch those as well we
+	// Finally subscribe to the update event. Note that by subscribing events at this
+	// point we have already missed some events
+	// like the ScreenMode event sent by the Graphics subsystem when opening the
+	// application window. To catch those as well we
 	// could subscribe in the constructor instead.
 	SubscribeToEvents();
 
@@ -95,7 +97,7 @@ void HelloGui::CreateUI()
 	window_ = new tbUIWindow(context_);
 	window_->SetSettings((UI_WINDOW_SETTINGS)(UI_WINDOW_SETTINGS_TITLEBAR | UI_WINDOW_SETTINGS_CLOSE_BUTTON));
 
-	window_->SetText("Hello Atomic GUI!");
+	window_->SetText("Hello TurboBadger GUI!");
 
 	window_->AddChild(layout);
 

@@ -7,6 +7,7 @@
 #ifndef CUSTOM_MESH_H
 #define CUSTOM_MESH_H
 
+#include <unordered_map>
 #include <math.h>
 #include <vector>
 #include <map>
@@ -15,6 +16,8 @@
 #include "../../Core/Object.h"
 #include "../../Graphics/Model.h"
 #include "../../Graphics/Geometry.h"
+#include "../../Graphics/VertexBuffer.h"
+#include "../../Graphics/IndexBuffer.h"
 
 #include "SymetricMatrix.h"
 
@@ -94,8 +97,7 @@ namespace Urho3D
 			bool create_normal = false,
 			bool create_uvs = false);
 
-		Geometry* GetGeometry();
-		Model* GetModel();
+		SharedPtr<Model> GetModel();
 
 		/// Main simplification function
 		///
@@ -137,6 +139,7 @@ namespace Urho3D
 		}
 
 	private:
+		// Todo: Change to pointers?
 		std::vector<Triangle> triangles;
 		std::vector<Vertex> vertices;
 		std::vector<VTRef> refs;

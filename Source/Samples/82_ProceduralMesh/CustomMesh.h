@@ -1,6 +1,5 @@
 //
 // Copyright (c) 2008-2016 the Urho3D project.
-// Copyright (c) 2014-2016, THUNDERBEAST GAMES LLC All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,15 +27,16 @@
 namespace Urho3D
 {
 	class tbUIWindow;
+	class tbUIView;
 }
 
-class HelloGui : public Sample
+class HelloCustomMesh : public Sample
 {
-	URHO3D_OBJECT(HelloGui, Sample)
+	URHO3D_OBJECT(HelloCustomMesh, Sample)
 
 public:
 	/// Construct.
-	HelloGui(Context* context);
+	HelloCustomMesh(Context* context);
 
 	/// Setup after engine initialization and before running the main loop.
 	virtual void Start();
@@ -44,17 +44,23 @@ public:
 protected:
 
 private:
-
 	void CreateUI();
+	void CreateScene();
+
 	/// Subscribe to application-wide logic update events.
 	void SubscribeToEvents();
+
 	/// Handle the logic update event.
 	void HandleUpdate(StringHash eventType, VariantMap& eventData);
-
 	void HandleWidgetEvent(StringHash eventType, VariantMap& eventData);
-
 	void HandleWidgetDeleted(StringHash eventType, VariantMap& eventData);
+
+	void SetupViewport();
+	void MoveCamera(float timeStep);
 
 	WeakPtr<tbUIWindow> window_;
 	WeakPtr<tbUIView> uiView_;
+
+	SharedPtr<Material> material_;
+	SharedPtr<tbUIButton> button_;
 };

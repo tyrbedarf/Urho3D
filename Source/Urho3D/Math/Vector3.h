@@ -328,6 +328,32 @@ public:
         return *this;
     }
 
+	bool operator<(const Vector3 &p_v) const
+	{
+		if (x_ == p_v.x_) {
+			if (y_ == p_v.y_)
+				return z_ < p_v.z_;
+			else
+				return y_ < p_v.y_;
+		}
+		else {
+			return x_ < p_v.x_;
+		}
+	}
+
+	bool operator<=(const Vector3 &p_v) const
+	{
+		if (x_ == p_v.x_) {
+			if (y_ == p_v.y_)
+				return z_ <= p_v.z_;
+			else
+				return y_ < p_v.y_;
+		}
+		else {
+			return x_ < p_v.x_;
+		}
+	}
+
     /// Normalize to unit length.
     void Normalize()
     {
@@ -516,5 +542,6 @@ inline IntVector3 VectorMax(const IntVector3& lhs, const IntVector3& rhs) { retu
 
 /// Return a random value from [0, 1) from 3-vector seed.
 inline float StableRandom(const Vector3& seed) { return StableRandom(Vector2(StableRandom(Vector2(seed.x_, seed.y_)), seed.z_)); }
-
 }
+
+
