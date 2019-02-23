@@ -349,6 +349,8 @@ public:
 
     /// Calculate dot product.
     float DotProduct(const Vector3& rhs) const { return x_ * rhs.x_ + y_ * rhs.y_ + z_ * rhs.z_; }
+	/// Shorthand for DotProduct
+	float Dot(const Vector3& rhs) const { return DotProduct(rhs); }
 
     /// Calculate absolute dot product.
     float AbsDotProduct(const Vector3& rhs) const
@@ -397,6 +399,8 @@ public:
             x_ * rhs.y_ - y_ * rhs.x_
         );
     }
+	/// Short hand for CrossProduct
+	Vector3 Cross(const Vector3& rhs) const { return CrossProduct(rhs); }
 
     /// Return absolute vector.
     Vector3 Abs() const { return Vector3(Urho3D::Abs(x_), Urho3D::Abs(y_), Urho3D::Abs(z_)); }

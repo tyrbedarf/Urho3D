@@ -22,7 +22,6 @@
 
 #pragma once
 
-
 #include "../../Core/Object.h"
 #include "../../Math/StringHash.h"
 #include "../../Container/HashMap.h"
@@ -32,13 +31,11 @@
 #include "../../Graphics/Texture2D.h"
 #include "../../UI/SystemUI/SystemUIEvents.h"
 
-// #include "../ThirdParty/imgui/imgui.h"
 #include <ImGui/imgui.h>
-
 
 namespace Urho3D
 {
-	class SystemUI : public Urho3D::Object
+	class URHO3D_API SystemUI : public Urho3D::Object
 	{
 		URHO3D_OBJECT(SystemUI, Urho3D::Object);
 
@@ -49,9 +46,11 @@ namespace Urho3D
 		//! Get ui scale.
 		//! \return scale of ui.
 		float GetScale() const { return uiScale_; };
+
 		//! Set ui scale.
 		//! \param scale of ui.
 		void SetScale(float scale);
+
 		//! Add font to imgui subsystem.
 		/*!
 		  \param font_path a string pointing to TTF font resource.
@@ -62,6 +61,7 @@ namespace Urho3D
 		*/
 		ImFont* AddFont(const Urho3D::String& font_path, float size = 0, const unsigned short* ranges = 0,
 			bool merge = false);
+
 		//! Add font to imgui subsystem.
 		/*!
 		  \param font_path a string pointing to TTF font resource.
@@ -89,5 +89,4 @@ namespace Urho3D
 		void OnRenderDrawLists(ImDrawData* data);
 		void OnRawEvent(VariantMap& args);
 	};
-
 }
