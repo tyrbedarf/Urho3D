@@ -1,4 +1,4 @@
-#include "CustomMesh.h"
+#include "ProceduralMesh.h"
 
 namespace Urho3D
 {
@@ -53,7 +53,7 @@ namespace Urho3D
 	{
 		auto dir1 = b - a;
 		auto dir2 = c - a;
-		auto normal = dir1.Cross(dir2).Normalized();
+		auto normal = dir2.Cross(dir1).Normalized();
 
 		auto uv1 = ProjectVertex(a, normal);
 		auto uv2 = ProjectVertex(b, normal);
@@ -72,7 +72,7 @@ namespace Urho3D
 	{
 		auto dir1 = b - a;
 		auto dir2 = c - a;
-		auto normal = dir1.Cross(dir2).Normalized();
+		auto normal = dir2.Cross(dir1).Normalized();
 
 		AddTriangle(
 			a,
@@ -138,7 +138,7 @@ namespace Urho3D
 		SharedPtr<VertexBuffer> vertexBuffer = SharedPtr<VertexBuffer>(new VertexBuffer(context_));
 		SharedPtr<IndexBuffer> indexBuffer = SharedPtr<IndexBuffer>(new IndexBuffer(context_));
 		SharedPtr<Geometry> geometry = SharedPtr<Geometry>(new Geometry(context_));
-		BoundingBox boundingBox_;
+		BoundingBox boundingBox;
 
 		PODVector<VertexElement> elements;
 		elements.Push(VertexElement(TYPE_VECTOR3, SEM_POSITION));
@@ -157,6 +157,10 @@ namespace Urho3D
 			Vector3 a = vertices[t.v[0]].p;
 			Vector3 b = vertices[t.v[1]].p;
 			Vector3 c = vertices[t.v[2]].p;
+
+			boundingBox.Merge(a);
+			boundingBox.Merge(b);
+			boundingBox.Merge(c);
 
 			// Vertices
 			vertexData[t.v[0] + 0] = a.x_;
@@ -193,6 +197,11 @@ namespace Urho3D
 
 			vertexData[t.v[2] + 6] = t.uvs[2].x_;
 			vertexData[t.v[2] + 7] = t.uvs[2].y_;
+
+			// Indices
+			indexData.Push(t.v[0]);
+			indexData.Push(t.v[1]);
+			indexData.Push(t.v[2]);
 		}
 
 		vertexBuffer->SetData(vertexData.Buffer());
@@ -218,7 +227,7 @@ namespace Urho3D
 
 		model->SetNumGeometries(1);
 		model->SetGeometry(0, 0, geometry);
-		model->SetBoundingBox(boundingBox_);
+		model->SetBoundingBox(boundingBox);
 		model->SetVertexBuffers(vertexBuffers, morphRangeStarts, morphRangeCounts);
 		model->SetIndexBuffers(indexBuffers);
 
