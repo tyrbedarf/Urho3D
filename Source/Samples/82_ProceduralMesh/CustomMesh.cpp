@@ -89,7 +89,7 @@ void HelloCustomMesh::CreateScene()
 	auto* light = lightNode->CreateComponent<Light>();
 	light->SetLightType(LIGHT_DIRECTIONAL);
 	light->SetColor(Color(0.4f, 1.0f, 0.4f));
-	light->SetSpecularIntensity(1.5f);
+	light->SetSpecularIntensity(2.5f);
 
 	//Vector3 vertices[] =
 	//{
@@ -158,7 +158,7 @@ void HelloCustomMesh::CreateScene()
 	auto vertexSize = vertexBuffer->GetVertexSize();
 	auto vertexCount = vertexBuffer->GetVertexCount();
 	URHO3D_LOGDEBUG("Size: " + String(vertexSize) + " Count: " + String(vertexCount));
-	/*for (int i = 0; i < vertexCount; i++)
+	for (int i = 0; i < vertexCount; i++)
 	{
 		const Vector3& src = *reinterpret_cast<const Vector3*>(verts + i * vertexSize);
 		URHO3D_LOGDEBUG(String(i + 1) + ". Vertex: " + String(src));
@@ -168,7 +168,7 @@ void HelloCustomMesh::CreateScene()
 
 		const Vector2& src3 = *reinterpret_cast<const Vector2*>(verts + (i * vertexSize) + (6 * sizeof(float)));
 		URHO3D_LOGDEBUG(String(i + 1) + ". UV: " + String(src3));
-	}*/
+	}
 
 	object->SetModel(model);
 	object->SetMaterial(material);
@@ -176,10 +176,9 @@ void HelloCustomMesh::CreateScene()
 	// Create a scene node for the camera, which we will move around
 	// The camera will use default settings (1000 far clip distance, 45 degrees FOV, set aspect ratio automatically)
 	cameraNode_ = new Node(context_);
-	cameraNode_->SetPosition(Vector3(0.0f, 5.0f, 0.0f));
+	cameraNode_->SetPosition(Vector3(0.0f, 10.0f, 0.0f));
 	cameraNode_->LookAt(node->GetPosition());
 	auto* camera = cameraNode_->CreateComponent<Camera>();
-	cameraNode_->LookAt(node->GetPosition());
 	camera->SetFarClip(300.0f);
 }
 

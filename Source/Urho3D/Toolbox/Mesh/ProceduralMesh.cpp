@@ -172,13 +172,13 @@ namespace Urho3D
 			Vector3 vb = *reinterpret_cast<const Vector3*>(vertexData + (b * vertexSize));
 			Vector3 vc = *reinterpret_cast<const Vector3*>(vertexData + (c * vertexSize));
 
-			URHO3D_LOGDEBUG
+			/*URHO3D_LOGDEBUG
 			(
 				String(i / 3) + ". " +
 				String(a) + " - " + String(va) + " | " +
 				String(b) + " - " + String(vb) + " | " +
 				String(c) + " - " + String(vc)
-			);
+			);*/
 
 			AddTriangle(va, vb, vc);
 		}
@@ -308,7 +308,7 @@ namespace Urho3D
 		geom->SetNumVertexBuffers(1);
 		geom->SetVertexBuffer(0, vb);
 		geom->SetIndexBuffer(ib);
-		geom->SetDrawRange(TRIANGLE_LIST, 0, vertices.size());
+		geom->SetDrawRange(TRIANGLE_LIST, 0, indexData.Size());
 
 		model->SetNumGeometries(1);
 		model->SetGeometry(0, 0, geom);
