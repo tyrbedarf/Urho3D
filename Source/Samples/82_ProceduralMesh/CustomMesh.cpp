@@ -143,7 +143,7 @@ void HelloCustomMesh::CreateScene()
 		return;
 	}
 
-	auto indexBuffer = geom->GetIndexBuffer();
+	/*auto indexBuffer = geom->GetIndexBuffer();
 	auto* indices = (const unsigned char*) indexBuffer->Lock(0, indexBuffer->GetIndexCount());
 	auto indexSize = indexBuffer->GetIndexSize();
 	auto indexCount = indexBuffer->GetIndexCount();
@@ -151,14 +151,14 @@ void HelloCustomMesh::CreateScene()
 	{
 		unsigned short src = *reinterpret_cast<const unsigned short*>(indices + i * indexSize);
 		URHO3D_LOGDEBUG(String(i + 1) + ". Index: " + String(src));
-	}
+	}*/
 
 	auto vertexBuffer = geom->GetVertexBuffer(0);
 	auto* verts = (const unsigned char*)vertexBuffer->Lock(0, vertexBuffer->GetVertexCount());
 	auto vertexSize = vertexBuffer->GetVertexSize();
 	auto vertexCount = vertexBuffer->GetVertexCount();
 	URHO3D_LOGDEBUG("Size: " + String(vertexSize) + " Count: " + String(vertexCount));
-	for (int i = 0; i < vertexCount; i++)
+	/*for (int i = 0; i < vertexCount; i++)
 	{
 		const Vector3& src = *reinterpret_cast<const Vector3*>(verts + i * vertexSize);
 		URHO3D_LOGDEBUG(String(i + 1) + ". Vertex: " + String(src));
@@ -168,7 +168,7 @@ void HelloCustomMesh::CreateScene()
 
 		const Vector2& src3 = *reinterpret_cast<const Vector2*>(verts + (i * vertexSize) + (6 * sizeof(float)));
 		URHO3D_LOGDEBUG(String(i + 1) + ". UV: " + String(src3));
-	}
+	}*/
 
 	object->SetModel(model);
 	object->SetMaterial(material);

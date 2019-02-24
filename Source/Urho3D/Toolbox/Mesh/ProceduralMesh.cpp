@@ -159,22 +159,26 @@ namespace Urho3D
 		int vertexSize = vertexBuffer->GetVertexSize();
 		int indexSize = indexBuffer->GetIndexSize();
 
+		URHO3D_LOGERROR("Idx Size: " + String(indexSize) + " - " + String(numIndices));
+		URHO3D_LOGERROR("Vtx Size: " + String(vertexSize) + " - " + String(numVertices));
+
 		for (int i = 0; i < numIndices; i += 3)
 		{
-			unsigned short a = *reinterpret_cast<const unsigned short*>(indexData + (i + 0) * indexSize);
-			unsigned short b = *reinterpret_cast<const unsigned short*>(indexData + (i + 1) * indexSize);
-			unsigned short c = *reinterpret_cast<const unsigned short*>(indexData + (i + 2) * indexSize);
+			unsigned short a = *reinterpret_cast<const unsigned short*>(indexData + (i * indexSize));
+			unsigned short b = *reinterpret_cast<const unsigned short*>(indexData + (i * indexSize) + indexSize);
+			unsigned short c = *reinterpret_cast<const unsigned short*>(indexData + (i * indexSize) + indexSize + indexSize);
 
 			Vector3 va = *reinterpret_cast<const Vector3*>(vertexData + (a * vertexSize));
 			Vector3 vb = *reinterpret_cast<const Vector3*>(vertexData + (b * vertexSize));
 			Vector3 vc = *reinterpret_cast<const Vector3*>(vertexData + (c * vertexSize));
 
-			/*URHO3D_LOGDEBUG
+			URHO3D_LOGDEBUG
 			(
+				String(i / 3) + ". " +
 				String(a) + " - " + String(va) + " | " +
 				String(b) + " - " + String(vb) + " | " +
 				String(c) + " - " + String(vc)
-			);*/
+			);
 
 			AddTriangle(va, vb, vc);
 		}
@@ -238,6 +242,9 @@ namespace Urho3D
 		const int vertexSize = 8;
 		PODVector<float> vertexData(vertices.size() * vertexSize);
 		PODVector<unsigned short> indexData;
+
+		URHO3D_LOGDEBUG("Triangles: " + String(triangles.size()));
+		URHO3D_LOGDEBUG("Vertices : " + String(vertexData.Size() / vertexSize));
 		for (int i = 0; i < triangles.size(); i++)
 		{
 			Triangle t = triangles[i];
@@ -295,7 +302,7 @@ namespace Urho3D
 		vb->SetData(vertexData.Buffer());
 
 		ib->SetShadowed(true);
-		ib->SetSize(triangles.size() * 3, false);
+		ib->SetSize(indexData.Size(), false);
 		ib->SetData(indexData.Buffer());
 
 		geom->SetNumVertexBuffers(1);
