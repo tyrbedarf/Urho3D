@@ -129,8 +129,9 @@ void HelloCustomMesh::CreateScene()
 	material = cache->GetResource<Material>("Materials/StoneTiled.xml");
 	auto* object = node->CreateComponent<StaticModel>();
 
+	mesh.SimplifyMeshLossless(true);
 	auto model = mesh.GetModel();
-	if (!model)
+	/*if (!model)
 	{
 		URHO3D_LOGDEBUG("Model has not been created.");
 		return;
@@ -141,7 +142,7 @@ void HelloCustomMesh::CreateScene()
 	{
 		URHO3D_LOGDEBUG("Geometry has not been created.");
 		return;
-	}
+	}*/
 
 	/*auto indexBuffer = geom->GetIndexBuffer();
 	auto* indices = (const unsigned char*) indexBuffer->Lock(0, indexBuffer->GetIndexCount());
@@ -153,7 +154,7 @@ void HelloCustomMesh::CreateScene()
 		URHO3D_LOGDEBUG(String(i + 1) + ". Index: " + String(src));
 	}*/
 
-	auto vertexBuffer = geom->GetVertexBuffer(0);
+	/*auto vertexBuffer = geom->GetVertexBuffer(0);
 	auto* verts = (const unsigned char*)vertexBuffer->Lock(0, vertexBuffer->GetVertexCount());
 	auto vertexSize = vertexBuffer->GetVertexSize();
 	auto vertexCount = vertexBuffer->GetVertexCount();
@@ -168,7 +169,7 @@ void HelloCustomMesh::CreateScene()
 
 		const Vector2& src3 = *reinterpret_cast<const Vector2*>(verts + (i * vertexSize) + (6 * sizeof(float)));
 		URHO3D_LOGDEBUG(String(i + 1) + ". UV: " + String(src3));
-	}
+	}*/
 
 	object->SetModel(model);
 	object->SetMaterial(material);
@@ -176,8 +177,8 @@ void HelloCustomMesh::CreateScene()
 	// Create a scene node for the camera, which we will move around
 	// The camera will use default settings (1000 far clip distance, 45 degrees FOV, set aspect ratio automatically)
 	cameraNode_ = new Node(context_);
-	cameraNode_->SetPosition(Vector3(0.0f, 10.0f, 0.0f));
-	cameraNode_->LookAt(node->GetPosition());
+	cameraNode_->SetPosition(Vector3(-30.4176f, 30.9977f, -36.2489f));
+	// cameraNode_->LookAt(Vector3(10, 0, 10));
 	auto* camera = cameraNode_->CreateComponent<Camera>();
 	camera->SetFarClip(300.0f);
 }
@@ -311,13 +312,18 @@ void HelloCustomMesh::CreateUI()
 	window_->AddChild(layout);
 	window_->ResizeToFitContent();
 	window_->SetPosition(20, 20);
-	window_->SetSize(250, 100);
+	window_->SetSize(250, 250);
 
 	button_ = new tbUIButton(context_);
 	button_->SetText("Toogle Wireframe");
 	button_->SetId("Solid");
 
+	auto* button2_ = new tbUIButton(context_);
+	button2_->SetText("Plot Camera Transform");
+	button2_->SetId("Plot");
+
 	layout->AddChild(button_);
+	layout->AddChild(button2_);
 
 	uiView_->AddChild(window_);
 }
@@ -341,10 +347,24 @@ void HelloCustomMesh::HandleWidgetEvent(StringHash eventType, VariantMap& eventD
 			return;
 		}
 
-		URHO3D_LOGDEBUG("Widget: " + widget->GetId());
-		FillMode mode = material->GetFillMode() == FillMode::FILL_WIREFRAME ? FillMode::FILL_SOLID : FillMode::FILL_WIREFRAME;
-		material->SetFillMode(mode);
+		if (widget->GetId() == "Solid")
+		{
+			ToggleWireFrame();
+		}
+
+		if (widget->GetId() == "Plot")
+		{
+			URHO3D_LOGDEBUG(
+				"Position: " + String(cameraNode_->GetPosition()) +
+				" Rotation: " + String(cameraNode_->GetRotation()));
+		}
 	}
+}
+
+void HelloCustomMesh::ToggleWireFrame()
+{
+	FillMode mode = material->GetFillMode() == FillMode::FILL_WIREFRAME ? FillMode::FILL_SOLID : FillMode::FILL_WIREFRAME;
+	material->SetFillMode(mode);
 }
 
 void HelloCustomMesh::HandleWidgetDeleted(StringHash eventType, VariantMap& eventData)
@@ -387,4 +407,16 @@ void HelloCustomMesh::MoveCamera(float timeStep)
 
 	if (input->GetKeyDown(KEY_D))
 		cameraNode_->Translate(Vector3::RIGHT * MOVE_SPEED * timeStep);
+
+	if (input->GetKeyPress(KEY_F8))
+	{
+		ToggleWireFrame();
+	}
+
+	if (input->GetKeyPress(KEY_F9))
+	{
+		URHO3D_LOGDEBUG(
+			"Position: " + String(cameraNode_->GetPosition()) +
+			" Rotation: " + String(cameraNode_->GetRotation()));
+	}
 }

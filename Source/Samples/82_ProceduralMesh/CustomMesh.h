@@ -60,6 +60,8 @@ private:
 
 	void CreateProceduralMesh();
 
+	void ToggleWireFrame();
+
 	WeakPtr<tbUIWindow> window_;
 	WeakPtr<tbUIView> uiView_;
 
