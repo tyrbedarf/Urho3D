@@ -18,6 +18,9 @@
 #include "../../Graphics/Geometry.h"
 #include "../../Graphics/VertexBuffer.h"
 #include "../../Graphics/IndexBuffer.h"
+#include "../../Graphics/Model.h"
+#include "../../Graphics/Geometry.h"
+
 
 #include "SymetricMatrix.h"
 
@@ -98,6 +101,10 @@ namespace Urho3D
 			bool create_uvs = false);
 
 		SharedPtr<Model> GetModel();
+
+		void FromModel(Model* model, unsigned int index, unsigned int lod);
+		void FromGeometry(Geometry* geom, unsigned int index);
+		void FromFile(String ressource, unsigned int index, unsigned int lod);
 
 		/// Main simplification function
 		///

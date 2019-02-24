@@ -223,6 +223,7 @@ void DynamicGeometry::CreateScene()
 
         // Shadowed buffer needed for raycasts to work, and so that data can be automatically restored on device loss
         vb->SetShadowed(true);
+
         // We could use the "legacy" element bitmask to define elements for more compact code, but let's demonstrate
         // defining the vertex elements explicitly to allow any element types and order
         PODVector<VertexElement> elements;
@@ -248,6 +249,7 @@ void DynamicGeometry::CreateScene()
         Vector<SharedPtr<IndexBuffer> > indexBuffers;
         vertexBuffers.Push(vb);
         indexBuffers.Push(ib);
+
         // Morph ranges could also be not defined. Here we simply define a zero range (no morphing) for the vertex buffer
         PODVector<unsigned> morphRangeStarts;
         PODVector<unsigned> morphRangeCounts;

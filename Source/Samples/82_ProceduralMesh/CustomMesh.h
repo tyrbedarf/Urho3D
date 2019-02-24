@@ -58,9 +58,11 @@ private:
 	void SetupViewport();
 	void MoveCamera(float timeStep);
 
+	void CreateProceduralMesh();
+
 	WeakPtr<tbUIWindow> window_;
 	WeakPtr<tbUIView> uiView_;
 
-	SharedPtr<Material> material_;
+	SharedPtr<Material> material;
 	SharedPtr<tbUIButton> button_;
 };

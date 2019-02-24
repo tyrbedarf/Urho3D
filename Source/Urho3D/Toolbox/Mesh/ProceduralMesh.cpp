@@ -1,5 +1,9 @@
 #include "ProceduralMesh.h"
 
+#include "../../IO/Log.h"
+#include "../../Resource/ResourceCache.h"
+#include "../../Graphics/GraphicsDefs.h"
+
 namespace Urho3D
 {
 	Vector3 Barycentric(
@@ -108,6 +112,87 @@ namespace Urho3D
 		triangles.push_back(t);
 	}
 
+	void ProceduralMesh::FromModel(Model* model, unsigned int index, unsigned int lod)
+	{
+		if (!model)
+		{
+			URHO3D_LOGERROR("Model not set.");
+			return;
+		}
+
+		FromGeometry(model->GetGeometry(index, lod), index);
+	}
+
+	void ProceduralMesh::FromGeometry(Geometry* geom, unsigned int index)
+	{
+		if (!geom)
+		{
+			URHO3D_LOGERROR("Geometry not set.");
+			return;
+		}
+
+		VertexBuffer* vertexBuffer = geom->GetVertexBuffer(index);
+		IndexBuffer* indexBuffer = geom->GetIndexBuffer();
+
+		const auto* vertexData =
+			(const unsigned char*)
+			vertexBuffer->Lock(0, vertexBuffer->GetVertexCount());
+
+		const auto* indexData =
+			(const unsigned char*)
+			indexBuffer->Lock(0, indexBuffer->GetIndexCount());
+
+		if (!vertexData)
+		{
+			URHO3D_LOGERROR("Could not lock vertex buffer.");
+			return;
+		}
+
+		if (!indexData)
+		{
+			URHO3D_LOGERROR("Could not lock index buffer.");
+			return;
+		}
+
+		int numVertices = vertexBuffer->GetVertexCount();
+		int numIndices = indexBuffer->GetIndexCount();
+		int vertexSize = vertexBuffer->GetVertexSize();
+		int indexSize = indexBuffer->GetIndexSize();
+
+		for (int i = 0; i < numIndices; i += 3)
+		{
+			unsigned short a = *reinterpret_cast<const unsigned short*>(indexData + (i + 0) * indexSize);
+			unsigned short b = *reinterpret_cast<const unsigned short*>(indexData + (i + 1) * indexSize);
+			unsigned short c = *reinterpret_cast<const unsigned short*>(indexData + (i + 2) * indexSize);
+
+			Vector3 va = *reinterpret_cast<const Vector3*>(vertexData + (a * vertexSize));
+			Vector3 vb = *reinterpret_cast<const Vector3*>(vertexData + (b * vertexSize));
+			Vector3 vc = *reinterpret_cast<const Vector3*>(vertexData + (c * vertexSize));
+
+			/*URHO3D_LOGDEBUG
+			(
+				String(a) + " - " + String(va) + " | " +
+				String(b) + " - " + String(vb) + " | " +
+				String(c) + " - " + String(vc)
+			);*/
+
+			AddTriangle(va, vb, vc);
+		}
+	}
+
+	void ProceduralMesh::FromFile(String ressource, unsigned int index, unsigned int lod)
+	{
+		auto* cache = GetSubsystem<ResourceCache>();
+		Model* model = cache->GetResource<Model>(ressource);
+		if (!model)
+		{
+			URHO3D_LOGERROR("Model could not be loaded");
+			return;
+		}
+
+		FromModel(model, index, lod);
+	}
+
 	int ProceduralMesh::GetIndex(Vector3 v)
 	{
 		auto it = VertexIndices.find(v);
@@ -135,22 +220,24 @@ namespace Urho3D
 	SharedPtr<Model> ProceduralMesh::GetModel()
 	{
 		SharedPtr<Model> model = SharedPtr<Model>(new Model(context_));
-		SharedPtr<VertexBuffer> vertexBuffer = SharedPtr<VertexBuffer>(new VertexBuffer(context_));
-		SharedPtr<IndexBuffer> indexBuffer = SharedPtr<IndexBuffer>(new IndexBuffer(context_));
-		SharedPtr<Geometry> geometry = SharedPtr<Geometry>(new Geometry(context_));
+		SharedPtr<VertexBuffer> vb = SharedPtr<VertexBuffer>(new VertexBuffer(context_));
+		SharedPtr<IndexBuffer> ib = SharedPtr<IndexBuffer>(new IndexBuffer(context_));
+		SharedPtr<Geometry> geom = SharedPtr<Geometry>(new Geometry(context_));
 		BoundingBox boundingBox;
+
+		vb->SetShadowed(true);
 
 		PODVector<VertexElement> elements;
 		elements.Push(VertexElement(TYPE_VECTOR3, SEM_POSITION));
 		elements.Push(VertexElement(TYPE_VECTOR3, SEM_NORMAL));
 		elements.Push(VertexElement(TYPE_VECTOR2, SEM_TEXCOORD));
+
 		// ToDo: Calculate Tangents
 		// elements.Push(VertexElement(TYPE_VECTOR4, SEM_TANGENT));
 
-		vertexBuffer->SetShadowed(true);
-		vertexBuffer->SetSize(triangles.size() * 3, elements);
-		Vector<float> vertexData(vertices.size() * 8);
-		Vector<unsigned short> indexData;
+		const int vertexSize = 8;
+		PODVector<float> vertexData(vertices.size() * vertexSize);
+		PODVector<unsigned short> indexData;
 		for (int i = 0; i < triangles.size(); i++)
 		{
 			Triangle t = triangles[i];
@@ -163,40 +250,40 @@ namespace Urho3D
 			boundingBox.Merge(c);
 
 			// Vertices
-			vertexData[t.v[0] + 0] = a.x_;
-			vertexData[t.v[0] + 1] = a.y_;
-			vertexData[t.v[0] + 2] = a.z_;
+			vertexData[(t.v[0] * vertexSize) + 0] = a.x_;
+			vertexData[(t.v[0] * vertexSize) + 1] = a.y_;
+			vertexData[(t.v[0] * vertexSize) + 2] = a.z_;
 
-			vertexData[t.v[1] + 0] = b.x_;
-			vertexData[t.v[1] + 1] = b.y_;
-			vertexData[t.v[1] + 2] = b.z_;
+			vertexData[(t.v[1] * vertexSize) + 0] = b.x_;
+			vertexData[(t.v[1] * vertexSize) + 1] = b.y_;
+			vertexData[(t.v[1] * vertexSize) + 2] = b.z_;
 
-			vertexData[t.v[2] + 0] = c.x_;
-			vertexData[t.v[2] + 1] = c.y_;
-			vertexData[t.v[2] + 2] = c.z_;
+			vertexData[(t.v[2] * vertexSize) + 0] = c.x_;
+			vertexData[(t.v[2] * vertexSize) + 1] = c.y_;
+			vertexData[(t.v[2] * vertexSize) + 2] = c.z_;
 
 			// Normals
-			vertexData[t.v[0] + 3] = t.n.x_;
-			vertexData[t.v[0] + 4] = t.n.y_;
-			vertexData[t.v[0] + 5] = t.n.z_;
+			vertexData[(t.v[0] * vertexSize) + 3] = t.n.x_;
+			vertexData[(t.v[0] * vertexSize) + 4] = t.n.y_;
+			vertexData[(t.v[0] * vertexSize) + 5] = t.n.z_;
 
-			vertexData[t.v[1] + 3] = t.n.x_;
-			vertexData[t.v[1] + 4] = t.n.y_;
-			vertexData[t.v[1] + 5] = t.n.z_;
+			vertexData[(t.v[1] * vertexSize) + 3] = t.n.x_;
+			vertexData[(t.v[1] * vertexSize) + 4] = t.n.y_;
+			vertexData[(t.v[1] * vertexSize) + 5] = t.n.z_;
 
-			vertexData[t.v[2] + 3] = t.n.x_;
-			vertexData[t.v[2] + 4] = t.n.y_;
-			vertexData[t.v[2] + 5] = t.n.z_;
+			vertexData[(t.v[2] * vertexSize) + 3] = t.n.x_;
+			vertexData[(t.v[2] * vertexSize) + 4] = t.n.y_;
+			vertexData[(t.v[2] * vertexSize) + 5] = t.n.z_;
 
 			// UVs
-			vertexData[t.v[0] + 6] = t.uvs[0].x_;
-			vertexData[t.v[0] + 7] = t.uvs[0].y_;
+			vertexData[(t.v[0] * vertexSize) + 6] = t.uvs[0].x_;
+			vertexData[(t.v[0] * vertexSize) + 7] = t.uvs[0].y_;
 
-			vertexData[t.v[1] + 6] = t.uvs[1].x_;
-			vertexData[t.v[1] + 7] = t.uvs[1].y_;
+			vertexData[(t.v[1] * vertexSize) + 6] = t.uvs[1].x_;
+			vertexData[(t.v[1] * vertexSize) + 7] = t.uvs[1].y_;
 
-			vertexData[t.v[2] + 6] = t.uvs[2].x_;
-			vertexData[t.v[2] + 7] = t.uvs[2].y_;
+			vertexData[(t.v[2] * vertexSize) + 6] = t.uvs[2].x_;
+			vertexData[(t.v[2] * vertexSize) + 7] = t.uvs[2].y_;
 
 			// Indices
 			indexData.Push(t.v[0]);
@@ -204,30 +291,32 @@ namespace Urho3D
 			indexData.Push(t.v[2]);
 		}
 
-		vertexBuffer->SetData(vertexData.Buffer());
+		vb->SetSize(vertices.size(), elements);
+		vb->SetData(vertexData.Buffer());
 
-		indexBuffer->SetShadowed(true);
-		indexBuffer->SetSize(triangles.size() * 3, false);
-		indexBuffer->SetData(indexData.Buffer());
+		ib->SetShadowed(true);
+		ib->SetSize(triangles.size() * 3, false);
+		ib->SetData(indexData.Buffer());
 
-		geometry->SetNumVertexBuffers(1);
-		geometry->SetVertexBuffer(0, vertexBuffer);
-		geometry->SetIndexBuffer(indexBuffer);
-		geometry->SetDrawRange(TRIANGLE_LIST, 0, triangles.size() * 3);
+		geom->SetNumVertexBuffers(1);
+		geom->SetVertexBuffer(0, vb);
+		geom->SetIndexBuffer(ib);
+		geom->SetDrawRange(TRIANGLE_LIST, 0, vertices.size());
+
+		model->SetNumGeometries(1);
+		model->SetGeometry(0, 0, geom);
+		model->SetBoundingBox(boundingBox);
 
 		Vector<SharedPtr<VertexBuffer>> vertexBuffers;
 		Vector<SharedPtr<IndexBuffer>> indexBuffers;
-		vertexBuffers.Push(vertexBuffer);
-		indexBuffers.Push(indexBuffer);
+		vertexBuffers.Push(vb);
+		indexBuffers.Push(ib);
 
 		PODVector<unsigned> morphRangeStarts;
 		PODVector<unsigned> morphRangeCounts;
 		morphRangeStarts.Push(0);
 		morphRangeCounts.Push(0);
 
-		model->SetNumGeometries(1);
-		model->SetGeometry(0, 0, geometry);
-		model->SetBoundingBox(boundingBox);
 		model->SetVertexBuffers(vertexBuffers, morphRangeStarts, morphRangeCounts);
 		model->SetIndexBuffers(indexBuffers);
 

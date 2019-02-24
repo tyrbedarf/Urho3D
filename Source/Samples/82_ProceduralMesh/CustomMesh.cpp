@@ -41,6 +41,7 @@
 #include <Urho3D/Graphics/Model.h>
 #include <Urho3D/Graphics/Geometry.h>
 #include <Urho3D/Toolbox/Mesh/ProceduralMesh.h>
+#include <Urho3D/Graphics/Zone.h>
 
 #include "CustomMesh.h"
 
@@ -61,6 +62,8 @@ void HelloCustomMesh::Start()
 	CreateScene();
 	SetupViewport();
 
+	// CreateProceduralMesh();
+
 	SubscribeToEvents();
 
 	Sample::InitMouseMode(MM_FREE);
@@ -72,56 +75,214 @@ void HelloCustomMesh::CreateScene()
 	scene_ = new Scene(context_);
 	scene_->CreateComponent<Octree>();
 
+	// Create a Zone for ambient light & fog control
+	Node* zoneNode = scene_->CreateChild("Zone");
+	auto* zone = zoneNode->CreateComponent<Zone>();
+	zone->SetBoundingBox(BoundingBox(-1000.0f, 1000.0f));
+	zone->SetFogColor(Color(0.2f, 0.2f, 0.2f));
+	zone->SetFogStart(200.0f);
+	zone->SetFogEnd(300.0f);
+
+	// Create a directional light
+	Node* lightNode = scene_->CreateChild("DirectionalLight");
+	lightNode->SetDirection(Vector3(-0.6f, -1.0f, -0.8f)); // The direction vector does not need to be normalized
+	auto* light = lightNode->CreateComponent<Light>();
+	light->SetLightType(LIGHT_DIRECTIONAL);
+	light->SetColor(Color(0.4f, 1.0f, 0.4f));
+	light->SetSpecularIntensity(1.5f);
+
+	//Vector3 vertices[] =
+	//{
+	//	Vector3(0.0f, 0.0f, 0.0),
+	//	Vector3(1.0f, 0.0f, 0.0),
+	//	Vector3(0.0f, 0.0f, 1.0),
+	//	Vector3(1.0f, 0.0f, 1.0),
+
+	//	Vector3(2.0f, 0.0f, 0.0), // 4
+	//	Vector3(0.0f, 0.0f, 2.0),
+	//	Vector3(2.0f, 0.0f, 2.0)
+	//};
+
+	//const size_t numOfTriangles = 4;
+	//unsigned short triangles[]
+	//{
+	//	0, 1, 2,
+	//	1, 3, 2,
+	//	1, 4, 3,
+	//	4, 6, 3
+	//};
+
 	ProceduralMesh mesh(context_);
-	Vector3 vertices[] =
-	{
-		Vector3(0.0f, 0.0f, 0.0),
-		Vector3(1.0f, 0.0f, 0.0),
-		Vector3(0.0f, 0.0f, 1.0),
-		Vector3(1.0f, 0.0f, 1.0),
-
-		Vector3(2.0f, 0.0f, 0.0), // 4
-		Vector3(0.0f, 0.0f, 2.0),
-		Vector3(2.0f, 0.0f, 2.0)
-	};
-
-	const size_t numOfTriangles = 4;
-	unsigned short triangles[]
-	{
-		0, 1, 2,
-		1, 3, 2,
-		1, 4, 3,
-		4, 5, 3
-	};
-
-	for (int i = 0; i < numOfTriangles; i++)
+	mesh.FromModel(cache->GetResource<Model>("Models/SubdividedPlane/Plane.mdl"), 0, 0);
+	/*for (int i = 0; i < numOfTriangles; i++)
 	{
 		mesh.AddTriangle(
 			vertices[triangles[(i * 3) + 0]],
 			vertices[triangles[(i * 3) + 1]],
 			vertices[triangles[(i * 3) + 2]]);
-	}
+	}*/
 
 
 	Node* node = scene_->CreateChild("Plane");
-	node->SetScale(Vector3(100.0f, 1.0f, 100.0f));
-	material_ = cache->GetResource<Material>("Materials/StoneTiled.xml");
+	node->SetScale(Vector3(10.0f, 1.0f, 10.0f));
+	node->SetPosition(Vector3(0.0f, 0.0f, 0.0f));
+	material = cache->GetResource<Material>("Materials/StoneTiled.xml");
 	auto* object = node->CreateComponent<StaticModel>();
-	object->SetModel(mesh.GetModel());
-	object->SetMaterial(material_);
 
-	Node* lightNode = scene_->CreateChild("DirectionalLight");
-	lightNode->SetDirection(Vector3(0.6f, -1.0f, 0.8f)); // The direction vector does not need to be normalized
-	auto* light = lightNode->CreateComponent<Light>();
-	light->SetLightType(LIGHT_DIRECTIONAL);
+	auto model = mesh.GetModel();
+	if (!model)
+	{
+		URHO3D_LOGDEBUG("Model has not been created.");
+		return;
+	}
+
+	auto geom = model->GetGeometry(0, 0);
+	if (!geom)
+	{
+		URHO3D_LOGDEBUG("Geometry has not been created.");
+		return;
+	}
+
+	auto indexBuffer = geom->GetIndexBuffer();
+	auto* indices = (const unsigned char*) indexBuffer->Lock(0, indexBuffer->GetIndexCount());
+	auto indexSize = indexBuffer->GetIndexSize();
+	auto indexCount = indexBuffer->GetIndexCount();
+	for (int i = 0; i < indexCount; i++)
+	{
+		unsigned short src = *reinterpret_cast<const unsigned short*>(indices + i * indexSize);
+		URHO3D_LOGDEBUG(String(i + 1) + ". Index: " + String(src));
+	}
+
+	auto vertexBuffer = geom->GetVertexBuffer(0);
+	auto* verts = (const unsigned char*)vertexBuffer->Lock(0, vertexBuffer->GetVertexCount());
+	auto vertexSize = vertexBuffer->GetVertexSize();
+	auto vertexCount = vertexBuffer->GetVertexCount();
+	URHO3D_LOGDEBUG("Size: " + String(vertexSize) + " Count: " + String(vertexCount));
+	for (int i = 0; i < vertexCount; i++)
+	{
+		const Vector3& src = *reinterpret_cast<const Vector3*>(verts + i * vertexSize);
+		URHO3D_LOGDEBUG(String(i + 1) + ". Vertex: " + String(src));
+
+		const Vector3& src2 = *reinterpret_cast<const Vector3*>(verts + (i * vertexSize) + (3 * sizeof(float)));
+		URHO3D_LOGDEBUG(String(i + 1) + ". Normal: " + String(src2));
+
+		const Vector2& src3 = *reinterpret_cast<const Vector2*>(verts + (i * vertexSize) + (6 * sizeof(float)));
+		URHO3D_LOGDEBUG(String(i + 1) + ". UV: " + String(src3));
+	}
+
+	object->SetModel(model);
+	object->SetMaterial(material);
 
 	// Create a scene node for the camera, which we will move around
 	// The camera will use default settings (1000 far clip distance, 45 degrees FOV, set aspect ratio automatically)
-	cameraNode_ = scene_->CreateChild("Camera");
-	cameraNode_->CreateComponent<Camera>();
-
-	// Set an initial position for the camera scene node above the plane
+	cameraNode_ = new Node(context_);
 	cameraNode_->SetPosition(Vector3(0.0f, 5.0f, 0.0f));
+	cameraNode_->LookAt(node->GetPosition());
+	auto* camera = cameraNode_->CreateComponent<Camera>();
+	cameraNode_->LookAt(node->GetPosition());
+	camera->SetFarClip(300.0f);
+}
+
+void HelloCustomMesh::CreateProceduralMesh()
+{
+	const unsigned numVertices = 18;
+
+	float vertexData[] = {
+		// Position             Normal
+		0.0f, 0.5f, 0.0f,       0.0f, 0.0f, 0.0f,
+		0.5f, -0.5f, 0.5f,      0.0f, 0.0f, 0.0f,
+		0.5f, -0.5f, -0.5f,     0.0f, 0.0f, 0.0f,
+
+		0.0f, 0.5f, 0.0f,       0.0f, 0.0f, 0.0f,
+		-0.5f, -0.5f, 0.5f,     0.0f, 0.0f, 0.0f,
+		0.5f, -0.5f, 0.5f,      0.0f, 0.0f, 0.0f,
+
+		0.0f, 0.5f, 0.0f,       0.0f, 0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f,    0.0f, 0.0f, 0.0f,
+		-0.5f, -0.5f, 0.5f,     0.0f, 0.0f, 0.0f,
+
+		0.0f, 0.5f, 0.0f,       0.0f, 0.0f, 0.0f,
+		0.5f, -0.5f, -0.5f,     0.0f, 0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f,    0.0f, 0.0f, 0.0f,
+
+		0.5f, -0.5f, -0.5f,     0.0f, 0.0f, 0.0f,
+		0.5f, -0.5f, 0.5f,      0.0f, 0.0f, 0.0f,
+		-0.5f, -0.5f, 0.5f,     0.0f, 0.0f, 0.0f,
+
+		0.5f, -0.5f, -0.5f,     0.0f, 0.0f, 0.0f,
+		-0.5f, -0.5f, 0.5f,     0.0f, 0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f,    0.0f, 0.0f, 0.0f
+	};
+
+	const unsigned short indexData[] = {
+		0, 1, 2,
+		3, 4, 5,
+		6, 7, 8,
+		9, 10, 11,
+		12, 13, 14,
+		15, 16, 17
+	};
+
+	// Calculate face normals now
+	for (unsigned i = 0; i < numVertices; i += 3)
+	{
+		Vector3& v1 = *(reinterpret_cast<Vector3*>(&vertexData[6 * i]));
+		Vector3& v2 = *(reinterpret_cast<Vector3*>(&vertexData[6 * (i + 1)]));
+		Vector3& v3 = *(reinterpret_cast<Vector3*>(&vertexData[6 * (i + 2)]));
+		Vector3& n1 = *(reinterpret_cast<Vector3*>(&vertexData[6 * i + 3]));
+		Vector3& n2 = *(reinterpret_cast<Vector3*>(&vertexData[6 * (i + 1) + 3]));
+		Vector3& n3 = *(reinterpret_cast<Vector3*>(&vertexData[6 * (i + 2) + 3]));
+
+		Vector3 edge1 = v1 - v2;
+		Vector3 edge2 = v1 - v3;
+		n1 = n2 = n3 = edge1.CrossProduct(edge2).Normalized();
+	}
+
+	SharedPtr<Model> fromScratchModel(new Model(context_));
+	SharedPtr<VertexBuffer> vb(new VertexBuffer(context_));
+	SharedPtr<IndexBuffer> ib(new IndexBuffer(context_));
+	SharedPtr<Geometry> geom(new Geometry(context_));
+
+	// Shadowed buffer needed for raycasts to work, and so that data can be automatically restored on device loss
+	vb->SetShadowed(true);
+	// We could use the "legacy" element bitmask to define elements for more compact code, but let's demonstrate
+	// defining the vertex elements explicitly to allow any element types and order
+	PODVector<VertexElement> elements;
+	elements.Push(VertexElement(TYPE_VECTOR3, SEM_POSITION));
+	elements.Push(VertexElement(TYPE_VECTOR3, SEM_NORMAL));
+	vb->SetSize(numVertices, elements);
+	vb->SetData(vertexData);
+
+	ib->SetShadowed(true);
+	ib->SetSize(numVertices, false);
+	ib->SetData(indexData);
+
+	geom->SetVertexBuffer(0, vb);
+	geom->SetIndexBuffer(ib);
+	geom->SetDrawRange(TRIANGLE_LIST, 0, numVertices);
+
+	fromScratchModel->SetNumGeometries(1);
+	fromScratchModel->SetGeometry(0, 0, geom);
+	fromScratchModel->SetBoundingBox(BoundingBox(Vector3(-0.5f, -0.5f, -0.5f), Vector3(0.5f, 0.5f, 0.5f)));
+
+	// Though not necessary to render, the vertex & index buffers must be listed in the model so that it can be saved properly
+	Vector<SharedPtr<VertexBuffer> > vertexBuffers;
+	Vector<SharedPtr<IndexBuffer> > indexBuffers;
+	vertexBuffers.Push(vb);
+	indexBuffers.Push(ib);
+
+	// Morph ranges could also be not defined. Here we simply define a zero range (no morphing) for the vertex buffer
+	PODVector<unsigned> morphRangeStarts;
+	PODVector<unsigned> morphRangeCounts;
+	morphRangeStarts.Push(0);
+	morphRangeCounts.Push(0);
+	fromScratchModel->SetVertexBuffers(vertexBuffers, morphRangeStarts, morphRangeCounts);
+	fromScratchModel->SetIndexBuffers(indexBuffers);
+
+	Node* node = scene_->CreateChild("FromScratchObject");
+	node->SetPosition(Vector3(0.0f, 3.0f, 0.0f));
+	auto* object = node->CreateComponent<StaticModel>();
+	object->SetModel(fromScratchModel);
 }
 
 void HelloCustomMesh::SetupViewport()
@@ -182,8 +343,8 @@ void HelloCustomMesh::HandleWidgetEvent(StringHash eventType, VariantMap& eventD
 		}
 
 		URHO3D_LOGDEBUG("Widget: " + widget->GetId());
-		FillMode mode = material_->GetFillMode() == FillMode::FILL_WIREFRAME ? FillMode::FILL_SOLID : FillMode::FILL_WIREFRAME;
-		material_->SetFillMode(mode);
+		FillMode mode = material->GetFillMode() == FillMode::FILL_WIREFRAME ? FillMode::FILL_SOLID : FillMode::FILL_WIREFRAME;
+		material->SetFillMode(mode);
 	}
 }
 
