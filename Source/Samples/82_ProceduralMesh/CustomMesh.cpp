@@ -155,7 +155,7 @@ void HelloCustomMesh::CreateScene()
 	}*/
 
 	/*auto vertexBuffer = geom->GetVertexBuffer(0);
-	auto* verts = (const unsigned char*)vertexBuffer->Lock(0, vertexBuffer->GetVertexCount());
+	auto verts = (const unsigned char*)vertexBuffer->Lock(0, vertexBuffer->GetVertexCount());
 	auto vertexSize = vertexBuffer->GetVertexSize();
 	auto vertexCount = vertexBuffer->GetVertexCount();
 	URHO3D_LOGDEBUG("Size: " + String(vertexSize) + " Count: " + String(vertexCount));

@@ -63,7 +63,13 @@ public:
     IntVector3& operator =(const IntVector3& rhs) noexcept = default;
 
     /// Test for equality with another vector.
-    bool operator ==(const IntVector3& rhs) const { return x_ == rhs.x_ && y_ == rhs.y_ && z_ == rhs.z_; }
+    bool operator ==(const IntVector3& rhs) const
+	{
+		return
+			x_ == rhs.x_ &&
+			y_ == rhs.y_ &&
+			z_ == rhs.z_;
+	}
 
     /// Test for inequality with another vector.
     bool operator !=(const IntVector3& rhs) const { return x_ != rhs.x_ || y_ != rhs.y_ || z_ != rhs.z_; }

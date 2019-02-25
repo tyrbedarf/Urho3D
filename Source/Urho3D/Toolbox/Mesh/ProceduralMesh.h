@@ -122,7 +122,7 @@ namespace Urho3D
 		void SimplifyMesh(float target_count_percentage, double agressiveness = 7, bool verbose = false);
 
 		/// Collapses coplanar faces only.
-		void SimplifyMeshLossless(bool verbose = false);
+		void SimplifyMeshLossless(bool verbose = false, int maxIterations = 9999);
 
 		/// Get or create a new vertex.
 		int GetIndex(Vector3 v);

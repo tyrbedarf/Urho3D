@@ -42,6 +42,13 @@ namespace Urho3D
 		return out;
 	}
 
+	Vector3 calcNormal(Vector3 a, Vector3 b, Vector3 c)
+	{
+		auto dir1 = b - a;
+		auto dir2 = c - a;
+		return dir2.Cross(dir1).Normalized();
+	}
+
 	ProceduralMesh::ProceduralMesh(Context* context_) : Object(context_)
 	{
 		// Prepare Planes to project uv onto surface.
@@ -55,9 +62,7 @@ namespace Urho3D
 
 	void ProceduralMesh::AddTriangle(Vector3 a, Vector3 b, Vector3 c)
 	{
-		auto dir1 = b - a;
-		auto dir2 = c - a;
-		auto normal = dir2.Cross(dir1).Normalized();
+		auto normal = calcNormal(a, b, c);
 
 		auto uv1 = ProjectVertex(a, normal);
 		auto uv2 = ProjectVertex(b, normal);
@@ -74,9 +79,7 @@ namespace Urho3D
 		Vector2 uv2,
 		Vector2 uv3)
 	{
-		auto dir1 = b - a;
-		auto dir2 = c - a;
-		auto normal = dir2.Cross(dir1).Normalized();
+		auto normal = calcNormal(a, b, c);
 
 		AddTriangle(
 			a,
@@ -428,12 +431,9 @@ namespace Urho3D
 		t.v[1] = b;
 		t.v[2] = c;
 
-		auto dir1 = vertices[b].p - vertices[a].p;
-		auto dir2 = vertices[c].p - vertices[a].p;
-
 		if (create_normal)
 		{
-			t.n = dir1.Cross(dir2).Normalized();
+			t.n = calcNormal(vertices[a].p, vertices[b].p, vertices[c].p);
 		}
 
 		if (create_uvs)
@@ -554,7 +554,7 @@ namespace Urho3D
 		CompactMesh();
 	}
 
-	void ProceduralMesh::SimplifyMeshLossless(bool verbose)
+	void ProceduralMesh::SimplifyMeshLossless(bool verbose, int maxIterations)
 	{
 		// init
 		printf("Before: Vertices %zd Triangles: %zd\n", vertices.size(), triangles.size());
@@ -566,7 +566,7 @@ namespace Urho3D
 		int triangle_count = triangles.size();
 		//int iteration = 0;
 		//loop(iteration,0,100)
-		for (int iteration = 0; iteration < 9999; iteration++)
+		for (int iteration = 0; iteration < maxIterations; iteration++)
 		{
 			// update mesh constantly
 			UpdateMesh(iteration);
@@ -599,8 +599,11 @@ namespace Urho3D
 					int i0 = t.v[j]; Vertex &v0 = vertices[i0];
 					int i1 = t.v[(j + 1) % 3]; Vertex &v1 = vertices[i1];
 
-					// Border check
-					if (v0.border != v1.border)  continue;
+					// Border check -> Does not seem to work borders are beeing
+					// identified correctly but vertices are beeing collapsed
+					// wrong. Just leave borders alone.
+					// if (v0.border != v1.border)  continue;
+					if (v0.border > 0 || v1.border > 0)  continue;
 
 					// Compute vertex to collapse to
 					Vector3 p;
@@ -674,6 +677,7 @@ namespace Urho3D
 				deleted[k] = 1;
 				continue;
 			}
+
 			Vector3 d1 = vertices[id1].p - p; d1.Normalize();
 			Vector3 d2 = vertices[id2].p - p; d2.Normalize();
 			if (fabs(d1.DotProduct(d2)) > 0.999) return true;
@@ -926,6 +930,8 @@ namespace Urho3D
 			double error2 = VertexError(q, p2.x_, p2.y_, p2.z_);
 			double error3 = VertexError(q, p3.x_, p3.y_, p3.z_);
 			error = fmin(error1, fmin(error2, error3));
+
+			// error = fmin(error1, error2);
 			if (error1 == error) p_result = p1;
 			if (error2 == error) p_result = p2;
 			if (error3 == error) p_result = p3;
