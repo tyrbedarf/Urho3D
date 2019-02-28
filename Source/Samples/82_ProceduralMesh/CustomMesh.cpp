@@ -113,63 +113,18 @@ void HelloCustomMesh::CreateScene()
 	//};
 
 	ProceduralMesh mesh(context_);
-	mesh.FromModel(cache->GetResource<Model>("Models/SubdividedPlane/Plane.mdl"), 0, 0);
-	/*for (int i = 0; i < numOfTriangles; i++)
-	{
-		mesh.AddTriangle(
-			vertices[triangles[(i * 3) + 0]],
-			vertices[triangles[(i * 3) + 1]],
-			vertices[triangles[(i * 3) + 2]]);
-	}*/
-
+	// mesh.FromModel(cache->GetResource<Model>("Models/SubdividedPlane/Plane.mdl"), 0, 0);
+	mesh.FromModel(cache->GetResource<Model>("Models/Torus.mdl"), 0, 0);
 
 	Node* node = scene_->CreateChild("Plane");
-	node->SetScale(Vector3(10.0f, 1.0f, 10.0f));
-	node->SetPosition(Vector3(0.0f, 0.0f, 0.0f));
+	node->SetScale(Vector3(10.0f, 10.0f, 10.0f));
+	node->SetPosition(Vector3(0.0f, 0.0f, 15.0f));
 	material = cache->GetResource<Material>("Materials/StoneTiled.xml");
 	auto* object = node->CreateComponent<StaticModel>();
 
-	mesh.SimplifyMeshLossless(true);
+	// mesh.SimplifyMeshLossless(true, 1);
+	mesh.SimplifyMesh(0.9f, 7.0f, true);
 	auto model = mesh.GetModel();
-	/*if (!model)
-	{
-		URHO3D_LOGDEBUG("Model has not been created.");
-		return;
-	}
-
-	auto geom = model->GetGeometry(0, 0);
-	if (!geom)
-	{
-		URHO3D_LOGDEBUG("Geometry has not been created.");
-		return;
-	}*/
-
-	/*auto indexBuffer = geom->GetIndexBuffer();
-	auto* indices = (const unsigned char*) indexBuffer->Lock(0, indexBuffer->GetIndexCount());
-	auto indexSize = indexBuffer->GetIndexSize();
-	auto indexCount = indexBuffer->GetIndexCount();
-	for (int i = 0; i < indexCount; i++)
-	{
-		unsigned short src = *reinterpret_cast<const unsigned short*>(indices + i * indexSize);
-		URHO3D_LOGDEBUG(String(i + 1) + ". Index: " + String(src));
-	}*/
-
-	/*auto vertexBuffer = geom->GetVertexBuffer(0);
-	auto verts = (const unsigned char*)vertexBuffer->Lock(0, vertexBuffer->GetVertexCount());
-	auto vertexSize = vertexBuffer->GetVertexSize();
-	auto vertexCount = vertexBuffer->GetVertexCount();
-	URHO3D_LOGDEBUG("Size: " + String(vertexSize) + " Count: " + String(vertexCount));
-	for (int i = 0; i < vertexCount; i++)
-	{
-		const Vector3& src = *reinterpret_cast<const Vector3*>(verts + i * vertexSize);
-		URHO3D_LOGDEBUG(String(i + 1) + ". Vertex: " + String(src));
-
-		const Vector3& src2 = *reinterpret_cast<const Vector3*>(verts + (i * vertexSize) + (3 * sizeof(float)));
-		URHO3D_LOGDEBUG(String(i + 1) + ". Normal: " + String(src2));
-
-		const Vector2& src3 = *reinterpret_cast<const Vector2*>(verts + (i * vertexSize) + (6 * sizeof(float)));
-		URHO3D_LOGDEBUG(String(i + 1) + ". UV: " + String(src3));
-	}*/
 
 	object->SetModel(model);
 	object->SetMaterial(material);
@@ -177,8 +132,8 @@ void HelloCustomMesh::CreateScene()
 	// Create a scene node for the camera, which we will move around
 	// The camera will use default settings (1000 far clip distance, 45 degrees FOV, set aspect ratio automatically)
 	cameraNode_ = new Node(context_);
-	cameraNode_->SetPosition(Vector3(-30.4176f, 30.9977f, -36.2489f));
-	// cameraNode_->LookAt(Vector3(10, 0, 10));
+	cameraNode_->SetPosition(Vector3(0.0f, 0.0f, 0.0f));
+	// cameraNode_->LookAt(Vector3(5.0f, 0.0f, 5.0f));
 	auto* camera = cameraNode_->CreateComponent<Camera>();
 	camera->SetFarClip(300.0f);
 }

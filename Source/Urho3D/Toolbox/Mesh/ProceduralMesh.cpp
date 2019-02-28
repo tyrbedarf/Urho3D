@@ -167,9 +167,12 @@ namespace Urho3D
 
 		for (int i = 0; i < numIndices; i += 3)
 		{
-			unsigned short a = *reinterpret_cast<const unsigned short*>(indexData + (i * indexSize));
-			unsigned short b = *reinterpret_cast<const unsigned short*>(indexData + (i * indexSize) + indexSize);
-			unsigned short c = *reinterpret_cast<const unsigned short*>(indexData + (i * indexSize) + indexSize + indexSize);
+			int offset_a = 0;
+			int offset_b = indexSize;
+			int offset_c = indexSize + indexSize;
+			unsigned short a = *reinterpret_cast<const unsigned short*>(indexData + (i * indexSize) + offset_a);
+			unsigned short b = *reinterpret_cast<const unsigned short*>(indexData + (i * indexSize) + offset_b);
+			unsigned short c = *reinterpret_cast<const unsigned short*>(indexData + (i * indexSize) + offset_c);
 
 			Vector3 va = *reinterpret_cast<const Vector3*>(vertexData + (a * vertexSize));
 			Vector3 vb = *reinterpret_cast<const Vector3*>(vertexData + (b * vertexSize));
@@ -251,6 +254,12 @@ namespace Urho3D
 		for (int i = 0; i < triangles.size(); i++)
 		{
 			Triangle t = triangles[i];
+			if (t.deleted)
+			{
+				URHO3D_LOGDEBUG("Ignored Triangle");
+				continue;
+			}
+
 			Vector3 a = vertices[t.v[0]].p;
 			Vector3 b = vertices[t.v[1]].p;
 			Vector3 c = vertices[t.v[2]].p;
@@ -447,6 +456,14 @@ namespace Urho3D
 
 		triangles.push_back(t);
 	}
+	void ProceduralMesh::SimplifyMesh(
+		float target_count_percentage,
+		double agressiveness,
+		bool verbose)
+	{
+		int target_count = (int) (vertices.size() * target_count_percentage);
+		SimplifyMesh(target_count, agressiveness, verbose);
+	}
 
 	void ProceduralMesh::SimplifyMesh(int target_count, double agressiveness, bool verbose)
 	{
@@ -564,8 +581,7 @@ namespace Urho3D
 		int deleted_triangles = 0;
 		std::vector<int> deleted0, deleted1;
 		int triangle_count = triangles.size();
-		//int iteration = 0;
-		//loop(iteration,0,100)
+
 		for (int iteration = 0; iteration < maxIterations; iteration++)
 		{
 			// update mesh constantly
@@ -596,14 +612,16 @@ namespace Urho3D
 
 				loopj(0, 3)if (t.err[j] < threshold)
 				{
-					int i0 = t.v[j]; Vertex &v0 = vertices[i0];
-					int i1 = t.v[(j + 1) % 3]; Vertex &v1 = vertices[i1];
+					int i0 = t.v[j];
+					Vertex &v0 = vertices[i0];
+					int i1 = t.v[(j + 1) % 3];
+					Vertex &v1 = vertices[i1];
 
 					// Border check -> Does not seem to work borders are beeing
 					// identified correctly but vertices are beeing collapsed
 					// wrong. Just leave borders alone.
-					// if (v0.border != v1.border)  continue;
-					if (v0.border > 0 || v1.border > 0)  continue;
+					if (v0.border != v1.border)  continue;
+					// if (v0.border > 0 || v1.border > 0)  continue;
 
 					// Compute vertex to collapse to
 					Vector3 p;
@@ -769,6 +787,7 @@ namespace Urho3D
 			{
 				Triangle &t = triangles[i];
 				Vector3 n, p[3];
+
 				loopj(0, 3) p[j] = vertices[t.v[j]].p;
 				// n.cross(p[1] - p[0], p[2] - p[0]);
 				n = (p[1] - p[0]).CrossProduct(p[2] - p[0]);
@@ -780,7 +799,8 @@ namespace Urho3D
 			loopi(0, triangles.size())
 			{
 				// Calc Edge Error
-				Triangle &t = triangles[i]; Vector3 p;
+				Triangle &t = triangles[i];
+				Vector3 p;
 				loopj(0, 3) t.err[j] = CalculateError(t.v[j], t.v[(j + 1) % 3], p);
 				t.err[3] = fmin(t.err[0], fmin(t.err[1], t.err[2]));
 			}
