@@ -527,6 +527,7 @@ namespace Urho3D
 					// Compute vertex to collapse to
 					Vector3 p;
 					CalculateError(i0, i1, p);
+
 					deleted0.resize(v0.tcount); // normals temporarily
 					deleted1.resize(v1.tcount); // normals temporarily
 												// don't remove if flipped
@@ -590,12 +591,10 @@ namespace Urho3D
 			// clear dirty flag
 			loopi(0, triangles.size()) triangles[i].dirty = 0;
 
-			//
 			// All triangles with edges below the threshold will be removed
 			//
 			// The following numbers works well for most models.
 			// If it does not, try to adjust the 3 parameters
-			//
 			double threshold = DBL_EPSILON; //1.0E-3 EPS;
 			if (verbose)
 			{
@@ -620,8 +619,12 @@ namespace Urho3D
 					// Border check -> Does not seem to work borders are beeing
 					// identified correctly but vertices are beeing collapsed
 					// wrong. Just leave borders alone.
-					if (v0.border != v1.border)  continue;
-					// if (v0.border > 0 || v1.border > 0)  continue;
+					// if (v0.border != v1.border)  continue;
+					if (v0.border > 0 || v1.border > 0)
+					{
+
+						continue;
+					}
 
 					// Compute vertex to collapse to
 					Vector3 p;
@@ -771,41 +774,6 @@ namespace Urho3D
 			triangles.resize(dst);
 		}
 
-		//
-		// Init Quadrics by Plane & Edge Errors
-		//
-		// required at the beginning ( iteration == 0 )
-		// recomputing during the simplification is not required,
-		// but mostly improves the result for closed meshes
-		//
-		if (iteration == 0)
-		{
-			loopi(0, vertices.size())
-				vertices[i].q = SymetricMatrix(0.0);
-
-			loopi(0, triangles.size())
-			{
-				Triangle &t = triangles[i];
-				Vector3 n, p[3];
-
-				loopj(0, 3) p[j] = vertices[t.v[j]].p;
-				// n.cross(p[1] - p[0], p[2] - p[0]);
-				n = (p[1] - p[0]).CrossProduct(p[2] - p[0]);
-				n.Normalize();
-				t.n = n;
-				loopj(0, 3) vertices[t.v[j]].q =
-					vertices[t.v[j]].q + SymetricMatrix(n.x_, n.y_, n.z_, -n.DotProduct(p[0]));
-			}
-			loopi(0, triangles.size())
-			{
-				// Calc Edge Error
-				Triangle &t = triangles[i];
-				Vector3 p;
-				loopj(0, 3) t.err[j] = CalculateError(t.v[j], t.v[(j + 1) % 3], p);
-				t.err[3] = fmin(t.err[0], fmin(t.err[1], t.err[2]));
-			}
-		}
-
 		// Init Reference ID list
 		loopi(0, vertices.size())
 		{
@@ -879,6 +847,42 @@ namespace Urho3D
 
 				loopj(0, vcount.size()) if (vcount[j] == 1)
 					vertices[vids[j]].border = 1;
+			}
+		}
+
+		// Init Quadrics by Plane & Edge Errors
+		//
+		// required at the beginning ( iteration == 0 )
+		// recomputing during the simplification is not required,
+		// but mostly improves the result for closed meshes
+		if (iteration == 0)
+		{
+			loopi(0, vertices.size())
+				vertices[i].q = SymetricMatrix(0.0);
+
+			loopi(0, triangles.size())
+			{
+				Triangle &t = triangles[i];
+				Vector3 n, p[3];
+
+				loopj(0, 3) p[j] = vertices[t.v[j]].p;
+
+				// n.cross(p[1] - p[0], p[2] - p[0]);
+				n = (p[1] - p[0]).CrossProduct(p[2] - p[0]);
+				n.Normalize();
+				t.n = n;
+
+				loopj(0, 3) vertices[t.v[j]].q =
+					vertices[t.v[j]].q + SymetricMatrix(n.x_, n.y_, n.z_, -n.DotProduct(p[0]));
+			}
+
+			loopi(0, triangles.size())
+			{
+				// Calc Edge Error
+				Triangle &t = triangles[i];
+				Vector3 p;
+				loopj(0, 3) t.err[j] = CalculateError(t.v[j], t.v[(j + 1) % 3], p);
+				t.err[3] = fmin(t.err[0], fmin(t.err[1], t.err[2]));
 			}
 		}
 	}

@@ -57,6 +57,7 @@ private:
 
 	void SetupViewport();
 	void MoveCamera(float timeStep);
+	void RotateNodes(float timeStep);
 
 	void CreateProceduralMesh();
 
@@ -67,4 +68,8 @@ private:
 
 	SharedPtr<Material> material;
 	SharedPtr<tbUIButton> button_;
+
+	WeakPtr<Node> torus_node;
+	WeakPtr<Node> plane_node;
+	WeakPtr<Node> sphere_node;
 };

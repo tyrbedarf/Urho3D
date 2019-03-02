@@ -113,27 +113,39 @@ void HelloCustomMesh::CreateScene()
 	//};
 
 	ProceduralMesh mesh(context_);
-	// mesh.FromModel(cache->GetResource<Model>("Models/SubdividedPlane/Plane.mdl"), 0, 0);
+	ProceduralMesh mesh2(context_);
+	mesh2.FromModel(cache->GetResource<Model>("Models/SubdividedPlane/Plane.mdl"), 0, 0);
 	mesh.FromModel(cache->GetResource<Model>("Models/Torus.mdl"), 0, 0);
 
-	Node* node = scene_->CreateChild("Plane");
-	node->SetScale(Vector3(10.0f, 10.0f, 10.0f));
-	node->SetPosition(Vector3(0.0f, 0.0f, 15.0f));
+	torus_node = WeakPtr<Node>(scene_->CreateChild("Torus"));
+	torus_node->SetScale(Vector3(10.0f, 10.0f, 10.0f));
+	torus_node->SetPosition(Vector3(-10.0f, 0.0f, 50.0f));
+	torus_node->Rotate(Quaternion(90.0f, 0.0f, 0.0f), TS_WORLD);
 	material = cache->GetResource<Material>("Materials/StoneTiled.xml");
-	auto* object = node->CreateComponent<StaticModel>();
+	auto* object = torus_node->CreateComponent<StaticModel>();
+
+	plane_node = WeakPtr<Node>(scene_->CreateChild("Plane"));
+	plane_node->SetScale(Vector3(10.0f, 10.0f, 10.0f));
+	plane_node->SetPosition(Vector3(10.0f, 0.0f, 50.0f));
+	plane_node->Rotate(Quaternion(90.0f, 120.0f, 0.0f), TS_WORLD);
+	auto* object2 = plane_node->CreateComponent<StaticModel>();
 
 	// mesh.SimplifyMeshLossless(true, 1);
 	mesh.SimplifyMesh(0.9f, 7.0f, true);
+	mesh2.SimplifyMeshLossless(true);
 	auto model = mesh.GetModel();
+	auto model2 = mesh2.GetModel();
 
 	object->SetModel(model);
 	object->SetMaterial(material);
+
+	object2->SetModel(model2);
+	object2->SetMaterial(material);
 
 	// Create a scene node for the camera, which we will move around
 	// The camera will use default settings (1000 far clip distance, 45 degrees FOV, set aspect ratio automatically)
 	cameraNode_ = new Node(context_);
 	cameraNode_->SetPosition(Vector3(0.0f, 0.0f, 0.0f));
-	// cameraNode_->LookAt(Vector3(5.0f, 0.0f, 5.0f));
 	auto* camera = cameraNode_->CreateComponent<Camera>();
 	camera->SetFarClip(300.0f);
 }
@@ -332,6 +344,7 @@ void HelloCustomMesh::HandleUpdate(StringHash eventType, VariantMap& eventData)
 	using namespace Update;
 	float timeStep = eventData[P_TIMESTEP].GetFloat();
 	MoveCamera(timeStep);
+	RotateNodes(timeStep);
 }
 
 void HelloCustomMesh::MoveCamera(float timeStep)
@@ -374,4 +387,19 @@ void HelloCustomMesh::MoveCamera(float timeStep)
 			"Position: " + String(cameraNode_->GetPosition()) +
 			" Rotation: " + String(cameraNode_->GetRotation()));
 	}
+}
+
+void HelloCustomMesh::RotateNodes(float timeStep)
+{
+	torus_node->Rotate
+	(
+		Quaternion(0.0f, 20.0f * timeStep, 0.0f),
+		TS_WORLD
+	);
+
+	plane_node->Rotate
+	(
+		Quaternion(0.0f, 20.0f * timeStep, 0.0f),
+		TS_WORLD
+	);
 }
