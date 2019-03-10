@@ -28,46 +28,43 @@
 
 namespace Urho3D
 {
+	class URHO3D_API tbUIButton : public tbUIWidget
+	{
+		URHO3D_OBJECT(tbUIButton, tbUIWidget)
 
+	public:
 
-class URHO3D_API tbUIButton : public tbUIWidget
-{
-    URHO3D_OBJECT(tbUIButton, tbUIWidget)
+		tbUIButton(Context* context, bool createWidget = true);
+		virtual ~tbUIButton();
 
-public:
+		/// Set if the button's text field should be allowed to squeeze below its preferred size
+		/// If squeezable it may shrink to width 0
+		void SetSqueezable(bool value);
 
-    tbUIButton(Context* context, bool createWidget = true);
-    virtual ~tbUIButton();
+		void SetEmulationButton(int button);
 
-    /// Set if the button's text field should be allowed to squeeze below its preferred size
-    /// If squeezable it may shrink to width 0
-    void SetSqueezable(bool value);
+		/// A URL link may be set via the URL value (or the Text value if using TBButton.link skin)
+		/// If enabled, a FileSystem open will be called when the button is clicked
+		/// for example a http:// link will open the default browser
+		void SetURLEnabled(bool enabled) { urlEnabled_ = enabled; }
 
-    void SetEmulationButton(int button);
+		/// Set the URL which is opened when this button is clicked
+		void SetURL(const String& url);
 
-    /// A URL link may be set via the URL value (or the Text value if using TBButton.link skin)
-    /// If enabled, a FileSystem open will be called when the button is clicked
-    /// for example a http:// link will open the default browser
-    void SetURLEnabled(bool enabled) { urlEnabled_ = enabled; }
+		/// Get the URL which is opened when this button is clicked
+		String GetURL();
 
-    /// Set the URL which is opened when this button is clicked
-    void SetURL (const String& url);
+		///Set to true if the button should toggle on and off
+		void SetToggleMode(bool toggle);
+		bool GetToggleMode() const;
 
-    /// Get the URL which is opened when this button is clicked
-    String GetURL ();
+	protected:
 
-    ///Set to true if the button should toggle on and off
-    void SetToggleMode(bool toggle);
-    bool GetToggleMode() const;
+		virtual bool OnEvent(const tb::TBWidgetEvent &ev);
 
-protected:
+	private:
 
-    virtual bool OnEvent(const tb::TBWidgetEvent &ev);
-
-private:
-
-    int emulationButton_;
-    bool urlEnabled_;
-};
-
+		int emulationButton_;
+		bool urlEnabled_;
+	};
 }

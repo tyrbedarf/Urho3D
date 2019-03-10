@@ -37,7 +37,7 @@ double TBSystem::GetTimeMS()
 
 int TBSystem::GetLongClickDelayMS()
 {
-    return 500;
+    return 1000;
 }
 
 int TBSystem::GetPanThreshold()

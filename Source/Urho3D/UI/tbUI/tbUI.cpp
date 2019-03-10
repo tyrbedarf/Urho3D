@@ -263,12 +263,12 @@ namespace Urho3D
 		}
 
 		// see if we have an override skin
-		SharedPtr<File> overrideFile = cache->GetFile("UI/Skin/Override/skin.ui.txt", false);
+		SharedPtr<File> overrideFile = cache->GetFile("TB/resources/Override/skin.ui.txt", false);
 
 		if (overrideFile.NotNull())
 		{
 			overrideFile->Close();
-			overrideSkin = "UI/Skin/Override/skin.ui.txt";
+			overrideSkin = "TB/resources/Override/skin.ui.txt";
 		}
 
 		LoadSkin(skin, overrideSkin);
@@ -276,7 +276,7 @@ namespace Urho3D
 		if (skin == "TB/resources/skin/skin.tb.txt")
 		{
 			AddFont("Fonts/BlueHighway.ttf", "BlueHighway");
-			SetDefaultFont("BlueHighway", 20);
+			SetDefaultFont("BlueHighway", 14);
 		}
 	}
 

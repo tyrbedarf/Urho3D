@@ -397,7 +397,6 @@ namespace Urho3D
 	///  return all of the widgets of the specified id
 	void tbUIWidget::SearchWidgetId(const String& searchid, PODVector<tbUIWidget*> &results)
 	{
-
 		results.Clear();
 
 		if (!widget_)
@@ -828,6 +827,7 @@ namespace Urho3D
 			if (widget_->GetVisibility() != tb::WIDGET_VISIBILITY_VISIBLE)
 				return 0.0f; // Say it's invisible.
 		}
+
 		return autoOpacity;
 	}
 
@@ -845,7 +845,6 @@ namespace Urho3D
 			return;
 
 		widget_->SetSkinBg(TBIDC(id.CString()));
-
 	}
 
 	void tbUIWidget::Remove()
@@ -854,7 +853,6 @@ namespace Urho3D
 			return;
 
 		widget_->GetParent()->RemoveChild(widget_);
-
 	}
 
 	void tbUIWidget::RemoveChild(tbUIWidget* child, bool cleanup)
@@ -1070,6 +1068,11 @@ namespace Urho3D
 	void tbUIWidget::OnResized(int old_w, int old_h)
 	{
 		// default implementation does nothing
+		/*URHO3D_LOGDEBUG
+		(
+			"Width: " + String(GetRect().Width()) +
+			" Height: " + String(GetRect().Height())
+		);*/
 	}
 
 	void tbUIWidget::OnFocusChanged(bool focused)
@@ -1162,16 +1165,12 @@ namespace Urho3D
 			if (ev.target && ev.target->GetID() == TBID("__popup-menu"))
 			{
 				// popup menu
-
-				/*if (JSGetHeapPtr())
-				{
-					VariantMap eventData;
-					eventData[PopupMenuSelect::P_BUTTON] = this;
-					String id;
-					ui->GetTBIDString(ev.ref_id, id);
-					eventData[PopupMenuSelect::P_REFID] = id;
-					SendEvent(E_POPUPMENUSELECT, eventData);
-				}*/
+				VariantMap eventData;
+				eventData[PopupMenuSelect::P_BUTTON] = this;
+				String id;
+				ui->GetTBIDString(ev.ref_id, id);
+				eventData[PopupMenuSelect::P_REFID] = id;
+				SendEvent(E_POPUPMENUSELECT, eventData);
 
 				return true;
 			}
@@ -1202,9 +1201,7 @@ namespace Urho3D
 					return true;
 
 			}
-
 		}
-
 
 		return false;
 	}
@@ -1215,7 +1212,6 @@ namespace Urho3D
 			return false;
 
 		return widget_->IsCaptured();
-
 	}
 
 	void tbUIWidget::SetCapturing(bool capturing)
@@ -1240,7 +1236,6 @@ namespace Urho3D
 			return;
 
 		widget_->InvalidateLayout(tb::TBWidget::INVALIDATE_LAYOUT_TARGET_ONLY);
-
 	}
 
 	void tbUIWidget::InvokeShortcut(const String& shortcut)
@@ -1280,7 +1275,6 @@ namespace Urho3D
 			return;
 
 		widget_->SetTooltip(tooltip.CString());
-
 	}
 
 	IntVector2 tbUIWidget::ConvertToRoot(const IntVector2 position) const
@@ -1302,5 +1296,4 @@ namespace Urho3D
 
 		return result;
 	}
-
 }

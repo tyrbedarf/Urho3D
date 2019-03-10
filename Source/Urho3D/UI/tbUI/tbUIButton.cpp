@@ -34,7 +34,6 @@ using namespace tb;
 
 namespace Urho3D
 {
-
 	tbUIButton::tbUIButton(Context* context, bool createWidget) : tbUIWidget(context, false),
 		emulationButton_(-1),
 		urlEnabled_(true)
