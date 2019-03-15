@@ -819,6 +819,73 @@ namespace Urho3D
 		return 0;
 	}
 
+	void tbUI::ConvertEvent(tbUIWidget* target, const tb::TBWidgetEvent &ev, VariantMap& data)
+	{
+		String refid;
+
+		GetTBIDString(ev.ref_id, refid);
+		if (refid.Length() < 1)
+		{
+			refid = target->GetId();
+		}
+
+		int key = ev.key;
+
+		if (ev.special_key)
+		{
+			switch (ev.special_key)
+			{
+			case TB_KEY_ENTER:
+				key = KEY_RETURN;
+				break;
+			case TB_KEY_BACKSPACE:
+				key = KEY_BACKSPACE;
+				break;
+			case TB_KEY_DELETE:
+				key = KEY_DELETE;
+				break;
+			case TB_KEY_DOWN:
+				key = KEY_DOWN;
+				break;
+			case TB_KEY_UP:
+				key = KEY_UP;
+				break;
+			case TB_KEY_LEFT:
+				key = KEY_LEFT;
+				break;
+			case TB_KEY_RIGHT:
+				key = KEY_RIGHT;
+				break;
+			default:
+				break;
+			}
+		}
+
+		unsigned modifierKeys = 0;
+
+		if (ev.special_key && TB_SHIFT)
+			modifierKeys |= QUAL_SHIFT;
+		if (ev.special_key && TB_CTRL)
+			modifierKeys |= QUAL_CTRL;
+		if (ev.special_key && TB_ALT)
+			modifierKeys |= QUAL_ALT;
+
+		using namespace WidgetEvent;
+		data[P_TARGET] = target;
+		data[P_TYPE] = (unsigned)ev.type;
+		data[P_X] = ev.target_x;
+		data[P_Y] = ev.target_y;
+		data[P_DELTAX] = ev.delta_x;
+		data[P_DELTAY] = ev.delta_y;
+		data[P_COUNT] = ev.count;
+		data[P_KEY] = key;
+
+		data[P_SPECIALKEY] = (unsigned)ev.special_key;
+		data[P_MODIFIERKEYS] = modifierKeys;
+		data[P_REFID] = refid;
+		data[P_TOUCH] = (unsigned)ev.touch;
+	}
+
 	void tbUI::OnWidgetDelete(tb::TBWidget *widget)
 	{
 
@@ -866,6 +933,89 @@ namespace Urho3D
 
 	bool tbUI::OnWidgetInvokeEvent(tb::TBWidget *widget, const tb::TBWidgetEvent &ev)
 	{
+		tbUI* ui = GetSubsystem<tbUI>();
+
+		if ((ev.type == EVENT_TYPE_CHANGED && !ui->GetBlockChangedEvents()) || ev.type == EVENT_TYPE_KEY_UP)
+		{
+			VariantMap eventData;
+			ConvertEvent(WrapWidget(ev.target), ev, eventData);
+			SendEvent(E_WIDGETEVENT, eventData);
+
+			if (eventData[WidgetEvent::P_HANDLED].GetBool())
+				return true;
+
+		}
+		else if (ev.type == EVENT_TYPE_RIGHT_POINTER_UP)
+		{
+			VariantMap eventData;
+			ConvertEvent(WrapWidget(ev.target), ev, eventData);
+			SendEvent(E_WIDGETEVENT, eventData);
+
+			if (eventData[WidgetEvent::P_HANDLED].GetBool())
+				return true;
+
+		}
+		else if (ev.type == EVENT_TYPE_POINTER_DOWN)
+		{
+			VariantMap eventData;
+			ConvertEvent(WrapWidget(ev.target), ev, eventData);
+			SendEvent(E_WIDGETEVENT, eventData);
+
+			if (eventData[WidgetEvent::P_HANDLED].GetBool())
+				return true;
+		}
+		else if (ev.type == EVENT_TYPE_SHORTCUT)
+		{
+			VariantMap eventData;
+			ConvertEvent(WrapWidget(ev.target), ev, eventData);
+			SendEvent(E_WIDGETEVENT, eventData);
+
+			if (eventData[WidgetEvent::P_HANDLED].GetBool())
+				return true;
+		}
+		else if (ev.type == EVENT_TYPE_TAB_CHANGED)
+		{
+			VariantMap eventData;
+			ConvertEvent(WrapWidget(ev.target), ev, eventData);
+			SendEvent(E_WIDGETEVENT, eventData);
+
+			if (eventData[WidgetEvent::P_HANDLED].GetBool())
+				return true;
+		}
+		else if (ev.type == EVENT_TYPE_CLICK)
+		{
+			if (ev.target && ev.target->GetID() == TBID("__popup-menu"))
+			{
+				// popup menu
+				VariantMap eventData;
+				eventData[PopupMenuSelect::P_BUTTON] = this;
+				String id;
+				ui->GetTBIDString(ev.ref_id, id);
+				eventData[PopupMenuSelect::P_REFID] = id;
+				SendEvent(E_POPUPMENUSELECT, eventData);
+
+				return true;
+			}
+			else
+			{
+				VariantMap eventData;
+				ConvertEvent(WrapWidget(ev.target), ev, eventData);
+				SendEvent(E_WIDGETEVENT, eventData);
+
+				if (eventData[WidgetEvent::P_HANDLED].GetBool())
+					return true;
+			}
+		}
+		if (ev.type == EVENT_TYPE_CUSTOM)
+		{
+			VariantMap eventData;
+			ConvertEvent(WrapWidget(ev.target), ev, eventData);
+			SendEvent(E_WIDGETEVENT, eventData);
+
+			if (eventData[WidgetEvent::P_HANDLED].GetBool())
+				return true;
+		}
+
 		return false;
 	}
 

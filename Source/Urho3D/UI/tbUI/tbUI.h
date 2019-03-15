@@ -127,6 +127,7 @@ namespace Urho3D
 		void OnWidgetFocusChanged(tb::TBWidget *widget, bool focused);
 		bool OnWidgetInvokeEvent(tb::TBWidget *widget, const tb::TBWidgetEvent &ev);
 		void OnWindowClose(tb::TBWindow *window);
+		void ConvertEvent(tbUIWidget* target, const tb::TBWidgetEvent &ev, VariantMap& data);
 
 		/// Add a UIView to UI subsystem, happens immediately at UIView creation
 		void AddUIView(tbUIView* uiView);

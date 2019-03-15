@@ -24,6 +24,7 @@
 #pragma once
 
 #include "Sample.h"
+#include <Urho3D/ThirdParty/TurboBadger/tb_widgets.h>
 
 namespace Urho3D
 {
@@ -57,5 +58,6 @@ private:
 	void HandleWidgetDeleted(StringHash eventType, VariantMap& eventData);
 
 	WeakPtr<tbUIWindow> window_;
+	WeakPtr<tbUIWindow> window2_;
 	WeakPtr<tbUIView> uiView_;
 };

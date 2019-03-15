@@ -228,11 +228,14 @@ namespace Urho3D
 				{   // get from widget, in case the user had been typing.
 					tbUIWidget *ewidget = GetResultWidget();
 					if (ewidget) eventData[UIFinderComplete::P_SELECTED] = ewidget->GetText();
+
+					tbUIWidget *cwidget = GetPathWidget();
+					if (cwidget) eventData[UIFinderComplete::P_SELECTED_PATH] = cwidget->GetText();
 				}
 				else  // finding a folder
 				{
 					tbUIWidget *cwidget = GetPathWidget();
-					if (cwidget) eventData[UIFinderComplete::P_SELECTED] = cwidget->GetText();
+					if (cwidget) eventData[UIFinderComplete::P_SELECTED_PATH] = cwidget->GetText();
 				}
 			}
 

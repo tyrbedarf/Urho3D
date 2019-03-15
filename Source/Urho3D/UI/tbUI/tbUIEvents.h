@@ -158,6 +158,7 @@ namespace Urho3D
 		URHO3D_PARAM(P_TITLE, Title);  // string
 		URHO3D_PARAM(P_REASON, Reason);  // string
 		URHO3D_PARAM(P_SELECTED, Selected);  // string
+		URHO3D_PARAM(P_SELECTED_PATH, Selected_Path); // string
 	}
 
 }

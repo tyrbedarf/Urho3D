@@ -1088,120 +1088,120 @@ namespace Urho3D
 
 	bool tbUIWidget::OnEvent(const tb::TBWidgetEvent &ev)
 	{
-		tbUI* ui = GetSubsystem<tbUI>();
+		//tbUI* ui = GetSubsystem<tbUI>();
 
-		if ((ev.type == EVENT_TYPE_CHANGED && !ui->GetBlockChangedEvents()) || ev.type == EVENT_TYPE_KEY_UP)
-		{
-			if (!ev.target || ui->IsWidgetWrapped(ev.target))
-			{
-				VariantMap eventData;
-				ConvertEvent(this, ui->WrapWidget(ev.target), ev, eventData);
-				SendEvent(E_WIDGETEVENT, eventData);
+		//if ((ev.type == EVENT_TYPE_CHANGED && !ui->GetBlockChangedEvents()) || ev.type == EVENT_TYPE_KEY_UP)
+		//{
+		//	if (!ev.target || ui->IsWidgetWrapped(ev.target))
+		//	{
+		//		VariantMap eventData;
+		//		ConvertEvent(this, ui->WrapWidget(ev.target), ev, eventData);
+		//		SendEvent(E_WIDGETEVENT, eventData);
 
-				if (eventData[WidgetEvent::P_HANDLED].GetBool())
-					return true;
+		//		if (eventData[WidgetEvent::P_HANDLED].GetBool())
+		//			return true;
 
-			}
+		//	}
 
-		}
-		else if (ev.type == EVENT_TYPE_RIGHT_POINTER_UP)
-		{
-			if (!ev.target || ui->IsWidgetWrapped(ev.target))
-			{
-				VariantMap eventData;
-				ConvertEvent(this, ui->WrapWidget(ev.target), ev, eventData);
-				SendEvent(E_WIDGETEVENT, eventData);
+		//}
+		//else if (ev.type == EVENT_TYPE_RIGHT_POINTER_UP)
+		//{
+		//	if (!ev.target || ui->IsWidgetWrapped(ev.target))
+		//	{
+		//		VariantMap eventData;
+		//		ConvertEvent(this, ui->WrapWidget(ev.target), ev, eventData);
+		//		SendEvent(E_WIDGETEVENT, eventData);
 
-				if (eventData[WidgetEvent::P_HANDLED].GetBool())
-					return true;
+		//		if (eventData[WidgetEvent::P_HANDLED].GetBool())
+		//			return true;
 
-			}
+		//	}
 
-		}
-		else if (ev.type == EVENT_TYPE_POINTER_DOWN)
-		{
-			if (!ev.target || ui->IsWidgetWrapped(ev.target))
-			{
-				VariantMap eventData;
-				ConvertEvent(this, ui->WrapWidget(ev.target), ev, eventData);
-				SendEvent(E_WIDGETEVENT, eventData);
+		//}
+		//else if (ev.type == EVENT_TYPE_POINTER_DOWN)
+		//{
+		//	if (!ev.target || ui->IsWidgetWrapped(ev.target))
+		//	{
+		//		VariantMap eventData;
+		//		ConvertEvent(this, ui->WrapWidget(ev.target), ev, eventData);
+		//		SendEvent(E_WIDGETEVENT, eventData);
 
-				if (eventData[WidgetEvent::P_HANDLED].GetBool())
-					return true;
+		//		if (eventData[WidgetEvent::P_HANDLED].GetBool())
+		//			return true;
 
-			}
+		//	}
 
-		}
-		else if (ev.type == EVENT_TYPE_SHORTCUT)
-		{
-			if (!ev.target || ui->IsWidgetWrapped(ev.target))
-			{
-				VariantMap eventData;
-				ConvertEvent(this, ui->WrapWidget(ev.target), ev, eventData);
-				SendEvent(E_WIDGETEVENT, eventData);
+		//}
+		//else if (ev.type == EVENT_TYPE_SHORTCUT)
+		//{
+		//	if (!ev.target || ui->IsWidgetWrapped(ev.target))
+		//	{
+		//		VariantMap eventData;
+		//		ConvertEvent(this, ui->WrapWidget(ev.target), ev, eventData);
+		//		SendEvent(E_WIDGETEVENT, eventData);
 
-				if (eventData[WidgetEvent::P_HANDLED].GetBool())
-					return true;
+		//		if (eventData[WidgetEvent::P_HANDLED].GetBool())
+		//			return true;
 
-			}
+		//	}
 
-		}
-		else if (ev.type == EVENT_TYPE_TAB_CHANGED)
-		{
-			if (!ev.target || ui->IsWidgetWrapped(ev.target))
-			{
-				VariantMap eventData;
-				ConvertEvent(this, ui->WrapWidget(ev.target), ev, eventData);
-				SendEvent(E_WIDGETEVENT, eventData);
+		//}
+		//else if (ev.type == EVENT_TYPE_TAB_CHANGED)
+		//{
+		//	if (!ev.target || ui->IsWidgetWrapped(ev.target))
+		//	{
+		//		VariantMap eventData;
+		//		ConvertEvent(this, ui->WrapWidget(ev.target), ev, eventData);
+		//		SendEvent(E_WIDGETEVENT, eventData);
 
-				if (eventData[WidgetEvent::P_HANDLED].GetBool())
-					return true;
+		//		if (eventData[WidgetEvent::P_HANDLED].GetBool())
+		//			return true;
 
-			}
+		//	}
 
-		}
-		else if (ev.type == EVENT_TYPE_CLICK)
-		{
-			if (ev.target && ev.target->GetID() == TBID("__popup-menu"))
-			{
-				// popup menu
-				VariantMap eventData;
-				eventData[PopupMenuSelect::P_BUTTON] = this;
-				String id;
-				ui->GetTBIDString(ev.ref_id, id);
-				eventData[PopupMenuSelect::P_REFID] = id;
-				SendEvent(E_POPUPMENUSELECT, eventData);
+		//}
+		//else if (ev.type == EVENT_TYPE_CLICK)
+		//{
+		//	if (ev.target && ev.target->GetID() == TBID("__popup-menu"))
+		//	{
+		//		// popup menu
+		//		VariantMap eventData;
+		//		eventData[PopupMenuSelect::P_BUTTON] = this;
+		//		String id;
+		//		ui->GetTBIDString(ev.ref_id, id);
+		//		eventData[PopupMenuSelect::P_REFID] = id;
+		//		SendEvent(E_POPUPMENUSELECT, eventData);
 
-				return true;
-			}
-			else
-			{
-				if (!ev.target || ui->IsWidgetWrapped(ev.target))
-				{
-					VariantMap eventData;
-					ConvertEvent(this, ui->WrapWidget(ev.target), ev, eventData);
-					SendEvent(E_WIDGETEVENT, eventData);
+		//		return true;
+		//	}
+		//	else
+		//	{
+		//		if (!ev.target || ui->IsWidgetWrapped(ev.target))
+		//		{
+		//			VariantMap eventData;
+		//			ConvertEvent(this, ui->WrapWidget(ev.target), ev, eventData);
+		//			SendEvent(E_WIDGETEVENT, eventData);
 
-					if (eventData[WidgetEvent::P_HANDLED].GetBool())
-						return true;
+		//			if (eventData[WidgetEvent::P_HANDLED].GetBool())
+		//				return true;
 
-				}
-			}
+		//		}
+		//	}
 
-		}
-		if (ev.type == EVENT_TYPE_CUSTOM)
-		{
-			if (!ev.target || ui->IsWidgetWrapped(ev.target))
-			{
-				VariantMap eventData;
-				ConvertEvent(this, ui->WrapWidget(ev.target), ev, eventData);
-				SendEvent(E_WIDGETEVENT, eventData);
+		//}
+		//if (ev.type == EVENT_TYPE_CUSTOM)
+		//{
+		//	if (!ev.target || ui->IsWidgetWrapped(ev.target))
+		//	{
+		//		VariantMap eventData;
+		//		ConvertEvent(this, ui->WrapWidget(ev.target), ev, eventData);
+		//		SendEvent(E_WIDGETEVENT, eventData);
 
-				if (eventData[WidgetEvent::P_HANDLED].GetBool())
-					return true;
+		//		if (eventData[WidgetEvent::P_HANDLED].GetBool())
+		//			return true;
 
-			}
-		}
+		//	}
+		//}
 
 		return false;
 	}

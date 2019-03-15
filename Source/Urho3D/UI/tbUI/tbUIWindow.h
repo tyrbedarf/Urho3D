@@ -30,49 +30,49 @@ namespace Urho3D
 {
 
 
-enum UI_WINDOW_SETTINGS {
+	enum UI_WINDOW_SETTINGS {
 
-    ///< Chrome less window without any other settings.
-    UI_WINDOW_SETTINGS_NONE             = 0, // tb::WINDOW_SETTINGS_NONE,
-    ///< Show a title bar that can also move the window.
-    UI_WINDOW_SETTINGS_TITLEBAR         = 1, // tb::WINDOW_SETTINGS_TITLEBAR,
-    ///< Show a widget for resizing the window.
-    UI_WINDOW_SETTINGS_RESIZABLE        = 2, // tb::WINDOW_SETTINGS_RESIZABLE,
-    ///< Show a widget for closing the window.
-    UI_WINDOW_SETTINGS_CLOSE_BUTTON     = 4, // tb::WINDOW_SETTINGS_CLOSE_BUTTON,
-    ///< Can be activated and deactivate other windows.
-    UI_WINDOW_SETTINGS_CAN_ACTIVATE     = 8, // tb::WINDOW_SETTINGS_CAN_ACTIVATE,
+		///< Chrome less window without any other settings.
+		UI_WINDOW_SETTINGS_NONE = 0, // tb::WINDOW_SETTINGS_NONE,
+		///< Show a title bar that can also move the window.
+		UI_WINDOW_SETTINGS_TITLEBAR = 1, // tb::WINDOW_SETTINGS_TITLEBAR,
+		///< Show a widget for resizing the window.
+		UI_WINDOW_SETTINGS_RESIZABLE = 2, // tb::WINDOW_SETTINGS_RESIZABLE,
+		///< Show a widget for closing the window.
+		UI_WINDOW_SETTINGS_CLOSE_BUTTON = 4, // tb::WINDOW_SETTINGS_CLOSE_BUTTON,
+		///< Can be activated and deactivate other windows.
+		UI_WINDOW_SETTINGS_CAN_ACTIVATE = 8, // tb::WINDOW_SETTINGS_CAN_ACTIVATE,
 
-    UI_WINDOW_SETTINGS_DEFAULT          = 15 // tb::WINDOW_SETTINGS_DEFAULT
-};
+		UI_WINDOW_SETTINGS_DEFAULT = 15 // tb::WINDOW_SETTINGS_DEFAULT
+	};
 
 
-class URHO3D_API tbUIWindow : public tbUIWidget
-{
-    URHO3D_OBJECT(tbUIWindow, tbUIWidget)
+	class URHO3D_API tbUIWindow : public tbUIWidget
+	{
+		URHO3D_OBJECT(tbUIWindow, tbUIWidget)
 
-    public:
+	public:
 
-    tbUIWindow(Context* context, bool createWidget = true);
-    virtual ~tbUIWindow();
+		tbUIWindow(Context* context, bool createWidget = true);
+		virtual ~tbUIWindow();
 
-    UI_WINDOW_SETTINGS GetSettings();
-    void SetSettings(UI_WINDOW_SETTINGS settings);
+		UI_WINDOW_SETTINGS GetSettings();
+		void SetSettings(UI_WINDOW_SETTINGS settings);
 
-    void ResizeToFitContent();
+		void ResizeToFitContent();
 
-    void AddChild(tbUIWidget *child);
+		void AddChild(tbUIWidget *child);
 
-    void Close();
+		void Close();
 
-    void SetAxis(UI_AXIS axis);  /// Axis orientation of titlebar, UI_AXIS_Y = top(default), UI_AXIS_X = left side
+		void SetAxis(UI_AXIS axis);  /// Axis orientation of titlebar, UI_AXIS_Y = top(default), UI_AXIS_X = left side
 
-protected:
+	protected:
 
-    virtual bool OnEvent(const tb::TBWidgetEvent &ev);
+		virtual bool OnEvent(const tb::TBWidgetEvent &ev);
 
-private:
+	private:
 
-};
+	};
 
 }

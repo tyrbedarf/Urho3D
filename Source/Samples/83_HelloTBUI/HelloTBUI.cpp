@@ -105,6 +105,13 @@ void HelloGui::CreateUI()
 
 	uiView_->AddChild(window_);
 	window_->Center();
+
+	window2_ = new tbUIWindow(context_);
+	window2_->Load("Data/TB/ui_test/hello_gui.tb.txt");
+	window2_->ResizeToFitContent();
+
+	uiView_->AddChild(window2_);
+	window2_->SetPosition(10, 10);
 }
 
 void HelloGui::SubscribeToEvents()
@@ -122,12 +129,12 @@ void HelloGui::HandleWidgetEvent(StringHash eventType, VariantMap& eventData)
 
 	if (eventData[P_TYPE] == UI_EVENT_TYPE_CLICK)
 	{
+		URHO3D_LOGDEBUG("Reference: " + eventData[P_REFID].ToString());
 		tbUIWidget* widget = static_cast<tbUIWidget*>(eventData[P_TARGET].GetPtr());
-		if (widget)
+		if (widget && window_)
 		{
 			window_->SetText(ToString("Hello: %s", widget->GetId().CString()));
 		}
-
 	}
 }
 
