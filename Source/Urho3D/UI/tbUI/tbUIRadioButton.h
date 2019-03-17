@@ -35,7 +35,6 @@ class URHO3D_API tbUIRadioButton : public tbUIWidget
 public:
 
     tbUIRadioButton(Context* context, bool createWidget = true);
-    virtual ~tbUIRadioButton();
 
 protected:
 

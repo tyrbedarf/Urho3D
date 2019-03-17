@@ -41,14 +41,9 @@ namespace Urho3D
 		if (createWidget)
 		{
 			widget_ = new TBButton();
-			widget_->SetDelegate(this);
+			widget_->AddListener(this);
 			GetSubsystem<tbUI>()->WrapWidget(this, widget_);
 		}
-	}
-
-	tbUIButton::~tbUIButton()
-	{
-
 	}
 
 	void tbUIButton::SetSqueezable(bool value)

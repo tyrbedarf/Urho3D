@@ -34,7 +34,6 @@ class URHO3D_API tbUIDimmer : public tbUIWidget
 public:
 
     tbUIDimmer(Context* context, bool createWidget = true);
-    virtual ~tbUIDimmer();
 
 protected:
 

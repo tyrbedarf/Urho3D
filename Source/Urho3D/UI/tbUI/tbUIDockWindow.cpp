@@ -42,13 +42,9 @@ tbUIDockWindow::tbUIDockWindow(Context* context, bool createWidget, const String
     {
         tb:TBWidget *contents = contentptr->GetInternalWidget();
         widget_ = new TBDockWindow( title.CString(), contents, minwidth, minheight );
-        widget_->SetDelegate(this);
+		widget_->AddListener(this);
         GetSubsystem<tbUI>()->WrapWidget(this, widget_);
     }
-}
-
-tbUIDockWindow::~tbUIDockWindow()
-{
 }
 
 /// ID of the redock widget. If specified, pressing the dock button, will move the content there.

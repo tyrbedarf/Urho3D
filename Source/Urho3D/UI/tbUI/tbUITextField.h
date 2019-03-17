@@ -34,7 +34,6 @@ class URHO3D_API tbUITextField : public tbUIWidget
 public:
 
     tbUITextField(Context* context, bool createWidget = true);
-    virtual ~tbUITextField();
 
     void SetTextAlign(UI_TEXT_ALIGN align);
 

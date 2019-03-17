@@ -39,14 +39,9 @@ tbUIContainer::tbUIContainer(Context* context, bool createWidget) : tbUIWidget(c
     if (createWidget)
     {
         widget_ = new TBContainer();
-        widget_->SetDelegate(this);
+		widget_->AddListener(this);
         GetSubsystem<tbUI>()->WrapWidget(this, widget_);
     }
-}
-
-tbUIContainer::~tbUIContainer()
-{
-
 }
 
 bool tbUIContainer::OnEvent(const tb::TBWidgetEvent &ev)

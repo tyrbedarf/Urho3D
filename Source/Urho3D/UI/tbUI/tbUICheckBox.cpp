@@ -39,13 +39,9 @@ tbUICheckBox::tbUICheckBox(Context* context, bool createWidget) : tbUIWidget(con
     if (createWidget)
     {
         widget_ = new TBCheckBox();
-        widget_->SetDelegate(this);
+		widget_->AddListener(this);
         GetSubsystem<tbUI>()->WrapWidget(this, widget_);
     }
-}
-
-tbUICheckBox::~tbUICheckBox()
-{
 }
 
 bool tbUICheckBox::OnEvent(const tb::TBWidgetEvent &ev)

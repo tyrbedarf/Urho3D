@@ -34,23 +34,19 @@ using namespace tb;
 namespace Urho3D
 {
 
-tbUIRadioButton::tbUIRadioButton(Context* context, bool createWidget) : tbUIWidget(context, false)
-{
-    if (createWidget)
-    {
-        widget_ = new TBRadioButton();
-        widget_->SetDelegate(this);
-        GetSubsystem<tbUI>()->WrapWidget(this, widget_);
-    }
-}
+	tbUIRadioButton::tbUIRadioButton(Context* context, bool createWidget) : tbUIWidget(context, false)
+	{
+		if (createWidget)
+		{
+			widget_ = new TBRadioButton();
+			widget_->AddListener(this);
+			GetSubsystem<tbUI>()->WrapWidget(this, widget_);
+		}
+	}
 
-tbUIRadioButton::~tbUIRadioButton()
-{
-}
-
-bool tbUIRadioButton::OnEvent(const tb::TBWidgetEvent &ev)
-{
-    return tbUIWidget::OnEvent(ev);
-}
+	bool tbUIRadioButton::OnEvent(const tb::TBWidgetEvent &ev)
+	{
+		return tbUIWidget::OnEvent(ev);
+	}
 
 }

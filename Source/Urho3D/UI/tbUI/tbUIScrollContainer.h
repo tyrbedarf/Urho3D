@@ -50,7 +50,6 @@ class URHO3D_API tbUIScrollContainer : public tbUIWidget
 public:
 
     tbUIScrollContainer(Context* context, bool createWidget = true);
-    virtual ~tbUIScrollContainer();
 
     void SetScrollMode(UI_SCROLL_MODE mode);
     UI_SCROLL_MODE GetScrollMode();

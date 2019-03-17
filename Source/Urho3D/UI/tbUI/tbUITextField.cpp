@@ -31,34 +31,26 @@ using namespace tb;
 
 namespace Urho3D
 {
+	tbUITextField::tbUITextField(Context* context, bool createWidget) : tbUIWidget(context, false)
+	{
+		if (createWidget)
+		{
+			widget_ = new TBTextField();
+			widget_->AddListener(this);
+			GetSubsystem<tbUI>()->WrapWidget(this, widget_);
+		}
+	}
 
-tbUITextField::tbUITextField(Context* context, bool createWidget) : tbUIWidget(context, false)
-{
-    if (createWidget)
-    {
-        widget_ = new TBTextField();
-        widget_->SetDelegate(this);
-        GetSubsystem<tbUI>()->WrapWidget(this, widget_);
-    }
-}
+	void tbUITextField::SetTextAlign(UI_TEXT_ALIGN align)
+	{
+		if (!widget_)
+			return;
 
-tbUITextField::~tbUITextField()
-{
+		((TBTextField*)widget_)->SetTextAlign((TB_TEXT_ALIGN)align);
+	}
 
-}
-
-void tbUITextField::SetTextAlign(UI_TEXT_ALIGN align)
-{
-    if (!widget_)
-        return;
-
-    ((TBTextField*)widget_)->SetTextAlign((TB_TEXT_ALIGN) align);
-
-}
-
-bool tbUITextField::OnEvent(const tb::TBWidgetEvent &ev)
-{
-    return false;
-}
-
+	bool tbUITextField::OnEvent(const tb::TBWidgetEvent &ev)
+	{
+		return false;
+	}
 }

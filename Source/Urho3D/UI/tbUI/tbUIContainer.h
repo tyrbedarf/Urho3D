@@ -34,7 +34,6 @@ class URHO3D_API tbUIContainer : public tbUIWidget
 public:
 
     tbUIContainer(Context* context, bool createWidget = true);
-    virtual ~tbUIContainer();
 
 protected:
 

@@ -35,7 +35,6 @@ class URHO3D_API tbUIPulldownMenu : public tbUIButton
 public:
 
     tbUIPulldownMenu(Context* context, bool createWidget = true);
-    virtual ~tbUIPulldownMenu();
 
     void SetSource(tbUISelectItemSource* source); /// for programming the pulled down menu
 

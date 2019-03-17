@@ -43,7 +43,6 @@ class URHO3D_API tbUIDockWindow : public tbUIWindow
     /// minwidth is the minimum width for the UIDockWindow
     /// minheight is the minimum height for the UIDockWindow
     tbUIDockWindow(Context* context, bool createWidget = true, const String& title = String::EMPTY, tbUIWidget *contentptr = NULL, int minwidth = 800, int minheight=400 );
-    virtual ~tbUIDockWindow();
 
     void SetDockOrigin( String dockid );  /// ID of the redock widget. If specified, pressing the dock button, will move the content there.
     tbUIWidget *GetDockContent();  /// This returns a pointer to the docked content.

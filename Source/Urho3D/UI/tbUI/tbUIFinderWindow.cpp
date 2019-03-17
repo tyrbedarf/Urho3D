@@ -51,7 +51,7 @@ namespace Urho3D
 		if (createWidget)
 		{
 			widget_ = new TBFinderWindow(target ? target->GetInternalWidget() : 0, TBIDC(id.CString()));
-			widget_->SetDelegate(this);
+			widget_->AddListener(this);
 			GetSubsystem<tbUI>()->WrapWidget(this, widget_);
 		}
 	}
@@ -64,6 +64,11 @@ namespace Urho3D
 			newFolderPtr_->UnsubscribeFromAllEvents();
 		if (!newBookmarkPtr_.Expired())
 			newBookmarkPtr_->UnsubscribeFromAllEvents();
+
+		if (widget_ && widget_->HasListener(this))
+		{
+			widget_->RemoveListener(this);
+		}
 
 	}
 

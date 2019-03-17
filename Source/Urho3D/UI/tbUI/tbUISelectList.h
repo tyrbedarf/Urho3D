@@ -40,7 +40,6 @@ class URHO3D_API tbUISelectList : public tbUIWidget
 public:
 
     tbUISelectList(Context* context, bool createWidget = true);
-    virtual ~tbUISelectList();
 
     void SetFilter(const String& filter);
 

@@ -35,6 +35,7 @@
 #include <Urho3D/UI/tbUI/tbUIButton.h>
 #include <Urho3D/UI/tbUI/tbUIEditField.h>
 #include <Urho3D/UI/tbUI/tbUIWindow.h>
+#include <Urho3D/UI/tbUI/tbUISlider.h>
 #include <Urho3D/Resource/ResourceCache.h>
 #include <Urho3D/Scene/Scene.h>
 
@@ -47,6 +48,7 @@ URHO3D_DEFINE_APPLICATION_MAIN(HelloGui)
 HelloGui::HelloGui(Context* context) :
 	Sample(context)
 {
+	ExampleSerializeable::RegisterObject(context);
 }
 
 void HelloGui::Start()
@@ -94,6 +96,15 @@ void HelloGui::CreateUI()
 	layout->AddChild(edit);
 	edit->SetId("EditField");
 
+	tbUISlider* edit2 = new tbUISlider(context_);
+	layout->AddChild(edit2);
+	edit2->SetId("EditField2");
+	edit2->SetLimits(0.0f, 100.0f);
+
+	example_ = SharedPtr<ExampleSerializeable>(new ExampleSerializeable(context_));
+	edit->SetSerializable(example_, "PlayerName");
+	edit2->SetSerializable(example_, "PlayerHealth");
+
 	window_ = new tbUIWindow(context_);
 	window_->SetSettings((UI_WINDOW_SETTINGS)(UI_WINDOW_SETTINGS_TITLEBAR | UI_WINDOW_SETTINGS_CLOSE_BUTTON));
 
@@ -129,11 +140,22 @@ void HelloGui::HandleWidgetEvent(StringHash eventType, VariantMap& eventData)
 
 	if (eventData[P_TYPE] == UI_EVENT_TYPE_CLICK)
 	{
-		URHO3D_LOGDEBUG("Reference: " + eventData[P_REFID].ToString());
+		/*URHO3D_LOGDEBUG("Reference: " + eventData[P_REFID].ToString());*/
 		tbUIWidget* widget = static_cast<tbUIWidget*>(eventData[P_TARGET].GetPtr());
 		if (widget && window_)
 		{
 			window_->SetText(ToString("Hello: %s", widget->GetId().CString()));
+		}
+	}
+
+	if (eventData[P_TYPE] == UI_EVENT_TYPE_CHANGED)
+	{
+		if (example_ && window_)
+		{
+			window_->SetText(ToString("Value Changed: %s", example_->GetPlayerName().CString()));
+			URHO3D_LOGDEBUG(
+				"PlayerName: " + example_->GetPlayerName() +
+				" Health: " + String(example_->GetPlayerHealth()));
 		}
 	}
 }

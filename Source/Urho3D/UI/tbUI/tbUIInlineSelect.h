@@ -35,7 +35,6 @@ class URHO3D_API tbUIInlineSelect : public tbUIWidget
 public:
 
     tbUIInlineSelect(Context* context, bool createWidget = true);
-    virtual ~tbUIInlineSelect();
 
     void SetLimits(double minimum, double maximum);
 

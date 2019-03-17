@@ -28,55 +28,49 @@
 
 namespace Urho3D
 {
+	enum UI_EDIT_TYPE {
+		UI_EDIT_TYPE_TEXT = 0, // tb::EDIT_TYPE_TEXT,
+		UI_EDIT_TYPE_SEARCH = 1, // tb::EDIT_TYPE_SEARCH,
+		UI_EDIT_TYPE_PASSWORD = 2, // tb::EDIT_TYPE_PASSWORD,
+		UI_EDIT_TYPE_EMAIL = 3, // tb::EDIT_TYPE_EMAIL,
+		UI_EDIT_TYPE_PHONE = 4, // tb::EDIT_TYPE_PHONE,
+		UI_EDIT_TYPE_URL = 5, // tb::EDIT_TYPE_URL,
+		UI_EDIT_TYPE_NUMBER = 6 // tb::EDIT_TYPE_NUMBER
+	};
 
-enum UI_EDIT_TYPE {
-    UI_EDIT_TYPE_TEXT = 0, // tb::EDIT_TYPE_TEXT,
-    UI_EDIT_TYPE_SEARCH = 1, // tb::EDIT_TYPE_SEARCH,
-    UI_EDIT_TYPE_PASSWORD = 2, // tb::EDIT_TYPE_PASSWORD,
-    UI_EDIT_TYPE_EMAIL = 3, // tb::EDIT_TYPE_EMAIL,
-    UI_EDIT_TYPE_PHONE = 4, // tb::EDIT_TYPE_PHONE,
-    UI_EDIT_TYPE_URL = 5, // tb::EDIT_TYPE_URL,
-    UI_EDIT_TYPE_NUMBER = 6 // tb::EDIT_TYPE_NUMBER
-};
+	class URHO3D_API tbUIEditField : public tbUIWidget
+	{
+		URHO3D_OBJECT(tbUIEditField, tbUIWidget)
 
-class URHO3D_API tbUIEditField : public tbUIWidget
-{
-    URHO3D_OBJECT(tbUIEditField, tbUIWidget)
+	public:
+		tbUIEditField(Context* context, bool createWidget = true);
 
-public:
+		void AppendText(const String& text);
 
-    tbUIEditField(Context* context, bool createWidget = true);
-    virtual ~tbUIEditField();
+		void SetTextAlign(UI_TEXT_ALIGN align);
 
-    void AppendText(const String& text);
+		void SetAdaptToContentSize(bool adapt);
+		bool GetAdaptToContentSize() const;
 
-    void SetTextAlign(UI_TEXT_ALIGN align);
+		void SetEditType(UI_EDIT_TYPE type);
 
-    void SetAdaptToContentSize(bool adapt);
-    bool GetAdaptToContentSize() const;
+		void SetReadOnly(bool readonly);
+		void SetStyling(bool styling);
+		void SetMultiline(bool multiline);
 
-    void SetEditType(UI_EDIT_TYPE type);
+		void Reformat(bool update_fragments = false);
 
-    void SetReadOnly(bool readonly);
-    void SetStyling(bool styling);
-    void SetMultiline(bool multiline);
+		void ScrollTo(int x, int y);
 
-    void Reformat(bool update_fragments = false);
+		void SetWrapping(bool wrap);
+		bool GetWrapping();
 
-    void ScrollTo(int x, int y);
+	protected:
+		virtual bool OnEvent(const tb::TBWidgetEvent &ev);
+		virtual void OnFocusChanged(bool focused);
 
-    void SetWrapping(bool wrap);
-    bool GetWrapping();
-
-protected:
-
-    virtual bool OnEvent(const tb::TBWidgetEvent &ev);
-
-    virtual void OnFocusChanged(bool focused);
-
-private:
-    // Used to keep track of if we have just been focused for the click select
-    bool firstFocusFlag_;
-};
-
+	private:
+		// Used to keep track of if we have just been focused for the click select
+		bool firstFocusFlag_;
+	};
 }

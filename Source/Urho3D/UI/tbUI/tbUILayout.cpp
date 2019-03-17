@@ -38,10 +38,6 @@ namespace Urho3D
 	{
 	}
 
-	tbUILayoutParams::~tbUILayoutParams()
-	{
-	}
-
 
 	tbUILayout::tbUILayout(Context* context, UI_AXIS axis, bool createWidget) :
 		tbUIWidget(context, false)
@@ -49,16 +45,12 @@ namespace Urho3D
 		if (createWidget)
 		{
 			widget_ = new TBLayout();
-			widget_->SetDelegate(this);
+			widget_->AddListener(this);
 			widget_->SetGravity(WIDGET_GRAVITY_ALL);
 			widget_->SetAxis((AXIS)axis);
 			assert(GetSubsystem<tbUI>() != 0);
 			GetSubsystem<tbUI>()->WrapWidget(this, widget_);
 		}
-	}
-
-	tbUILayout::~tbUILayout()
-	{
 	}
 
 	void tbUILayout::SetSpacing(int spacing)

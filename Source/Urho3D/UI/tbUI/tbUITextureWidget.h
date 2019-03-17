@@ -41,7 +41,6 @@ class URHO3D_API UITextureWidget : public tbUIWidget
 public:
 
     UITextureWidget(Context* context, bool createWidget = true);
-    virtual ~UITextureWidget();
 
     void SetTexture(Texture *texture);
     Texture* GetTexture();

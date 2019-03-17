@@ -40,14 +40,9 @@ tbUISlider::tbUISlider(Context* context, bool createWidget) : tbUIWidget(context
     if (createWidget)
     {
         widget_ = new TBSlider();
-        widget_->SetDelegate(this);
+		widget_->AddListener(this);
         GetSubsystem<tbUI>()->WrapWidget(this, widget_);
     }
-}
-
-tbUISlider::~tbUISlider()
-{
-
 }
 
 void tbUISlider::SetLimits(double minimum, double maximum)

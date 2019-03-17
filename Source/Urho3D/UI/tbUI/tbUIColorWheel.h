@@ -37,7 +37,6 @@ class URHO3D_API tbUIColorWheel : public tbUIWidget
 public:
 
     tbUIColorWheel(Context* context, bool createWidget = true);
-    virtual ~tbUIColorWheel();
 
     float GetHue();
     float GetSaturation();

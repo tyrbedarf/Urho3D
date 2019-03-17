@@ -35,7 +35,6 @@ namespace Urho3D
 	public:
 
 		tbUIButton(Context* context, bool createWidget = true);
-		virtual ~tbUIButton();
 
 		/// Set if the button's text field should be allowed to squeeze below its preferred size
 		/// If squeezable it may shrink to width 0

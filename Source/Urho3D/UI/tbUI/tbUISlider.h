@@ -35,7 +35,6 @@ class URHO3D_API tbUISlider : public tbUIWidget
 public:
 
     tbUISlider(Context* context, bool createWidget = true);
-    virtual ~tbUISlider();
 
     void SetLimits(double minimum, double maximum);
     double GetMinValue() const;

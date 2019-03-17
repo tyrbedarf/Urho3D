@@ -40,14 +40,9 @@ tbUIMessageWindow::tbUIMessageWindow(Context* context, tbUIWidget* target, const
     if (createWidget)
     {
         widget_ = new TBMessageWindow(target ? target->GetInternalWidget() : 0, TBIDC(id.CString()));
-        widget_->SetDelegate(this);
+		widget_->AddListener(this);
         GetSubsystem<tbUI>()->WrapWidget(this, widget_);
     }
-}
-
-tbUIMessageWindow::~tbUIMessageWindow()
-{
-
 }
 
 void tbUIMessageWindow::Show(const String &title, const String &message, UI_MESSAGEWINDOW_SETTINGS settings, bool dimmer, int width, int height)

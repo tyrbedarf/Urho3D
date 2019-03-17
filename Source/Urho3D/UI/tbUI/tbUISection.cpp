@@ -40,14 +40,9 @@ tbUISection::tbUISection(Context* context, bool createWidget) : tbUIWidget(conte
     if (createWidget)
     {
         widget_ = new TBSection();
-        widget_->SetDelegate(this);
+		widget_->AddListener(this);
         GetSubsystem<tbUI>()->WrapWidget(this, widget_);
     }
-}
-
-tbUISection::~tbUISection()
-{
-
 }
 
 bool tbUISection::OnEvent(const tb::TBWidgetEvent &ev)

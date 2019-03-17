@@ -30,66 +30,59 @@
 
 namespace Urho3D
 {
+	class tbUISelectItemSource;
 
-class tbUISelectItemSource;
+	class URHO3D_API tbUISelectItem : public Object
+	{
+		URHO3D_OBJECT(tbUISelectItem, Object)
 
-class URHO3D_API tbUISelectItem : public Object
-{
-    URHO3D_OBJECT(tbUISelectItem, Object)
+	public:
+		tbUISelectItem(Context* context, const String& str = String::EMPTY, const String& id = String::EMPTY, const String& skinImage = String::EMPTY);
+		virtual ~tbUISelectItem();
 
-public:
+		void SetString(const String& str) { str_ = str; }
+		void SetID(const String& id);
+		const String& GetStr() { return str_; }
+		tb::TBID GetID() { return id_; }
+		void SetSkinImage(const String& skinImage);
+		void SetSubSource(tbUISelectItemSource *subSource);
 
-    tbUISelectItem(Context* context, const String& str = String::EMPTY, const String& id = String::EMPTY, const String& skinImage = String::EMPTY);
-    virtual ~tbUISelectItem();
+		virtual tb::TBGenericStringItem* GetTBItem();
 
-    void SetString(const String& str) { str_ = str; }
-    void SetID(const String& id);
-    const String& GetStr() { return str_; }
-    tb::TBID GetID() { return id_; }
-    void SetSkinImage(const String& skinImage);
-    void SetSubSource(tbUISelectItemSource *subSource);
+	protected:
+		String str_;
 
-    virtual tb::TBGenericStringItem* GetTBItem();
+		// TBID
+		tb::TBID id_;
+		// TBID
+		tb::TBID skinImage_;
 
-protected:
+		SharedPtr<tbUISelectItemSource> subSource_;
+	};
 
-    String str_;
+	class URHO3D_API tbUISelectItemSource : public Object
+	{
+		URHO3D_OBJECT(tbUISelectItemSource, Object)
 
-    // TBID
-    tb::TBID id_;
-    // TBID
-    tb::TBID skinImage_;
+	public:
 
-    SharedPtr<tbUISelectItemSource> subSource_;
+		tbUISelectItemSource(Context* context);
+		virtual ~tbUISelectItemSource();
 
-};
+		void AddItem(tbUISelectItem* item) { items_.Push(SharedPtr<tbUISelectItem>(item)); }
+		void RemoveItemWithId(const String& id);
+		void RemoveItemWithStr(const String& str);
+		int GetItemCount() { return items_.Size(); }
 
-class URHO3D_API tbUISelectItemSource : public Object
-{
-    URHO3D_OBJECT(tbUISelectItemSource, Object)
+		void Clear() { items_.Clear(); }
 
-public:
+		/// Returns item string for the index. Returns empty string for invalid indexes.
+		const String& GetItemStr(int index);
 
-    tbUISelectItemSource(Context* context);
-    virtual ~tbUISelectItemSource();
+		// caller's responsibility to clean up
+		virtual tb::TBSelectItemSource* GetTBItemSource();
 
-    void AddItem(tbUISelectItem* item) { items_.Push(SharedPtr<tbUISelectItem>(item)); }
-    void RemoveItemWithId(const String& id);
-    void RemoveItemWithStr(const String& str);
-    int GetItemCount() { return items_.Size(); }
-
-    void Clear() { items_.Clear(); }
-
-    /// Returns item string for the index. Returns empty string for invalid indexes.
-    const String& GetItemStr(int index);
-
-    // caller's responsibility to clean up
-    virtual tb::TBSelectItemSource* GetTBItemSource();
-
-protected:
-
-    List<SharedPtr<tbUISelectItem>> items_;
-
-};
-
+	protected:
+		List<SharedPtr<tbUISelectItem>> items_;
+	};
 }

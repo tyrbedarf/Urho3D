@@ -42,14 +42,9 @@ tbUISkinImage::tbUISkinImage(Context* context, const String& bitmapID, bool crea
         else
             widget_ = new TBSkinImage();
 
-        widget_->SetDelegate(this);
+		widget_->AddListener(this);
         GetSubsystem<tbUI>()->WrapWidget(this, widget_);
     }
-}
-
-tbUISkinImage::~tbUISkinImage()
-{
-
 }
 
 bool tbUISkinImage::OnEvent(const tb::TBWidgetEvent &ev)

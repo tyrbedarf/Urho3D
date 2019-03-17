@@ -54,7 +54,6 @@ namespace Urho3D
 	public:
 
 		tbUIWindow(Context* context, bool createWidget = true);
-		virtual ~tbUIWindow();
 
 		UI_WINDOW_SETTINGS GetSettings();
 		void SetSettings(UI_WINDOW_SETTINGS settings);

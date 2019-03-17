@@ -35,7 +35,6 @@ class URHO3D_API tbUICheckBox : public tbUIWidget
 public:
 
     tbUICheckBox(Context* context, bool createWidget = true);
-    virtual ~tbUICheckBox();
 
 protected:
 

@@ -37,7 +37,6 @@ class tbUIPromptWindow : public tbUIWindow
 public:
 
     tbUIPromptWindow(Context* context, tbUIWidget* target, const String& id, bool createWidget = true);
-    virtual ~tbUIPromptWindow();
 
     void Show(const String& title, const String& message, const String& preset, int dimmer=0, int width=0, int height=0);
 

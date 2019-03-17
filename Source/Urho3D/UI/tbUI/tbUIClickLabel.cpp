@@ -39,13 +39,9 @@ tbUIClickLabel::tbUIClickLabel(Context* context, bool createWidget) : tbUIWidget
     if (createWidget)
     {
         widget_ = new TBClickLabel();
-        widget_->SetDelegate(this);
+		widget_->AddListener(this);
         GetSubsystem<tbUI>()->WrapWidget(this, widget_);
     }
-}
-
-tbUIClickLabel::~tbUIClickLabel()
-{
 }
 
 bool tbUIClickLabel::OnEvent(const tb::TBWidgetEvent &ev)

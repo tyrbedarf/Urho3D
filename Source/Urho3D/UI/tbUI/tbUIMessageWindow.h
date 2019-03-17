@@ -44,7 +44,6 @@ class URHO3D_API tbUIMessageWindow : public tbUIWindow
 public:
 
     tbUIMessageWindow(Context* context, tbUIWidget* target, const String& id, bool createWidget = true);
-    virtual ~tbUIMessageWindow();
 
     void Show(const String& title, const String& message, UI_MESSAGEWINDOW_SETTINGS settings, bool dimmer, int width, int height);
 

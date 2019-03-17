@@ -39,14 +39,9 @@ tbUIDimmer::tbUIDimmer(Context* context, bool createWidget) : tbUIWidget(context
     if (createWidget)
     {
         widget_ = new TBDimmer();
-        widget_->SetDelegate(this);
+		widget_->AddListener(this);
         GetSubsystem<tbUI>()->WrapWidget(this, widget_);
     }
-}
-
-tbUIDimmer::~tbUIDimmer()
-{
-
 }
 
 bool tbUIDimmer::OnEvent(const tb::TBWidgetEvent &ev)

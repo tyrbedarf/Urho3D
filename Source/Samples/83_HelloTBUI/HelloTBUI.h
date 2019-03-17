@@ -25,12 +25,66 @@
 
 #include "Sample.h"
 #include <Urho3D/ThirdParty/TurboBadger/tb_widgets.h>
+#include <Urho3D/Scene/Serializable.h>
 
 namespace Urho3D
 {
 	class tbUIWindow;
 	class tbUIView;
 }
+
+#define GET_SET(name, type)\
+	private:\
+		type m##name;\
+	public:\
+		void Set##name(type value) { m##name = value; } \
+		type Get##name() const { return m##name; }
+
+#define GET_SET_STRING(name)\
+	private:\
+		String m##name;\
+	public:\
+		void Set##name(const String& value) { m##name = value; } \
+		const String& Get##name() const { return m##name; }
+
+#define QUICK_ACCESOR_STRING(name)\
+	URHO3D_ACCESSOR_ATTRIBUTE(\
+	#name,\
+	Get##name,\
+	Set##name,\
+	String,\
+	String::EMPTY,\
+	AM_FILE)
+
+#define QUICK_ACCESOR(name, type, default_value)\
+	URHO3D_ACCESSOR_ATTRIBUTE(\
+	#name,\
+	Get##name,\
+	Set##name,\
+	type,\
+	default_value,\
+	AM_FILE)
+
+class ExampleSerializeable : public Serializable
+{
+	URHO3D_OBJECT(ExampleSerializeable, Serializable)
+
+		GET_SET_STRING(PlayerName);
+	GET_SET(PlayerHealth, int);
+
+public:
+	ExampleSerializeable(Context* context) : Serializable(context)
+	{
+
+	}
+	/// Register object factory.
+	static void RegisterObject(Context* context)
+	{
+		/*context->RegisterFactory<ExampleSerializeable>();*/
+		QUICK_ACCESOR_STRING(PlayerName);
+		QUICK_ACCESOR(PlayerHealth, int, 100);
+	}
+};
 
 class HelloGui : public Sample
 {
@@ -60,4 +114,5 @@ private:
 	WeakPtr<tbUIWindow> window_;
 	WeakPtr<tbUIWindow> window2_;
 	WeakPtr<tbUIView> uiView_;
+	SharedPtr<ExampleSerializeable> example_;
 };

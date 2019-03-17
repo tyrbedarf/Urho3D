@@ -69,7 +69,6 @@ class URHO3D_API UISceneView : public tbUIWidget
 public:
 
     UISceneView(Context* context, bool createWidget = true);
-    virtual ~UISceneView();
 
     /// React to resize.
     void OnResize(const IntVector2& newSize);

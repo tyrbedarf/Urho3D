@@ -36,7 +36,6 @@ class URHO3D_API tbUIBargraph : public tbUIWidget
 public:
 
     tbUIBargraph(Context* context, bool createWidget = true);
-    virtual ~tbUIBargraph();
 
     void SetColor(Color col);
 

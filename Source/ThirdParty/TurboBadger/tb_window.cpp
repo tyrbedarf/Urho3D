@@ -291,7 +291,7 @@ void TBWindow::OnResized(int old_w, int old_h)
     // FIX: Put a layout in the TBMover so we can add things there nicely.
     int title_height = GetTitleHeight();
 // ATOMIC BEGIN
-    if ( m_axis == AXIS_Y )  // default axis 
+    if ( m_axis == AXIS_Y )  // default axis
     {
 // ATOMIC END
         m_mover.SetRect(TBRect(0, 0, GetRect().w, title_height));

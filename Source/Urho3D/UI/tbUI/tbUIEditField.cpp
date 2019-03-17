@@ -41,14 +41,9 @@ tbUIEditField::tbUIEditField(Context* context, bool createWidget) : tbUIWidget(c
     if (createWidget)
     {
         widget_ = new TBEditField();
-        widget_->SetDelegate(this);
+		widget_->AddListener(this);
         GetSubsystem<tbUI>()->WrapWidget(this, widget_);
     }
-}
-
-tbUIEditField::~tbUIEditField()
-{
-
 }
 
 void tbUIEditField::SetReadOnly(bool readonly)

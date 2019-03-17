@@ -34,9 +34,7 @@ class URHO3D_API tbUITabContainer : public tbUIWidget
     URHO3D_OBJECT(tbUITabContainer, tbUIWidget)
 
 public:
-
     tbUITabContainer(Context* context, bool createWidget = true);
-    virtual ~tbUITabContainer();
 
     int GetNumPages();
     void SetCurrentPage(int page);

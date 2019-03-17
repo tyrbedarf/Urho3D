@@ -49,7 +49,6 @@ class URHO3D_API tbUIView : public tbUIWidget
 public:
 
     tbUIView(Context* context);
-    virtual ~tbUIView();
 
     /// Set the view size
     bool SetSize(int width, int height);

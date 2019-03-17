@@ -41,13 +41,9 @@ tbUIImageWidget::tbUIImageWidget(Context* context, bool createWidget) : tbUIWidg
     if (createWidget)
     {
         widget_ = new TBImageWidget();
-        widget_->SetDelegate(this);
+		widget_->AddListener(this);
         GetSubsystem<tbUI>()->WrapWidget(this, widget_);
     }
-}
-
-tbUIImageWidget::~tbUIImageWidget()
-{
 }
 
 int tbUIImageWidget::GetImageWidth() const

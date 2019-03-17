@@ -39,14 +39,9 @@ tbUIScrollContainer::tbUIScrollContainer(Context* context, bool createWidget) : 
     if (createWidget)
     {
         widget_ = new TBScrollContainer();
-        widget_->SetDelegate(this);
+		widget_->AddListener(this);
         GetSubsystem<tbUI>()->WrapWidget(this, widget_);
     }
-}
-
-tbUIScrollContainer::~tbUIScrollContainer()
-{
-
 }
 
 void tbUIScrollContainer::SetScrollMode(UI_SCROLL_MODE mode)

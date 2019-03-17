@@ -35,7 +35,6 @@ class URHO3D_API tbUIImageWidget : public tbUIWidget
 public:
 
     tbUIImageWidget(Context* context, bool createWidget = true);
-    virtual ~tbUIImageWidget();
 
     void SetImage(const String& imagePath);
 

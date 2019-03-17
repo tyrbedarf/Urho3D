@@ -34,7 +34,6 @@ class URHO3D_API tbUISkinImage : public tbUIWidget
 public:
 
     tbUISkinImage(Context* context, const String& bitmapID, bool createWidget = true);
-    virtual ~tbUISkinImage();
 
 protected:
 

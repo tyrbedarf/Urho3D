@@ -35,9 +35,8 @@ class URHO3D_API tbUISelectDropdown : public tbUIButton
 public:
 
     tbUISelectDropdown(Context* context, bool createWidget = true);
-    virtual ~tbUISelectDropdown();
 
-    void SetSource(tbUISelectItemSource* source);
+	void SetSource(tbUISelectItemSource* source);
 
 protected:
 

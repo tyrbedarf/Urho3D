@@ -35,7 +35,6 @@ class URHO3D_API tbUIScrollBar : public tbUIWidget
 public:
 
     tbUIScrollBar(Context* context, bool createWidget = true);
-    virtual ~tbUIScrollBar();
 
     void SetLimits(double minimum, double maximum, double visible);
     double GetMinValue() const;

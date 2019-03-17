@@ -35,7 +35,6 @@ class URHO3D_API tbUIClickLabel : public tbUIWidget
 public:
 
     tbUIClickLabel(Context* context, bool createWidget = true);
-    virtual ~tbUIClickLabel();
 
 protected:
 

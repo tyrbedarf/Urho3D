@@ -39,14 +39,9 @@ namespace Urho3D
 		if (createWidget)
 		{
 			widget_ = new TBTabContainer();
-			widget_->SetDelegate(this);
+			widget_->AddListener(this);
 			GetSubsystem<tbUI>()->WrapWidget(this, widget_);
 		}
-	}
-
-	tbUITabContainer::~tbUITabContainer()
-	{
-
 	}
 
 	tbUIWidget* tbUITabContainer::GetCurrentPageWidget()

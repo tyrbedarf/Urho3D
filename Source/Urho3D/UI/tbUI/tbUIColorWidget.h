@@ -38,7 +38,6 @@ class URHO3D_API tbUIColorWidget : public tbUIWidget
 public:
 
     tbUIColorWidget(Context* context, bool createWidget = true);
-    virtual ~tbUIColorWidget();
 
     /// Set color from a Color value
     void SetColor(const Color& color);

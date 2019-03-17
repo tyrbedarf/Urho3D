@@ -43,13 +43,9 @@ tbUIPromptWindow::tbUIPromptWindow(Context* context, tbUIWidget* target, const S
     if (createWidget)
     {
         widget_ = new TBPromptWindow(target ? target->GetInternalWidget() : 0, TBIDC(id.CString()));
-        widget_->SetDelegate(this);
+		widget_->AddListener(this);
         GetSubsystem<tbUI>()->WrapWidget(this, widget_);
     }
-}
-
-tbUIPromptWindow::~tbUIPromptWindow()
-{
 }
 
 void tbUIPromptWindow::Show(const String &title, const String &message, const String &preset, int dimmer, int width, int height)

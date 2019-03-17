@@ -40,16 +40,11 @@ tbUISelectList::tbUISelectList(Context* context, bool createWidget) : tbUIWidget
     if (createWidget)
     {
         widget_ = new TBSelectList();
-        widget_->SetDelegate(this);
+		widget_->AddListener(this);
         GetSubsystem<tbUI>()->WrapWidget(this, widget_);
     }
 
     SubscribeToEvent(E_UIUPDATE, URHO3D_HANDLER(tbUISelectList, HandleUIUpdate));
-}
-
-tbUISelectList::~tbUISelectList()
-{
-
 }
 
 tb::TBSelectList* tbUISelectList::GetTBSelectList()

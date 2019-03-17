@@ -38,7 +38,6 @@ class URHO3D_API tbUIComponent : public Component
     URHO3D_OBJECT(tbUIComponent, Component)
 
 public:
-
     /// Construct.
     tbUIComponent(Context* context);
     /// Destruct.

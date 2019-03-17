@@ -66,16 +66,11 @@ UITextureWidget::UITextureWidget(Context* context, bool createWidget) : tbUIWidg
     {
         widget_ = new TBTextureWidget();
         ((TBTextureWidget*)widget_)->uiTextureWidget_ = this;
-        widget_->SetDelegate(this);
+		widget_->AddListener(this);
         ui->WrapWidget(this, widget_);
     }
 
     renderer_ = ui->GetRenderer();
-}
-
-UITextureWidget::~UITextureWidget()
-{
-
 }
 
 void UITextureWidget::SetTexture(Texture *texture)

@@ -40,14 +40,9 @@ tbUIScrollBar::tbUIScrollBar(Context* context, bool createWidget) : tbUIWidget(c
     if (createWidget)
     {
         widget_ = new TBScrollBar();
-        widget_->SetDelegate(this);
+		widget_->AddListener(this);
         GetSubsystem<tbUI>()->WrapWidget(this, widget_);
     }
-}
-
-tbUIScrollBar::~tbUIScrollBar()
-{
-
 }
 
 void tbUIScrollBar::SetLimits(double minimum, double maximum, double visible)

@@ -149,6 +149,11 @@ namespace Urho3D
 
 			tb::TBWidgetsAnimationManager::Shutdown();
 
+			if (rootWidget_->HasListener(this))
+			{
+				rootWidget_->RemoveListener(this);
+			}
+
 			delete rootWidget_;
 			widgetWrap_.Clear();
 
@@ -367,7 +372,6 @@ namespace Urho3D
 
 			itr++;
 		}
-
 	}
 
 
@@ -888,7 +892,10 @@ namespace Urho3D
 
 	void tbUI::OnWidgetDelete(tb::TBWidget *widget)
 	{
-
+		if (widget && widgetWrap_.Contains(widget))
+		{
+			widgetWrap_.Erase(widget);
+		}
 	}
 
 	bool tbUI::OnWidgetDying(tb::TBWidget *widget)
@@ -898,6 +905,7 @@ namespace Urho3D
 
 	void tbUI::OnWindowClose(tb::TBWindow *window)
 	{
+		URHO3D_LOGDEBUG("Window Close");
 		if (widgetWrap_.Contains(window))
 		{
 			tbUIWidget* widget = widgetWrap_[window];

@@ -41,13 +41,9 @@ tbUIBargraph::tbUIBargraph(Context* context, bool createWidget) : tbUIWidget(con
     if (createWidget)
     {
         widget_ = new TBBarGraph();
-        widget_->SetDelegate(this);
+		widget_->AddListener(this);
         GetSubsystem<tbUI>()->WrapWidget(this, widget_);
     }
-}
-
-tbUIBargraph::~tbUIBargraph()
-{
 }
 
 void tbUIBargraph::SetColor(Color color)

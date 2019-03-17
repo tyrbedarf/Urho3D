@@ -41,14 +41,9 @@ tbUIInlineSelect::tbUIInlineSelect(Context* context, bool createWidget) : tbUIWi
     if (createWidget)
     {
         widget_ = new TBInlineSelect();
-        widget_->SetDelegate(this);
+		widget_->AddListener(this);
         GetSubsystem<tbUI>()->WrapWidget(this, widget_);
     }
-}
-
-tbUIInlineSelect::~tbUIInlineSelect()
-{
-
 }
 
 void tbUIInlineSelect::SetEditFieldLayoutParams(tbUILayoutParams* params)

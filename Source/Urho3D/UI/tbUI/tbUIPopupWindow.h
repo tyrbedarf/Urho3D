@@ -34,7 +34,6 @@ class URHO3D_API tbUIPopupWindow: public tbUIWidget
 public:
 
     tbUIPopupWindow(Context* context, bool createWidget, tbUIWidget* target = nullptr, const String& id = String::EMPTY);
-    virtual ~tbUIPopupWindow();
 
     void Show(int x = -1, int y = -1);
 

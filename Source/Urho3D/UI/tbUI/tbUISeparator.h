@@ -34,7 +34,6 @@ class URHO3D_API tbUISeparator : public tbUIWidget
 public:
 
     tbUISeparator(Context* context, bool createWidget = true);
-    virtual ~tbUISeparator();
 
 protected:
 

@@ -35,81 +35,78 @@ using namespace tb;
 namespace Urho3D
 {
 
-tbUIWindow::tbUIWindow(Context* context, bool createWidget) : tbUIWidget(context, false)
-{
-    if (createWidget)
-    {
-        widget_ = new TBWindow();
-        widget_->SetDelegate(this);
-        GetSubsystem<tbUI>()->WrapWidget(this, widget_);
-    }
-}
-UI_WINDOW_SETTINGS tbUIWindow::GetSettings()
-{
-    if (!widget_)
-        return UI_WINDOW_SETTINGS_DEFAULT;
+	tbUIWindow::tbUIWindow(Context* context, bool createWidget) : tbUIWidget(context, false)
+	{
+		if (createWidget)
+		{
+			widget_ = new TBWindow();
+			GetSubsystem<tbUI>()->WrapWidget(this, widget_);
+			widget_->AddListener(this);
+		}
+	}
+	UI_WINDOW_SETTINGS tbUIWindow::GetSettings()
+	{
+		if (!widget_)
+			return UI_WINDOW_SETTINGS_DEFAULT;
 
-    return (UI_WINDOW_SETTINGS) ((TBWindow*)widget_)->GetSettings();
+		return (UI_WINDOW_SETTINGS)((TBWindow*)widget_)->GetSettings();
 
-}
+	}
 
-void tbUIWindow::SetSettings(UI_WINDOW_SETTINGS settings)
-{
-    if (!widget_)
-        return;
+	void tbUIWindow::SetSettings(UI_WINDOW_SETTINGS settings)
+	{
+		if (!widget_)
+			return;
 
-    ((TBWindow*)widget_)->SetSettings((WINDOW_SETTINGS) settings);
-}
+		((TBWindow*)widget_)->SetSettings((WINDOW_SETTINGS)settings);
+	}
 
-void tbUIWindow::ResizeToFitContent()
-{
-    if (!widget_)
-        return;
+	void tbUIWindow::ResizeToFitContent()
+	{
+		if (!widget_)
+			return;
 
-    ((TBWindow*)widget_)->ResizeToFitContent();
+		((TBWindow*)widget_)->ResizeToFitContent();
+	}
 
-}
+	void tbUIWindow::Close()
+	{
+		if (!widget_)
+			return;
 
-void tbUIWindow::Close()
-{
-    if (!widget_)
-        return;
+		if (widget_->HasListener(this))
+		{
+			widget_->RemoveListener(this);
+		}
 
-    ((TBWindow*)widget_)->Close();
+		((TBWindow*)widget_)->Close();
+	}
 
-}
 
+	void tbUIWindow::AddChild(tbUIWidget *child)
+	{
+		if (!widget_ || !child->GetInternalWidget())
+			return;
 
-void tbUIWindow::AddChild(tbUIWidget *child)
-{
-    if (!widget_ || !child->GetInternalWidget())
-        return;
+		tbUIWidget::AddChild(child);
 
-    tbUIWidget::AddChild(child);
+		// this is to get proper padding, this may cause problems
+		// as this is called from the widget_reader, and not as part of
+		// AddChild.  This may also need to be called from other widgets
+		// that have padding, etc
+		widget_->OnInflateChild(child->GetInternalWidget());
+	}
 
-    // this is to get proper padding, this may cause problems
-    // as this is called from the widget_reader, and not as part of
-    // AddChild.  This may also need to be called from other widgets
-    // that have padding, etc
-    widget_->OnInflateChild(child->GetInternalWidget());
+	bool tbUIWindow::OnEvent(const tb::TBWidgetEvent &ev)
+	{
+		return tbUIWidget::OnEvent(ev);
+	}
 
-}
+	void tbUIWindow::SetAxis(UI_AXIS axis)
+	{
+		if (!widget_)
+			return;
 
-tbUIWindow::~tbUIWindow()
-{
-}
-
-bool tbUIWindow::OnEvent(const tb::TBWidgetEvent &ev)
-{
-    return tbUIWidget::OnEvent(ev);
-}
-
-void tbUIWindow::SetAxis(UI_AXIS axis)
-{
-    if (!widget_)
-        return;
-
-    widget_->SetAxis((AXIS) axis);
-}
-
+		widget_->SetAxis((AXIS)axis);
+	}
 }

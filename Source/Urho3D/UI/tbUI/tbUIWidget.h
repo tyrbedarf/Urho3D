@@ -25,8 +25,12 @@
 #include <TurboBadger/tb_widgets.h>
 #include <TurboBadger/tb_widgets_common.h>
 #include <TurboBadger/tb_font_renderer.h>
+#include <TurboBadger/tb_widgets_listener.h>
 
 #include "../../Core/Object.h"
+#include "../../Scene/Serializable.h"
+#include "../../Core/Context.h"
+#include "../../IO/Log.h"
 
 #include "tbUIPreferredSize.h"
 #include "tbUIDragObject.h"
@@ -51,8 +55,8 @@ namespace Urho3D
 
 	/// TBWidget gravity (may be combined).
 	/// Gravity gives hints about positioning and sizing preferences.
-	enum UI_GRAVITY {
-
+	enum UI_GRAVITY
+	{
 		UI_GRAVITY_NONE = 0,   // tb::WIDGET_GRAVITY_NONE,
 		UI_GRAVITY_LEFT = 1,   // tb::WIDGET_GRAVITY_LEFT,
 		UI_GRAVITY_RIGHT = 2,  // tb::WIDGET_GRAVITY_RIGHT,
@@ -65,8 +69,8 @@ namespace Urho3D
 		UI_GRAVITY_DEFAULT = 5   // tb::WIDGET_GRAVITY_DEFAULT
 	};
 
-	enum UI_EVENT_TYPE {
-
+	enum UI_EVENT_TYPE
+	{
 		/** Click event is what should be used to trig actions in almost all cases.
 
 			It is invoked on a widget after POINTER_UP if the pointer is still inside
@@ -129,7 +133,8 @@ namespace Urho3D
 	};
 
 	/** Defines widget z level relative to another widget, used with TBWidget::AddChildRelative. */
-	enum UI_WIDGET_Z_REL {
+	enum UI_WIDGET_Z_REL
+	{
 		UI_WIDGET_Z_REL_BEFORE = 0, // tb::WIDGET_Z_REL_BEFORE,        ///< Before the reference widget (visually behind reference).
 		UI_WIDGET_Z_REL_AFTER = 1   // tb::WIDGET_Z_REL_AFTER            ///< After the reference widget (visually above reference).
 	};
@@ -142,8 +147,8 @@ namespace Urho3D
 		UI_TEXT_ALIGN_CENTER = 2    // tb::TB_TEXT_ALIGN_CENTER
 	};
 
-	enum UI_WIDGET_STATE {
-
+	enum UI_WIDGET_STATE
+	{
 		UI_WIDGET_STATE_NONE = 0,       // tb::WIDGET_STATE_NONE,
 		UI_WIDGET_STATE_DISABLED = 1,   // tb::WIDGET_STATE_DISABLED,
 		UI_WIDGET_STATE_FOCUSED = 2,    // tb::WIDGET_STATE_FOCUSED,
@@ -152,10 +157,10 @@ namespace Urho3D
 		UI_WIDGET_STATE_HOVERED = 16,   // tb::WIDGET_STATE_HOVERED,
 
 		UI_WIDGET_STATE_ALL = 31        // tb::WIDGET_STATE_ALL
-
 	};
 
-	enum UI_AXIS {
+	enum UI_AXIS
+	{
 		///< Horizontal layout
 		UI_AXIS_X = 0,  // tb::AXIS_X,
 		///< Vertical layout
@@ -168,8 +173,109 @@ namespace Urho3D
 	class tbUIFontDescription;
 	class tbUISelectItemSource;
 
+	/**
+	* Wrap a serializable and handle updates to its attributes automatically.
+	*
+	*/
+	class URHO3D_API tbValueHandler : public Object
+	{
+		URHO3D_OBJECT(tbValueHandler, Object)
+
+	private:
+		WeakPtr<Serializable> mObject;
+		WeakPtr<AttributeAccessor> mAccessor;
+		VariantType mValueType;
+		bool mIsSetUp;
+
+	public:
+		tbValueHandler(Context* context, Serializable* ser, const String& attribute) :
+			Object(context),
+			mIsSetUp(false)
+		{
+			mObject = WeakPtr<Serializable>(ser);
+
+			auto attrs = context_->GetAttributes(mObject->GetTypeName());
+			if (!attrs)
+			{
+				URHO3D_LOGERROR(
+					"Could not find attribute. Did you register the type with the context?");
+				return;
+			}
+
+			for (int i = 0; i < attrs->Size(); i++)
+			{
+				auto attr = attrs->At(i);
+				if (attr.name_ == attribute)
+				{
+					mIsSetUp = true;
+					mAccessor = WeakPtr<AttributeAccessor>(attr.accessor_);
+					mValueType = attr.type_;
+					break;
+				}
+			}
+
+			if (!mIsSetUp)
+			{
+				URHO3D_LOGERROR(
+					"Could not find attribute named " + attribute +
+					". Did you register the type with the context?");
+				return;
+			}
+		}
+
+		VariantType GetVariantType() const { return mValueType; }
+
+		void Set(String value)
+		{
+			if (mValueType != VariantType::VAR_STRING)
+			{
+				return;
+			}
+
+			URHO3D_LOGDEBUG("Update: " + value);
+
+			mAccessor->Set(mObject, Variant(value));
+		}
+
+		void Set(int value)
+		{
+			if (mValueType != VariantType::VAR_INT)
+			{
+				return;
+			}
+
+			URHO3D_LOGDEBUG("Update: " + String(value));
+
+			mAccessor->Set(mObject, Variant(value));
+		}
+
+		void Set(float value)
+		{
+			if (mValueType != VariantType::VAR_FLOAT)
+			{
+				return;
+			}
+
+			URHO3D_LOGDEBUG("Update: " + String(value));
+
+			mAccessor->Set(mObject, Variant(value));
+		}
+
+		void Set(double value)
+		{
+			if (mValueType != VariantType::VAR_DOUBLE)
+			{
+				return;
+			}
+
+			URHO3D_LOGDEBUG("Update: " + String(value));
+
+			mAccessor->Set(mObject, Variant(value));
+		}
+	};
+
 	/// Wraps a TurboBadger widget in our Object model
-	class URHO3D_API tbUIWidget : public Object, public tb::TBWidgetDelegate
+	class URHO3D_API tbUIWidget : public Object, public tb::TBWidgetListener //, public tb::TBWidgetDelegate
 	{
 		friend class tbUI;
 
@@ -272,7 +378,7 @@ namespace Urho3D
 
 		tb::TBWidget* GetInternalWidget() { return widget_; }
 
-		void SetDelegate(tbUIWidget* widget) { widget_->SetDelegate(widget); }
+		/*void SetDelegate(tbUIWidget* widget) { widget_->SetDelegate(widget); }*/
 
 		void SetMultiTouch(bool multiTouch) { multiTouch_ = multiTouch; }
 
@@ -342,6 +448,9 @@ namespace Urho3D
 		void SetAutoOpacity(float autoOpacity);
 		float GetAutoOpacity();
 
+		/// Add a serializable to handle assignment to its values automatically.
+		void SetSerializable(Serializable* ser, const String& attribute);
+
 	protected:
 
 		void ConvertEvent(tbUIWidget* handler, tbUIWidget* target, const tb::TBWidgetEvent &ev, VariantMap& data);
@@ -352,8 +461,16 @@ namespace Urho3D
 		virtual void OnDelete();
 		virtual void OnResized(int old_w, int old_h);
 
+		virtual bool OnWidgetDying(tb::TBWidget *widget);
+		virtual bool OnWidgetInvokeEvent(tb::TBWidget *widget, const tb::TBWidgetEvent &ev);
+		virtual void OnWidgetFocusChanged(tb::TBWidget *widget, bool focused);
+
+		void UpdateData();
+
 		String id_;
 		tb::TBWidget* widget_;
+
+		SharedPtr<tbValueHandler> value_;
 
 		SharedPtr<tbUIPreferredSize> preferredSize_;
 

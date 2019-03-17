@@ -39,14 +39,9 @@ tbUISelectDropdown::tbUISelectDropdown(Context* context, bool createWidget) : tb
     if (createWidget)
     {
         widget_ = new TBSelectDropdown();
-        widget_->SetDelegate(this);
+		widget_->AddListener(this);
         GetSubsystem<tbUI>()->WrapWidget(this, widget_);
     }
-}
-
-tbUISelectDropdown::~tbUISelectDropdown()
-{
-
 }
 
 void tbUISelectDropdown::SetSource(tbUISelectItemSource* source)

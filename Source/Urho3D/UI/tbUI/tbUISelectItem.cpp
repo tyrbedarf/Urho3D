@@ -26,110 +26,108 @@ using namespace tb;
 
 namespace Urho3D
 {
+	tbUISelectItem::tbUISelectItem(Context* context, const String &str, const String &id, const String &skinImage) : Object(context)
+		, subSource_(nullptr)
+	{
+		SetID(id);
+		SetString(str);
+		SetSkinImage(skinImage);
+	}
 
-tbUISelectItem::tbUISelectItem(Context* context, const String &str, const String &id, const String &skinImage) : Object(context)
-    , subSource_(nullptr)
-{
-    SetID(id);
-    SetString(str);
-    SetSkinImage(skinImage);
-}
+	tbUISelectItem::~tbUISelectItem()
+	{
 
-tbUISelectItem::~tbUISelectItem()
-{
+	}
 
-}
+	void tbUISelectItem::SetID(const String& id)
+	{
+		id_ = TBID(id.CString());
+	}
 
-void tbUISelectItem::SetID(const String& id)
-{
-    id_ = TBID(id.CString());
-}
+	void tbUISelectItem::SetSkinImage(const String& skinImage)
+	{
+		skinImage_ = TBID(skinImage.CString());
+	}
 
-void tbUISelectItem::SetSkinImage(const String& skinImage)
-{
-    skinImage_ = TBID(skinImage.CString());
-}
+	void tbUISelectItem::SetSubSource(tbUISelectItemSource *subSource)
+	{
+		subSource_ = subSource;
+	}
 
-void tbUISelectItem::SetSubSource(tbUISelectItemSource *subSource)
-{
-    subSource_ = subSource;
-}
+	tb::TBGenericStringItem* tbUISelectItem::GetTBItem()
+	{
+		tb::TBGenericStringItem* item;
+		if (!subSource_)
+		{
+			item = new tb::TBGenericStringItem(str_.CString(), id_);
+			if (skinImage_)
+				item->SetSkinImage(skinImage_);
+		}
+		else
+		{
+			item = new tb::TBGenericStringItem(str_.CString(), subSource_->GetTBItemSource());
+		}
 
-tb::TBGenericStringItem* tbUISelectItem::GetTBItem()
-{
-    tb::TBGenericStringItem* item;
-    if (!subSource_)
-    {
-         item = new tb::TBGenericStringItem(str_.CString(), id_);
-         if (skinImage_)
-             item->SetSkinImage(skinImage_);
-    }
-    else
-    {
-        item = new tb::TBGenericStringItem(str_.CString(), subSource_->GetTBItemSource());
-    }
+		return item;
+	}
 
-    return item;
-}
+	// Source
 
-// Source
+	tbUISelectItemSource::tbUISelectItemSource(Context* context) : Object(context)
+	{
 
-tbUISelectItemSource::tbUISelectItemSource(Context* context) : Object(context)
-{
+	}
 
-}
+	tbUISelectItemSource::~tbUISelectItemSource()
+	{
 
-tbUISelectItemSource::~tbUISelectItemSource()
-{
+	}
 
-}
+	void tbUISelectItemSource::RemoveItemWithId(const String& id)
+	{
+		tb::TBID test = TBID(id.CString());
+		for (List<SharedPtr<tbUISelectItem> >::Iterator itr = items_.Begin(); itr != items_.End(); itr++)
+		{
+			if ((*itr)->GetID() == test) {
+				items_.Erase(itr);
+				break;
+			}
+		}
+	}
 
-void tbUISelectItemSource::RemoveItemWithId(const String& id)
-{
-    tb::TBID test = TBID(id.CString());
-    for (List<SharedPtr<tbUISelectItem> >::Iterator itr = items_.Begin(); itr != items_.End(); itr++)
-    {
-        if ((*itr)->GetID() == test) {
-            items_.Erase(itr);
-            break;
-        }
-    }
-}
+	void tbUISelectItemSource::RemoveItemWithStr(const String& str)
+	{
+		for (List<SharedPtr<tbUISelectItem> >::Iterator itr = items_.Begin(); itr != items_.End(); itr++)
+		{
+			if ((*itr)->GetStr() == str) {
+				items_.Erase(itr);
+				break;
+			}
+		}
+	}
 
-void tbUISelectItemSource::RemoveItemWithStr(const String& str)
-{
-    for (List<SharedPtr<tbUISelectItem> >::Iterator itr = items_.Begin(); itr != items_.End(); itr++)
-    {
-        if ((*itr)->GetStr() == str) {
-            items_.Erase(itr);
-            break;
-        }
-    }
-}
+	const String& tbUISelectItemSource::GetItemStr(int index)
+	{
+		int nn = 0;
+		for (List<SharedPtr<tbUISelectItem> >::Iterator itr = items_.Begin(); itr != items_.End(); itr++)
+		{
+			if (nn == index) return (*itr)->GetStr();
+			nn++;
+		}
+		return (String::EMPTY);
+	}
 
-const String& tbUISelectItemSource::GetItemStr(int index)
-{
-    int nn = 0;
-    for (List<SharedPtr<tbUISelectItem> >::Iterator itr = items_.Begin(); itr != items_.End(); itr++)
-    {
-        if ( nn == index) return (*itr)->GetStr();
-        nn++;
-    }
-    return ( String::EMPTY );
-}
+	TBSelectItemSource *tbUISelectItemSource::GetTBItemSource()
+	{
+		// caller's responsibility to clean up
+		TBGenericStringItemSource* src = new TBGenericStringItemSource();
 
-TBSelectItemSource *tbUISelectItemSource::GetTBItemSource()
-{
-    // caller's responsibility to clean up
-    TBGenericStringItemSource* src = new TBGenericStringItemSource();
+		for (List<SharedPtr<tbUISelectItem> >::Iterator itr = items_.Begin(); itr != items_.End(); itr++)
+		{
+			tb::TBGenericStringItem* tbitem = (*itr)->GetTBItem();
+			src->AddItem(tbitem);
+		}
 
-    for (List<SharedPtr<tbUISelectItem> >::Iterator itr = items_.Begin(); itr != items_.End(); itr++)
-    {
-        tb::TBGenericStringItem* tbitem = (*itr)->GetTBItem();
-        src->AddItem(tbitem);
-    }
-
-    return src;
-}
-
+		return src;
+	}
 }

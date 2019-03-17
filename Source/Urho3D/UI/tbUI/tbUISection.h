@@ -35,7 +35,6 @@ class URHO3D_API tbUISection : public tbUIWidget
 public:
 
     tbUISection(Context* context, bool createWidget = true);
-    virtual ~tbUISection();
 
     void AddChild(tbUIWidget* child);
     void AddChildAfter(tbUIWidget* child, tbUIWidget* otherChild);

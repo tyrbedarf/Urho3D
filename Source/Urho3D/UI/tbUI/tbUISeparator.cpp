@@ -39,14 +39,9 @@ tbUISeparator::tbUISeparator(Context* context, bool createWidget) : tbUIWidget(c
     if (createWidget)
     {
         widget_ = new TBSeparator();
-        widget_->SetDelegate(this);
+		widget_->AddListener(this);
         GetSubsystem<tbUI>()->WrapWidget(this, widget_);
     }
-}
-
-tbUISeparator::~tbUISeparator()
-{
-
 }
 
 bool tbUISeparator::OnEvent(const tb::TBWidgetEvent &ev)

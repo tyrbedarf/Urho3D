@@ -45,14 +45,17 @@ namespace Urho3D
 		if (createWidget)
 		{
 			widget_ = new TBWidget();
-			widget_->SetDelegate(this);
+			widget_->AddListener(this);
 			GetSubsystem<tbUI>()->WrapWidget(this, widget_);
 		}
 	}
 
 	tbUIWidget::~tbUIWidget()
 	{
-
+		if (widget_ && widget_->HasListener(this))
+		{
+			widget_->RemoveListener(this);
+		}
 	}
 
 	void tbUIWidget::SetIsFocusable(bool value)
@@ -105,24 +108,94 @@ namespace Urho3D
 	void tbUIWidget::SetWidget(tb::TBWidget* widget)
 	{
 		widget_ = widget;
-		widget_->SetDelegate(this);
+		widget_->AddListener(this);
 	}
 
-	/*
-	enum SPECIAL_KEY
+	bool tbUIWidget::OnWidgetDying(tb::TBWidget *widget)
 	{
-		TB_KEY_UNDEFINED = 0,
-		TB_KEY_UP, TB_KEY_DOWN, TB_KEY_LEFT, TB_KEY_RIGHT,
-		TB_KEY_PAGE_UP, TB_KEY_PAGE_DOWN, TB_KEY_HOME, TB_KEY_END,
-		TB_KEY_TAB, TB_KEY_BACKSPACE, TB_KEY_INSERT, TB_KEY_DELETE,
-		TB_KEY_ENTER, TB_KEY_ESC,
-		TB_KEY_F1, TB_KEY_F2, TB_KEY_F3, TB_KEY_F4, TB_KEY_F5, TB_KEY_F6,
-		TB_KEY_F7, TB_KEY_F8, TB_KEY_F9, TB_KEY_F10, TB_KEY_F11, TB_KEY_F12
-	};
-	*/
+		if (widget && widget->HasListener(this))
+		{
+			widget->RemoveListener(this);
+			return true;
+		}
 
+		return false;
+	}
 
-	void tbUIWidget::ConvertEvent(tbUIWidget *handler, tbUIWidget* target, const tb::TBWidgetEvent &ev, VariantMap& data)
+	bool tbUIWidget::OnWidgetInvokeEvent(tb::TBWidget *widget, const tb::TBWidgetEvent &ev)
+	{
+		if (!widget || widget != widget_)
+		{
+			return false;
+		}
+
+		if (ev.type == EVENT_TYPE::EVENT_TYPE_CHANGED)
+		{
+			UpdateData();
+		}
+
+		return false;
+	}
+
+	void tbUIWidget::OnWidgetFocusChanged(tb::TBWidget *widget, bool focused)
+	{
+		if (!widget || widget != widget_)
+		{
+			return;
+		}
+	}
+
+	void tbUIWidget::SetSerializable(Serializable* ser, const String& attribute)
+	{
+		if (!ser)
+		{
+			URHO3D_LOGWARNING("Could not set serializable to widet. The reference was NULL.");
+			return;
+		}
+
+		value_ = SharedPtr<tbValueHandler>(new tbValueHandler(context_, ser, attribute));
+	}
+
+	void tbUIWidget::UpdateData()
+	{
+		if (!value_ || !widget_)
+		{
+			return;
+		}
+
+		switch (value_->GetVariantType())
+		{
+		case VariantType::VAR_INT :
+		{
+			value_->Set(widget_->GetValue());
+			break;
+		}
+		case VariantType::VAR_FLOAT:
+		{
+			value_->Set((float) widget_->GetValueDouble());
+			break;
+		}
+		case VariantType::VAR_DOUBLE:
+		{
+			value_->Set(widget_->GetValueDouble());
+			break;
+		}
+		case VariantType::VAR_STRING:
+		{
+			value_->Set(widget_->GetText().CStr());
+			break;
+		}
+		default:
+			URHO3D_LOGWARNING("Unkown variant type. Could not update serializable from widget.");
+			break;
+		}
+	}
+
+	void tbUIWidget::ConvertEvent(
+		tbUIWidget *handler,
+		tbUIWidget* target,
+		const tb::TBWidgetEvent &ev,
+		VariantMap& data)
 	{
 		tbUI* ui = GetSubsystem<tbUI>();
 
@@ -205,10 +278,14 @@ namespace Urho3D
 			{
 				ui->UnwrapWidget(widget_);
 			}
+
+			if (widget_->HasListener(this))
+			{
+				widget_->RemoveListener(this);
+			}
 		}
 
 		widget_ = 0;
-
 	}
 
 	void tbUIWidget::AddChildAfter(tbUIWidget* child, tbUIWidget* otherChild)
@@ -327,7 +404,6 @@ namespace Urho3D
 		tbrect.h = rect.bottom_ - rect.top_;
 
 		widget_->SetRect(tbrect);
-
 	}
 
 
@@ -1067,12 +1143,7 @@ namespace Urho3D
 
 	void tbUIWidget::OnResized(int old_w, int old_h)
 	{
-		// default implementation does nothing
-		/*URHO3D_LOGDEBUG
-		(
-			"Width: " + String(GetRect().Width()) +
-			" Height: " + String(GetRect().Height())
-		);*/
+
 	}
 
 	void tbUIWidget::OnFocusChanged(bool focused)
