@@ -1,6 +1,7 @@
 //
 // Copyright (c) 2008-2016 the Urho3D project.
 // Copyright (c) 2014-2016, THUNDERBEAST GAMES LLC All rights reserved
+// Copyright (c) 2018-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,6 +34,7 @@ namespace Urho3D
 	class tbUIView;
 }
 
+// Macros to make it easier to create attributes for serializable.
 #define GET_SET(name, type)\
 	private:\
 		type m##name;\
@@ -65,11 +67,16 @@ namespace Urho3D
 	default_value,\
 	AM_FILE)
 
+/// Each Object that derives from serializable can be updated automatically
+/// inside turbo badger widgets using reflection. Supported valuie types are
+/// int, float, double and string any attribute.
+/// To enable automatic updates use SetSerializable on a widget and pass
+/// the name of the attribute as second argument.
 class ExampleSerializeable : public Serializable
 {
 	URHO3D_OBJECT(ExampleSerializeable, Serializable)
 
-		GET_SET_STRING(PlayerName);
+	GET_SET_STRING(PlayerName);
 	GET_SET(PlayerHealth, int);
 
 public:
@@ -80,7 +87,8 @@ public:
 	/// Register object factory.
 	static void RegisterObject(Context* context)
 	{
-		/*context->RegisterFactory<ExampleSerializeable>();*/
+		context->RegisterFactory<ExampleSerializeable>();
+
 		QUICK_ACCESOR_STRING(PlayerName);
 		QUICK_ACCESOR(PlayerHealth, int, 100);
 	}
@@ -97,22 +105,19 @@ public:
 	/// Setup after engine initialization and before running the main loop.
 	virtual void Start();
 
-protected:
-
 private:
-
 	void CreateUI();
+
 	/// Subscribe to application-wide logic update events.
 	void SubscribeToEvents();
+
 	/// Handle the logic update event.
 	void HandleUpdate(StringHash eventType, VariantMap& eventData);
-
 	void HandleWidgetEvent(StringHash eventType, VariantMap& eventData);
-
 	void HandleWidgetDeleted(StringHash eventType, VariantMap& eventData);
 
 	WeakPtr<tbUIWindow> window_;
-	WeakPtr<tbUIWindow> window2_;
+	WeakPtr<tbUIWindow> output_;
 	WeakPtr<tbUIView> uiView_;
 	SharedPtr<ExampleSerializeable> example_;
 };

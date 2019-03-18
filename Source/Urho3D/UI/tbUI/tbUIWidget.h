@@ -188,7 +188,10 @@ namespace Urho3D
 		bool mIsSetUp;
 
 	public:
-		tbValueHandler(Context* context, Serializable* ser, const String& attribute) :
+		tbValueHandler(
+			Context* context,
+			Serializable* ser,
+			const String& attribute) :
 			Object(context),
 			mIsSetUp(false)
 		{
@@ -232,7 +235,7 @@ namespace Urho3D
 				return;
 			}
 
-			URHO3D_LOGDEBUG("Update: " + value);
+			/*URHO3D_LOGDEBUG("Update: " + value);*/
 
 			mAccessor->Set(mObject, Variant(value));
 		}
@@ -244,7 +247,7 @@ namespace Urho3D
 				return;
 			}
 
-			URHO3D_LOGDEBUG("Update: " + String(value));
+			/*URHO3D_LOGDEBUG("Update: " + String(value));*/
 
 			mAccessor->Set(mObject, Variant(value));
 		}
@@ -256,7 +259,7 @@ namespace Urho3D
 				return;
 			}
 
-			URHO3D_LOGDEBUG("Update: " + String(value));
+			/*URHO3D_LOGDEBUG("Update: " + String(value));*/
 
 			mAccessor->Set(mObject, Variant(value));
 		}
@@ -268,7 +271,7 @@ namespace Urho3D
 				return;
 			}
 
-			URHO3D_LOGDEBUG("Update: " + String(value));
+			/*URHO3D_LOGDEBUG("Update: " + String(value));*/
 
 			mAccessor->Set(mObject, Variant(value));
 		}
@@ -312,12 +315,16 @@ namespace Urho3D
 
 		/// searches for specified widget ID from the top of the widget tree, returns the 1st one found.
 		virtual tbUIWidget *FindWidget(const String& searchid);
+
 		/// return all of the widgets of the specified classname and id that is not 0 from the current widget
 		virtual void SearchWidgetClass(const String& className, PODVector<tbUIWidget*> &results);
+
 		///  return all of the widgets of the specified id and id that is not 0 from the current widget
 		virtual void SearchWidgetId(const String& searchid, PODVector<tbUIWidget*> &results);
+
 		/// return all of the widgets with the specified text and id that is not 0 from the current widget
 		virtual void SearchWidgetText(const String& searchText, PODVector<tbUIWidget*> &results);
+
 		/// print out the widget tree to stdout from the current widget
 		virtual void PrintPrettyTree();
 
@@ -377,8 +384,6 @@ namespace Urho3D
 		void InvalidateLayout();
 
 		tb::TBWidget* GetInternalWidget() { return widget_; }
-
-		/*void SetDelegate(tbUIWidget* widget) { widget_->SetDelegate(widget); }*/
 
 		void SetMultiTouch(bool multiTouch) { multiTouch_ = multiTouch; }
 
@@ -450,9 +455,9 @@ namespace Urho3D
 
 		/// Add a serializable to handle assignment to its values automatically.
 		void SetSerializable(Serializable* ser, const String& attribute);
+		void SetSerializable(const String& widget_id, Serializable* ser, const String& attribute);
 
 	protected:
-
 		void ConvertEvent(tbUIWidget* handler, tbUIWidget* target, const tb::TBWidgetEvent &ev, VariantMap& data);
 
 		void SetWidget(tb::TBWidget* widget);
@@ -471,13 +476,10 @@ namespace Urho3D
 		tb::TBWidget* widget_;
 
 		SharedPtr<tbValueHandler> value_;
-
 		SharedPtr<tbUIPreferredSize> preferredSize_;
-
 		SharedPtr<tbUIDragObject> dragObject_;
 
 		bool multiTouch_;
-
 	};
 
 }

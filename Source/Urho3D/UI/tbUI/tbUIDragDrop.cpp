@@ -75,7 +75,6 @@ tbUIDragDrop::tbUIDragDrop(Context* context) : Object(context)
     root->AddChild(dragLayout_->GetInternalWidget());
 
     InitDragAndDrop(this);
-
 }
 
 tbUIDragDrop::~tbUIDragDrop()

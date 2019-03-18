@@ -35,6 +35,7 @@ namespace Urho3D
 	class tbUIWidget;
 	class tbUIView;
 	class tbUIPopupWindow;
+	class tbUIDragDrop;
 
 	class URHO3D_API tbUI : public Object, private tb::TBWidgetListener
 	{
@@ -138,6 +139,7 @@ namespace Urho3D
 
 		tb::TBWidget* rootWidget_;
 		tbUIRenderer* renderer_;
+		SharedPtr<tbUIDragDrop> dragdrop_;
 
 		WeakPtr<Graphics> graphics_;
 

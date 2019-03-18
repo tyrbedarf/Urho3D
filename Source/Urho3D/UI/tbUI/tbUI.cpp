@@ -154,6 +154,8 @@ namespace Urho3D
 				rootWidget_->RemoveListener(this);
 			}
 
+			context_->RemoveSubsystem<tbUIDragDrop>();
+
 			delete rootWidget_;
 			widgetWrap_.Clear();
 
@@ -199,7 +201,6 @@ namespace Urho3D
 				changedEventsBlocked_ = 0;
 			}
 		}
-
 	}
 
 	void tbUI::Initialize(const String& languageFile)
@@ -236,7 +237,8 @@ namespace Urho3D
 		SubscribeToEvent(E_RENDERUPDATE, URHO3D_HANDLER(tbUI, HandleRenderUpdate));
 
 		// register the UIDragDrop subsystem (after we have subscribed to events, so it is processed after)
-		context_->RegisterSubsystem(new tbUIDragDrop(context_));
+		dragdrop_ = SharedPtr<tbUIDragDrop>(new tbUIDragDrop(context_));
+		context_->RegisterSubsystem(dragdrop_);
 
 		tb::TBWidgetListener::AddGlobalListener(this);
 

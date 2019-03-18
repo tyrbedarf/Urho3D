@@ -156,6 +156,18 @@ namespace Urho3D
 		value_ = SharedPtr<tbValueHandler>(new tbValueHandler(context_, ser, attribute));
 	}
 
+	void tbUIWidget::SetSerializable(const String& widget_id, Serializable* ser, const String& attribute)
+	{
+		auto widget = FindWidget(widget_id);
+		if (!widget)
+		{
+			URHO3D_LOGWARNING("Could not set serializable to widet. Could not find the widget: " + widget_id);
+			return;
+		}
+
+		widget->SetSerializable(ser, attribute);
+	}
+
 	void tbUIWidget::UpdateData()
 	{
 		if (!value_ || !widget_)

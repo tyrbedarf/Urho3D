@@ -36,7 +36,6 @@ using namespace tb;
 
 namespace Urho3D
 {
-
 	tbUIView::tbUIView(Context* context) : tbUIWidget(context, false),
 		autoFocus_(true),
 		mouseEnabled_(true),

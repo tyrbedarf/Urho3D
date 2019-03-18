@@ -143,6 +143,16 @@ namespace tb {
 
 		StopLongClickTimer();
 
+		//if (m_listeners.HasLinks())
+		//{
+		//	auto it = m_listeners.IterateForward();
+		//	TBWidgetListener* item = nullptr;
+		//	while ((item = it.GetAndStep()) != nullptr)
+		//	{
+		//		printf("Item");
+		//	}
+		//}
+
 		// assert(!m_listeners.HasLinks()); // There's still listeners added to this widget!
 	}
 

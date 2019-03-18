@@ -1,6 +1,7 @@
 //
 // Copyright (c) 2008-2016 the Urho3D project.
 // Copyright (c) 2014-2016, THUNDERBEAST GAMES LLC All rights reserved
+// Copyright (c) 2018-2019 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -78,56 +79,120 @@ void HelloGui::CreateUI()
 
 	uiView_ = new tbUIView(context_);
 
-	tbUILayout* layout = new tbUILayout(context_);
-	layout->SetAxis(UI_AXIS_Y);
+	const int min_with = 150;
 
-	tbUICheckBox* checkBox = new tbUICheckBox(context_);
-	checkBox->SetId("Checkbox");
+	// Input Area
+	tbUILayout* input_layout = new tbUILayout(context_);
+	input_layout->SetAxis(UI_AXIS_Y);
 
-	layout->AddChild(checkBox);
+	tbUILayout* name_layout = new tbUILayout(context_);
+	name_layout->SetAxis(UI_AXIS_X);
 
-	tbUIButton* button = new tbUIButton(context_);
-	button->SetText("Button");
-	button->SetId("Button");
+	tbUITextField* lbl_name = new tbUITextField(context_);
+	lbl_name->SetText("Player Name");
+	lbl_name->SetLayoutMinWidth(min_with);
+	lbl_name->SetTextAlign(UI_TEXT_ALIGN_LEFT);
+	name_layout->AddChild(lbl_name);
 
-	layout->AddChild(button);
+	tbUIEditField* edit_name = new tbUIEditField(context_);
+	name_layout->AddChild(edit_name);
+	edit_name->SetLayoutMinWidth(min_with);
+	edit_name->SetId("edit_name");
 
-	tbUIEditField* edit = new tbUIEditField(context_);
-	layout->AddChild(edit);
-	edit->SetId("EditField");
+	tbUILayout* health_layout = new tbUILayout(context_);
+	health_layout->SetAxis(UI_AXIS_X);
 
-	tbUISlider* edit2 = new tbUISlider(context_);
-	layout->AddChild(edit2);
-	edit2->SetId("EditField2");
-	edit2->SetLimits(0.0f, 100.0f);
+	tbUITextField* lbl_health = new tbUITextField(context_);
+	lbl_health->SetText("Health");
+	lbl_health->SetTextAlign(UI_TEXT_ALIGN_LEFT);
+	lbl_health->SetLayoutMinWidth(min_with);
+	health_layout->AddChild(lbl_health);
 
-	example_ = SharedPtr<ExampleSerializeable>(new ExampleSerializeable(context_));
-	edit->SetSerializable(example_, "PlayerName");
-	edit2->SetSerializable(example_, "PlayerHealth");
+	tbUISlider* edit_health = new tbUISlider(context_);
+	health_layout->AddChild(edit_health);
+	edit_health->SetId("edit_health");
+	edit_health->SetLimits(0.0f, 100.0f);
+	edit_health->SetLayoutMinWidth(min_with);
+
+	// edit_name->SetSerializable(example_, "PlayerName");
+	// edit_health->SetSerializable(example_, "PlayerHealth");
+
+	input_layout->AddChild(name_layout);
+	input_layout->AddChild(health_layout);
 
 	window_ = new tbUIWindow(context_);
 	window_->SetSettings((UI_WINDOW_SETTINGS)(UI_WINDOW_SETTINGS_TITLEBAR | UI_WINDOW_SETTINGS_CLOSE_BUTTON));
 
-	window_->SetText("Hello TurboBadger GUI!");
+	window_->SetText("Change values here!");
 
-	window_->AddChild(layout);
+	window_->AddChild(input_layout);
 
+	// Widget need a size, otherwise they wont show up.
 	window_->ResizeToFitContent();
 
 	uiView_->AddChild(window_);
 	window_->Center();
+	window_->SetPosition(window_->GetRect().left_ - 200, window_->GetRect().top_);
 
-	window2_ = new tbUIWindow(context_);
-	window2_->Load("Data/TB/ui_test/hello_gui.tb.txt");
-	window2_->ResizeToFitContent();
+	example_ = SharedPtr<ExampleSerializeable>(new ExampleSerializeable(context_));
+	example_->SetPlayerName("Player 1");
+	example_->SetPlayerHealth(0);
+	window_->SetSerializable("edit_name", example_, "PlayerName");
+	window_->SetSerializable("edit_health", example_, "PlayerHealth");
 
-	uiView_->AddChild(window2_);
-	window2_->SetPosition(10, 10);
+	edit_name->SetText(example_->GetPlayerName());
+
+	// Update from the serializable after UI_EVENT_TYPE_CHANGED was send
+	output_ = new tbUIWindow(context_);
+	output_->SetSettings((UI_WINDOW_SETTINGS)(UI_WINDOW_SETTINGS_TITLEBAR | UI_WINDOW_SETTINGS_CLOSE_BUTTON));
+	output_->SetText("See effect here!");
+
+	tbUILayout* input_layout2 = new tbUILayout(context_);
+	input_layout2->SetAxis(UI_AXIS_Y);
+
+	tbUILayout* name_layout2 = new tbUILayout(context_);
+	name_layout2->SetAxis(UI_AXIS_X);
+
+	tbUITextField* lbl_name2 = new tbUITextField(context_);
+	lbl_name2->SetText("Player Name");
+	lbl_name2->SetLayoutMinWidth(min_with);
+	lbl_name2->SetTextAlign(UI_TEXT_ALIGN_LEFT);
+	name_layout2->AddChild(lbl_name2);
+
+	tbUITextField* edit_name2 = new tbUITextField(context_);
+	name_layout2->AddChild(edit_name2);
+	edit_name2->SetLayoutMinWidth(min_with);
+	edit_name2->SetId("edit_name2");
+
+	tbUILayout* health_layout2 = new tbUILayout(context_);
+	health_layout2->SetAxis(UI_AXIS_X);
+
+	tbUITextField* lbl_health2 = new tbUITextField(context_);
+	lbl_health2->SetText("Health");
+	lbl_health2->SetTextAlign(UI_TEXT_ALIGN_LEFT);
+	lbl_health2->SetLayoutMinWidth(min_with);
+	health_layout2->AddChild(lbl_health2);
+
+	tbUITextField* edit_health2 = new tbUITextField(context_);
+	health_layout2->AddChild(edit_health2);
+	edit_health2->SetId("edit_health2");
+	edit_health2->SetLayoutMinWidth(min_with);
+
+	input_layout2->AddChild(name_layout2);
+	input_layout2->AddChild(health_layout2);
+
+	edit_name2->SetText(example_->GetPlayerName());
+	edit_health2->SetText("0");
+
+	output_->AddChild(input_layout2);
+	output_->ResizeToFitContent();
+	uiView_->AddChild(output_);
+	output_->Center();
+	output_->SetPosition(output_->GetRect().left_ + 200, output_->GetRect().top_);
 }
 
 void HelloGui::SubscribeToEvents()
 {
-	// Subscribe HandleUpdate() function for processing update events
 	SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(HelloGui, HandleUpdate));
 
 	SubscribeToEvent(E_WIDGETEVENT, URHO3D_HANDLER(HelloGui, HandleWidgetEvent));
@@ -138,24 +203,25 @@ void HelloGui::HandleWidgetEvent(StringHash eventType, VariantMap& eventData)
 {
 	using namespace WidgetEvent;
 
-	if (eventData[P_TYPE] == UI_EVENT_TYPE_CLICK)
-	{
-		/*URHO3D_LOGDEBUG("Reference: " + eventData[P_REFID].ToString());*/
-		tbUIWidget* widget = static_cast<tbUIWidget*>(eventData[P_TARGET].GetPtr());
-		if (widget && window_)
-		{
-			window_->SetText(ToString("Hello: %s", widget->GetId().CString()));
-		}
-	}
-
 	if (eventData[P_TYPE] == UI_EVENT_TYPE_CHANGED)
 	{
-		if (example_ && window_)
+		if (example_ && output_)
 		{
-			window_->SetText(ToString("Value Changed: %s", example_->GetPlayerName().CString()));
-			URHO3D_LOGDEBUG(
+			/*URHO3D_LOGDEBUG(
 				"PlayerName: " + example_->GetPlayerName() +
-				" Health: " + String(example_->GetPlayerHealth()));
+				" Health: " + String(example_->GetPlayerHealth()));*/
+
+			auto player_name = output_->FindWidget("edit_name2");
+			if (player_name)
+			{
+				player_name->SetText(example_->GetPlayerName());
+			}
+
+			auto player_health = output_->FindWidget("edit_health2");
+			if (player_health)
+			{
+				player_health->SetText(String(example_->GetPlayerHealth()));
+			}
 		}
 	}
 }

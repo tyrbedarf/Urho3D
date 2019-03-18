@@ -38,7 +38,6 @@ namespace Urho3D
 	{
 	}
 
-
 	tbUILayout::tbUILayout(Context* context, UI_AXIS axis, bool createWidget) :
 		tbUIWidget(context, false)
 	{
