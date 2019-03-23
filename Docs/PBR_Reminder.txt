@@ -1,0 +1,8 @@
+PBR Reminder:
+
+https://discourse.urho3d.io/t/ao-texture-slot-in-pbr/3265/6
+
+dragonCASTjosh
+Yes it works kinda the same as unreal packs export. Currently there are no docs, just remember Red = roughness, Green = metallic
+
+Albedo and Normal go into their own slot.
