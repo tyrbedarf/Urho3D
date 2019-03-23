@@ -72,8 +72,8 @@ void HelloSystemUi::SubscribeToEvents()
 
 void HelloSystemUi::RenderUi(StringHash eventType, VariantMap& eventData)
 {
-	if (show_demo_window)
-		ImGui::ShowTestWindow();
+	//if (show_demo_window)
+	//	ImGui::ShowTestWindow();
 
 	if (!window_open)
 		return;
