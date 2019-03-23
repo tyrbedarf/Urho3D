@@ -74,45 +74,11 @@ if (DOXYGEN_FOUND)
         configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/generated/Doxyfile)
     endif ()
 
-    # Dump AngelScript and LuaScript API to Doxygen file if the corresponding host tool is available
-    if (TARGET ScriptCompiler AND NOT CMAKE_CROSSCOMPILING)
-        add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/ScriptAPI.dox ${CMAKE_CURRENT_BINARY_DIR}/generated/AngelScriptAPI.h
-            COMMAND ${CMAKE_BINARY_DIR}/bin/tool/ScriptCompiler -dumpapi ${CMAKE_SOURCE_DIR} ScriptAPI.dox AngelScriptAPI.h
-            DEPENDS ScriptCompiler     # ScriptCompiler implicitly depends on Urho3D already
-            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated
-            COMMENT "Dumping AngelScript API to ScriptAPI.dox")
-    else ()
-        add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/ScriptAPI.dox ${CMAKE_CURRENT_BINARY_DIR}/generated/AngelScriptAPI.h
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/ScriptAPI.dox ${CMAKE_CURRENT_BINARY_DIR}/generated/ScriptAPI.dox
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/AngelScriptAPI.h ${CMAKE_CURRENT_BINARY_DIR}/generated/AngelScriptAPI.h
-            DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/ScriptAPI.dox ${CMAKE_CURRENT_SOURCE_DIR}/AngelScriptAPI.h)
-    endif ()
-    if (TARGET tolua++ AND NOT CMAKE_CROSSCOMPILING)
-        file (GLOB PKGS RELATIVE ${CMAKE_SOURCE_DIR}/Source/Urho3D/LuaScript/pkgs ${CMAKE_SOURCE_DIR}/Source/Urho3D/LuaScript/pkgs/*.pkg)
-        list (SORT PKGS)
-        set (PKGLIST "// This is a generated file. DO NOT EDIT!\n\n")
-        foreach (PKG ${PKGS})
-            set (PKGLIST "${PKGLIST}$pfile \"${PKG}\"\n")
-        endforeach ()
-        file (WRITE ${CMAKE_CURRENT_BINARY_DIR}/generated/LuaPkgToDox.txt.new ${PKGLIST})
-        execute_process (COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/generated/LuaPkgToDox.txt.new ${CMAKE_CURRENT_BINARY_DIR}/generated/LuaPkgToDox.txt)
-        execute_process (COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_CURRENT_BINARY_DIR}/generated/LuaPkgToDox.txt.new)
-        file (GLOB_RECURSE API_PKG_FILES ${CMAKE_SOURCE_DIR}/Source/Urho3D/LuaScript/pkgs/*.pkg)
-        add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/LuaScriptAPI.dox
-            COMMAND ${CMAKE_BINARY_DIR}/bin/tool/tolua++ -L ToDoxHook.lua -P -o ${CMAKE_CURRENT_BINARY_DIR}/generated/LuaScriptAPI.dox ${CMAKE_CURRENT_BINARY_DIR}/generated/LuaPkgToDox.txt
-            DEPENDS tolua++ ${API_PKG_FILES} ${CMAKE_CURRENT_BINARY_DIR}/generated/LuaPkgToDox.txt ${CMAKE_SOURCE_DIR}/Source/Urho3D/LuaScript/pkgs/ToDoxHook.lua
-            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Source/Urho3D/LuaScript/pkgs
-            COMMENT "Dumping LuaScript API to LuaScriptAPI.dox")
-    else ()
-        add_custom_command (OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/LuaScriptAPI.dox
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/LuaScriptAPI.dox ${CMAKE_CURRENT_BINARY_DIR}/generated/LuaScriptAPI.dox
-            DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/LuaScriptAPI.dox)
-    endif ()
-
     # In quiet mode, redirect standard output stream of Doxygen to a null device
     if (URHO3D_DOCS_QUIET)
         set (REDIRECT_STDOUT 1>${NULL_DEVICE})
     endif ()
+	
     # If URHO3D_DOCS build option is set then add the custom 'doc' target into the default 'all' target, i.e. a normal build would not only build the software but also the documentation
     if (URHO3D_DOCS)
         set (ALL ALL)
