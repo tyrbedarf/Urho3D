@@ -162,6 +162,7 @@ Urho3D development, contributions and bugfixes by:
 - thebluefish
 - tommy3
 - yushli
+- Dirk Becker
 
 Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
 (http://www.horde3d.org). Additional inspiration & research used:
@@ -186,8 +187,6 @@ Urho3D is greatly inspired by OGRE (http://www.ogre3d.org) and Horde3D
   http://warp.povusers.org/SortComparison/
 
 Urho3D uses the following third-party libraries:
-- AngelScript 2.33.0 WIP (http://www.angelcode.com/angelscript)
-- Boost 1.64.0 (http://www.boost.org) - only used for AngelScript generic bindings
 - Box2D 2.3.2 WIP (http://box2d.org)
 - Bullet 2.86.1 (http://www.bulletphysics.org)
 - Civetweb 1.7 (https://github.com/civetweb/civetweb)
@@ -195,9 +194,7 @@ Urho3D uses the following third-party libraries:
 - GLEW 1.13.0 (http://glew.sourceforge.net)
 - SLikeNet (https://github.com/SLikeSoft/SLikeNet)
 - libcpuid 0.4.0+ (https://github.com/anrieff/libcpuid)
-- Lua 5.1 (https://www.lua.org)
-- LuaJIT 2.1.0+ (http://www.luajit.org)
-- LZ4 1.7.5 (https://github.com/lz4/lz4)
+- LZ4 1.8.2 (https://github.com/lz4/lz4)
 - MojoShader (https://icculus.org/mojoshader)
 - Mustache 1.0 (https://mustache.github.io, https://github.com/kainjow/Mustache)
 - nanodbc 2.12.4+ (https://lexicalunit.github.io/nanodbc)
