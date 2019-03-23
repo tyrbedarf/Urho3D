@@ -46,6 +46,7 @@ namespace Urho3D
 		, vertexBuffer_(context)
 		, indexBuffer_(context)
 	{
+		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO();
 		io.KeyMap[ImGuiKey_Tab] = SCANCODE_TAB;
 		io.KeyMap[ImGuiKey_LeftArrow] = SCANCODE_LEFT;
@@ -88,7 +89,8 @@ namespace Urho3D
 
 	SystemUI::~SystemUI()
 	{
-		ImGui::Shutdown();
+		// ImGui::Shutdown();
+		ImGui::DestroyContext();
 	}
 
 	void SystemUI::Start()
@@ -249,7 +251,7 @@ namespace Urho3D
 			if (cmd_list->IdxBuffer.Size > indexBuffer_.GetIndexCount())
 				indexBuffer_.SetSize((unsigned int)(cmd_list->IdxBuffer.Size * 2), false, true);
 
-#if (defined(_WIN32) && !defined(ATOMIC_D3D11) && !defined(ATOMIC_OPENGL)) || defined(ATOMIC_D3D9)
+#if (defined(_WIN32) && !defined(URHO3D_D3D11) && !defined(URHO3D_OPENGL)) || defined(URHO3D_D3D9)
 			for (int i = 0; i < cmd_list->VtxBuffer.Size; i++)
 			{
 				ImDrawVert& v = cmd_list->VtxBuffer.Data[i];

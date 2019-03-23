@@ -73,29 +73,32 @@ void HelloSystemUi::SubscribeToEvents()
 void HelloSystemUi::RenderUi(StringHash eventType, VariantMap& eventData)
 {
 	if (show_demo_window)
-		ImGui::ShowTestWindow(&show_demo_window);
+		ImGui::ShowTestWindow();
 
 	if (!window_open)
 		return;
 
 	ImGui::SetNextWindowSize(ImVec2(200, 300), ImGuiCond_FirstUseEver);
 	ImGui::SetNextWindowPos(ImVec2(200, 300), ImGuiCond_FirstUseEver);
-	if (ImGui::Begin("Sample SystemUI", &window_open))
+	if (!ImGui::Begin("Sample SystemUI", &window_open))
 	{
-		if (ImGui::Button("Toggle console"))
-		{
-			GetSubsystem<Console>()->Toggle();
-		}
-
-		ImGui::Text("This is text");
-
-		if(!checkbox_test)
-			ImGui::Checkbox("Check box?", &checkbox_test);
-		else
-			ImGui::Checkbox("Box checked!", &checkbox_test);
-
 		ImGui::End();
+		return;
 	}
+
+	if (ImGui::Button("Toggle console"))
+	{
+		GetSubsystem<Console>()->Toggle();
+	}
+
+	ImGui::Text("This is text");
+
+	if (!checkbox_test)
+		ImGui::Checkbox("Check box?", &checkbox_test);
+	else
+		ImGui::Checkbox("Box checked!", &checkbox_test);
+
+	ImGui::End();
 }
 
 void HelloSystemUi::HandleKeyDown(StringHash eventType, VariantMap& eventData)
