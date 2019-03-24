@@ -45,8 +45,24 @@ namespace Urho3D
 		for (int i = 0; i < attributes->Size(); i++)
 		{
 			auto attribute = attributes->At(i);
+			auto column = SharedPtr<DatabaseColumn>(new DatabaseColumn(context_, attribute));
+			if (column->IsPrimaryKey())
+			{
+				primaryKey_ = column;
+			}
 
+			columms_.Push(column);
 		}
+
+		tableName_ = InitializeTableName(type);
+	}
+
+	// TODO: Find a way to alow users to use an attribute to set the table name.
+	String DatabaseTable::InitializeTableName(const TypeInfo* type)
+	{
+		String result = type->GetTypeName();
+
+		return result;
 	}
 
 	DatabaseTable::~DatabaseTable()

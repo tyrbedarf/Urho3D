@@ -41,9 +41,15 @@ namespace Urho3D
 		DatabaseTable(Context* context, const TypeInfo* type);
 		~DatabaseTable();
 
+		const String& GetTableName() const { return tableName_; }
+		const Vector<SharedPtr<DatabaseColumn>>& GetColumns() const { return columms_; }
+
 	private:
+		String InitializeTableName(const TypeInfo* type);
+		String tableName_;
+
 		Vector<SharedPtr<DatabaseColumn>> columms_;
-		WeakPtr<DatabaseColumn> primaryKey_;
+		SharedPtr<DatabaseColumn> primaryKey_;
 	};
 }
 #endif

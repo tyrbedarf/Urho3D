@@ -26,11 +26,24 @@
 #include "../../Scene/Serializable.h"
 #include "../../Core/Object.h"
 
+#include "DatabaseColumn.h"
+#include "DatabaseTable.h"
+
 namespace Urho3D
 {
 	class URHO3D_API AbstractDatabaseSerializer : public Object
 	{
 		URHO3D_OBJECT(AbstractDatabaseSerializer, Object);
+
+	public:
+		AbstractDatabaseSerializer(Context* context) :
+			Object(context)
+		{
+
+		}
+
+		virtual String GetColumnSql(const DatabaseColumn* column) = 0;
+		virtual String GetTableSql(const DatabaseTable* table) = 0;
 	};
 }
 

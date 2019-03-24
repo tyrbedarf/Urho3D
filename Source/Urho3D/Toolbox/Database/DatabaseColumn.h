@@ -34,15 +34,12 @@ namespace Urho3D
 		URHO3D_OBJECT(DatabaseColumn, Object);
 
 	public:
-		const String META_COLUMN_NAME	= "column_name";	// String
-		const String META_PRIMARY_KEY	= "primary_key";	// bool
-		const String META_NOT_NULL		= "not_null";		// bool
-
 		DatabaseColumn(Context* context, AttributeInfo& info);
 
-		const String& GetColumnName() const { return columnName_; }
-		bool IsPrimaryKey() const			{ return primaryKey; }
-		bool IsNotNull() const				{ return notNull; }
+		VariantType GetDatabaseType() const		{ return attribute_.type_; }
+		const String& GetColumnName() const		{ return columnName_; }
+		bool IsPrimaryKey() const				{ return primaryKey; }
+		bool IsNotNull() const					{ return notNull; }
 
 	private:
 		String InitializeColumnName();

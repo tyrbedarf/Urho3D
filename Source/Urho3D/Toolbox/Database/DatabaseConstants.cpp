@@ -19,41 +19,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#ifdef URHO3D_DATABASE
-
 #pragma once
 
-#include "../../Scene/Serializable.h"
-#include "../../Core/Object.h"
-#include "../../Database/DbConnection.h"
-#include "../../Database/Database.h"
+#ifdef URHO3D_DATABASE
 
-#include "DatabaseTable.h"
-#include "SqliteSerializer.h"
+#include "DatabaseConstants.h"
 
 namespace Urho3D
 {
-	class URHO3D_API DatabaseContext : public Object
-	{
-		URHO3D_OBJECT(DatabaseContext, Object);
-
-	public:
-		DatabaseContext(Context* context, String db_file);
-		~DatabaseContext();
-
-		void AddTable(const TypeInfo* t);
-		void CreateDatabase();
-
-		bool Open();
-		void Close();
-
-	private:
-		String db_file;
-		Vector<SharedPtr<DatabaseTable>> tables_;
-		SharedPtr<AbstractDatabaseSerializer> serializer_;
-
-		SharedPtr<DbConnection> connection_;
-	};
+	String DatabaseConstants::META_COLUMN_NAME = "column_name";
+	String DatabaseConstants::META_PRIMARY_KEY = "primary_key";
+	String DatabaseConstants::META_NOT_NULL = "not_null";
+	String DatabaseConstants::META_TABLE_NAME = "table_name";
 }
 
 #endif

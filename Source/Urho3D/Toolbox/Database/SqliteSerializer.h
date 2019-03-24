@@ -33,6 +33,15 @@ namespace Urho3D
 	class URHO3D_API SqliteSerializer : public AbstractDatabaseSerializer
 	{
 		URHO3D_OBJECT(SqliteSerializer, AbstractDatabaseSerializer);
+
+	public:
+		SqliteSerializer(Context* context) :
+			AbstractDatabaseSerializer(context)
+		{
+
+		}
+		virtual String GetColumnSql(const DatabaseColumn* column);
+		virtual String GetTableSql(const DatabaseTable* table);
 	};
 }
 #endif

@@ -23,6 +23,7 @@
 #ifdef URHO3D_DATABASE
 
 #include "DatabaseColumn.h"
+#include "DatabaseConstants.h"
 
 namespace Urho3D
 {
@@ -37,12 +38,14 @@ namespace Urho3D
 	String DatabaseColumn::InitializeColumnName()
 	{
 		auto result = attribute_.name_;
-		auto metaData = attribute_.GetMetadata(META_COLUMN_NAME);
+		auto metaData = attribute_.GetMetadata(DatabaseConstants::META_COLUMN_NAME);
 		if (!metaData.IsEmpty())
 		{
 			if (metaData.GetType() != VAR_STRING)
 			{
-				URHO3D_LOGWARNING("Found column name metadata on " + attribute_.name_ + " but it was not of type VAR_STRING. The provided value will be ignored");
+				URHO3D_LOGWARNING(
+					"Found column name metadata on " + attribute_.name_ +
+					" but it was not of type VAR_STRING. The provided value will be ignored");
 			}
 			else
 			{
@@ -56,12 +59,14 @@ namespace Urho3D
 	bool DatabaseColumn::InitializePrimaryKey()
 	{
 		auto result = false;
-		auto metaData = attribute_.GetMetadata(META_PRIMARY_KEY);
+		auto metaData = attribute_.GetMetadata(DatabaseConstants::META_PRIMARY_KEY);
 		if (!metaData.IsEmpty())
 		{
 			if (metaData.GetType() != VAR_BOOL)
 			{
-				URHO3D_LOGWARNING("Found primnary key metadata on " + attribute_.name_ + " but it was not of type VAR_BOOL. The provided value will be ignored");
+				URHO3D_LOGWARNING(
+					"Found primnary key metadata on " + attribute_.name_ +
+					" but it was not of type VAR_BOOL. The provided value will be ignored");
 			}
 			else
 			{
@@ -75,12 +80,14 @@ namespace Urho3D
 	bool DatabaseColumn::InitializeNotNull()
 	{
 		auto result = false;
-		auto metaData = attribute_.GetMetadata(META_NOT_NULL);
+		auto metaData = attribute_.GetMetadata(DatabaseConstants::META_NOT_NULL);
 		if (!metaData.IsEmpty())
 		{
 			if (metaData.GetType() != VAR_BOOL)
 			{
-				URHO3D_LOGWARNING("Found primnary key metadata on " + attribute_.name_ + " but it was not of type VAR_BOOL. The provided value will be ignored");
+				URHO3D_LOGWARNING(
+					"Found primnary key metadata on " + attribute_.name_ +
+					" but it was not of type VAR_BOOL. The provided value will be ignored");
 			}
 			else
 			{
