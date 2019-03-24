@@ -31,6 +31,7 @@ namespace Urho3D
 	String DatabaseConstants::META_PRIMARY_KEY = "primary_key";
 	String DatabaseConstants::META_NOT_NULL = "not_null";
 	String DatabaseConstants::META_TABLE_NAME = "table_name";
+	String DatabaseConstants::META_UNIQUE = "unique";
 }
 
 #endif

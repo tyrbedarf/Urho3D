@@ -33,9 +33,9 @@
 
 URHO3D_DEFINE_APPLICATION_MAIN(HelloUrhoOrm)
 
-void UrhoOrmPayLoad::RegisterObject(Context* context)
+void Player::RegisterObject(Context* context)
 {
-	context->RegisterFactory<UrhoOrmPayLoad>();
+	context->RegisterFactory<Player>();
 
 	URHO3D_ACCESSOR_ATTRIBUTE(
 		"PlayerId",
@@ -54,6 +54,16 @@ void UrhoOrmPayLoad::RegisterObject(Context* context)
 		"A Players Name",
 		AM_FILE)
 		.SetMetadata(DatabaseConstants::META_NOT_NULL, Variant(true));
+
+	URHO3D_ACCESSOR_ATTRIBUTE(
+		"eMail",
+		GetEMail,
+		SetEMail,
+		String,
+		"An eMail adress",
+		AM_FILE)
+		.SetMetadata(DatabaseConstants::META_NOT_NULL, Variant(true))
+		.SetMetadata(DatabaseConstants::META_UNIQUE, Variant(true));
 
 	URHO3D_ACCESSOR_ATTRIBUTE(
 		"Velocity",
@@ -82,20 +92,24 @@ void HelloUrhoOrm::Start()
 	// Execute base class startup
 	Sample::Start();
 
-	UrhoOrmPayLoad::RegisterObject(context_);
+	Player::RegisterObject(context_);
 
 	// Save a file
-	auto file = GetSubsystem<FileSystem>()->GetProgramDir() + "database.sqlite";
-	auto connectionString = "Data Source=" + file + ";Version=3;";
+	auto file = GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Databases/orm_test.sqlite";
+	auto connectionString = "file:" + file + "";
 	dbContext_ = SharedPtr<DatabaseContext>(new DatabaseContext(context_, connectionString));
-	dbContext_->AddTable(UrhoOrmPayLoad::GetTypeInfoStatic());
+	dbContext_->AddTable(Player::GetTypeInfoStatic());
 	dbContext_->CreateDatabase();
 
-	auto object = SharedPtr<UrhoOrmPayLoad>(new UrhoOrmPayLoad(context_));
+	auto object = SharedPtr<Player>(new Player(context_));
 	object->SetPlayerName("John Doe");
 	object->SetVelocity(1.5f);
 	object->SetHealth(100);
+	object->SetEMail("mail@example.de");
 
+	dbContext_->Update(object);
 
+	// Set the mouse mode to use in the sample
+	Sample::InitMouseMode(MM_FREE);
 
 }

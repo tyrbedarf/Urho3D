@@ -40,17 +40,146 @@ namespace Urho3D
 		const String& GetColumnName() const		{ return columnName_; }
 		bool IsPrimaryKey() const				{ return primaryKey; }
 		bool IsNotNull() const					{ return notNull; }
+		bool IsUnique() const					{ return unique; }
+
+		Variant Get(const Serializable* data) const
+		{
+			if (!data)
+			{
+				URHO3D_LOGERROR("Serializable cannot be null, in order to get a value.");
+				return Variant(0);
+			}
+
+			Variant result;
+			attribute_.accessor_->Get(data, result);
+
+			return result;
+		}
+
+		void Set(Serializable* data, int value)
+		{
+			if (!data)
+			{
+				URHO3D_LOGERROR("Serializable cannot be null, in order to set a value.");
+				return;
+			}
+
+			if (attribute_.type_ != VAR_INT)
+			{
+				URHO3D_LOGERROR("Attribute has the wrong data type.");
+				return;
+			}
+
+			Variant var(value);
+			attribute_.accessor_->Set(data, var);
+		}
+
+		void Set(Serializable* data, float value)
+		{
+			if (!data)
+			{
+				URHO3D_LOGERROR("Serializable cannot be null, in order to set a value.");
+				return;
+			}
+
+			if (attribute_.type_ != VAR_FLOAT)
+			{
+				URHO3D_LOGERROR("Attribute has the wrong data type.");
+				return;
+			}
+
+			Variant var(value);
+			attribute_.accessor_->Set(data, var);
+		}
+
+		void Set(Serializable* data, double value)
+		{
+			if (!data)
+			{
+				URHO3D_LOGERROR("Serializable cannot be null, in order to set a value.");
+				return;
+			}
+
+			if (attribute_.type_ != VAR_DOUBLE)
+			{
+				URHO3D_LOGERROR("Attribute has the wrong data type.");
+				return;
+			}
+
+			Variant var(value);
+			attribute_.accessor_->Set(data, var);
+		}
+
+		void Set(Serializable* data, String value)
+		{
+			if (!data)
+			{
+				URHO3D_LOGERROR("Serializable cannot be null, in order to set a value.");
+				return;
+			}
+
+			if (attribute_.type_ != VAR_STRING)
+			{
+				URHO3D_LOGERROR("Attribute has the wrong data type.");
+				return;
+			}
+
+			Variant var(value);
+			attribute_.accessor_->Set(data, var);
+		}
+
+		void Set(Serializable* data, bool value)
+		{
+			if (!data)
+			{
+				URHO3D_LOGERROR("Serializable cannot be null, in order to set a value.");
+				return;
+			}
+
+			if (attribute_.type_ != VAR_BOOL)
+			{
+				URHO3D_LOGERROR("Attribute has the wrong data type.");
+				return;
+			}
+
+			Variant var(value);
+			attribute_.accessor_->Set(data, var);
+		}
+
+		void Set(Serializable* data, Variant& value)
+		{
+			if (!data)
+			{
+				URHO3D_LOGERROR("Serializable cannot be null, in order to set a value.");
+				return;
+			}
+
+			switch (attribute_.type_)
+			{
+			case VAR_BOOL: Set(data, value.GetBool()); break;
+			case VAR_FLOAT: Set(data, value.GetFloat()); break;
+			case VAR_DOUBLE: Set(data, value.GetDouble()); break;
+			case VAR_INT: Set(data, value.GetInt()); break;
+			case VAR_STRING: Set(data, value.GetString()); break;
+
+			default:
+				URHO3D_LOGERROR("Unhandled variant type.");
+				break;
+			}
+		}
 
 	private:
 		String InitializeColumnName();
 		bool InitializePrimaryKey();
 		bool InitializeNotNull();
+		bool InitializeUnique();
 
 		AttributeInfo attribute_;
 		String columnName_;
 
 		bool primaryKey;
 		bool notNull;
+		bool unique;
 	};
 }
 #endif

@@ -34,18 +34,19 @@ namespace Urho3D
 	class tbUIView;
 }
 
-class UrhoOrmPayLoad : public Serializable
+class Player : public Serializable
 {
-	URHO3D_OBJECT(UrhoOrmPayLoad, Serializable);
+	URHO3D_OBJECT(Player, Serializable);
 
 private:
 	int mPlayerId;
 	String mPlayerName;
+	String mEMail;
 	float mVelocity;
 	int mHealth;
 
 public:
-	UrhoOrmPayLoad(Context* context) : Serializable(context)
+	Player(Context* context) : Serializable(context)
 	{
 
 	}
@@ -58,6 +59,9 @@ public:
 
 	const String& GetPlayerName() const		{ return mPlayerName; }
 	void SetPlayerName(const String& name)	{ mPlayerName = name; }
+
+	const String& GetEMail() const			{ return mEMail; }
+	void SetEMail(const String& value)		{ mEMail = value; }
 
 	float GetVelocity() const				{ return mVelocity; }
 	void SetVelocity(float value)			{ mVelocity = value; }

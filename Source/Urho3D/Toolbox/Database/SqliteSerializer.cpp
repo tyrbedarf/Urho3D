@@ -42,10 +42,29 @@ namespace Urho3D
 		}
 
 		String constraints = "";
-		if (column->IsNotNull()) { constraints += "NOT NULL "; }
-		if (column->IsPrimaryKey()) { constraints = "PRIMARY KEY"; }
+		if (column->IsNotNull())
+		{
+			constraints += "NOT NULL";
+		}
 
-		return "'" + column->GetColumnName() + "' " + type + " " + constraints;
+		if (column->IsUnique())
+		{
+			constraints += constraints.Length() > 0 ? " " : "";
+			constraints += "UNIQUE";
+		}
+
+		if (column->IsPrimaryKey())
+		{
+			constraints = "PRIMARY KEY";
+		}
+
+		auto r = "'" + column->GetColumnName() + "' " + type;
+		if (constraints.Length() > 0)
+		{
+			r += " " + constraints;
+		}
+
+		return r;
 	}
 
 	String SqliteSerializer::GetTableSql(const DatabaseTable* table)
@@ -61,13 +80,96 @@ namespace Urho3D
 				columnDescr += ", \n";
 			}
 
-			columnDescr += GetColumnSql(column);
+			columnDescr += "\t" + GetColumnSql(column);
 		}
 
 		result += "(\n" + columnDescr + "\n);";
 
 		return result;
 	}
-}
 
+	String SqliteSerializer::GetUpdateSql(
+		const DatabaseTable* table,
+		const Serializable* data)
+	{
+		auto pk = table->GetPrimaryKey();
+		String stmt = "UPDATE '" + table->GetTableName() + "' SET \n";
+		String whereClause = " WHERE ";
+		if (pk)
+		{
+			auto id = pk->Get(data).GetInt();
+			whereClause += pk->GetColumnName() + " = " + String(id) + ";";
+		}
+
+		auto columns = table->GetColumns();
+		String values = "";
+		for (auto it = columns.Begin(); it != columns.End(); it++)
+		{
+			auto column = *(it);
+			if (column->IsPrimaryKey())
+			{
+				continue;
+			}
+
+			if (values.Length() > 0)
+			{
+				values += ", \n";
+			}
+
+			switch (column->GetDatabaseType())
+			{
+			case VAR_INT: values += "\t'" + column->GetColumnName() + "' = " + String(column->Get(data).GetInt()); break;
+			case VAR_FLOAT: values += "\t'" + column->GetColumnName() + "' = " + String(column->Get(data).GetFloat()); break;
+			case VAR_DOUBLE: values += "\t'" + column->GetColumnName() + "' = " + String(column->Get(data).GetDouble()); break;
+			case VAR_BOOL: values += "\t'" + column->GetColumnName() + "' = " + String(column->Get(data).GetBool()); break;
+			case VAR_STRING: values += "\t'" + column->GetColumnName() + "' = '" + column->Get(data).GetString() + "'"; break;
+			default:
+				break;
+			}
+		}
+
+		return stmt + "(" + values + "\n) " + whereClause;
+	}
+
+	String SqliteSerializer::GetInsertSql(
+		const DatabaseTable* table,
+		const Serializable* data)
+	{
+		auto pk = table->GetPrimaryKey();
+		String stmt = "INSERT INTO '" + table->GetTableName() + "'";
+		String columnNames = "";
+		String values = "";
+
+		auto columns = table->GetColumns();
+		for (auto it = columns.Begin(); it != columns.End(); it++)
+		{
+			auto column = *(it);
+			if (column->IsPrimaryKey())
+			{
+				continue;
+			}
+
+			if (columnNames.Length() > 0)
+			{
+				columnNames += ", ";
+				values += ", ";
+			}
+
+			columnNames += "'" + column->GetColumnName() + "'";
+
+			switch (column->GetDatabaseType())
+			{
+			case VAR_INT: values += String(column->Get(data).GetInt()); break;
+			case VAR_FLOAT: values += String(column->Get(data).GetFloat()); break;
+			case VAR_DOUBLE: values += String(column->Get(data).GetDouble()); break;
+			case VAR_BOOL: values += String(column->Get(data).GetBool()); break;
+			case VAR_STRING: values += "'" + column->Get(data).GetString() + "'"; break;
+			default:
+				break;
+			}
+		}
+
+		return stmt + "(" + columnNames + ") VALUES (" + values + ");";
+	}
+}
 #endif

@@ -24,6 +24,7 @@
 
 #include "../../Database/DatabaseEvents.h"
 #include "../../IO/Log.h"
+#include "../../IO/FileSystem.h"
 
 namespace Urho3D
 {
@@ -33,7 +34,14 @@ DbConnection::DbConnection(Context* context, const String& connectionString) :
     connectionString_(connectionString),
     connectionImpl_(nullptr)
 {
-    if (sqlite3_open(connectionString.CString(), &connectionImpl_) != SQLITE_OK)
+	auto temp = connectionString;
+    if (sqlite3_open_v2(
+		temp.CString(),
+		&connectionImpl_,
+		SQLITE_OPEN_READWRITE |
+		SQLITE_OPEN_CREATE |
+		SQLITE_OPEN_URI,
+		nullptr) != SQLITE_OK)
     {
         URHO3D_LOGERRORF("Could not connect: %s", sqlite3_errmsg(connectionImpl_));
         sqlite3_close(connectionImpl_);

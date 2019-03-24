@@ -27,7 +27,8 @@
 namespace Urho3D
 {
 	DatabaseTable::DatabaseTable(Context* context, const TypeInfo* type) :
-		Object(context)
+		Object(context),
+		primaryKey_(nullptr)
 	{
 		if (type == nullptr)
 		{

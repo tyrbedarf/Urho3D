@@ -104,6 +104,7 @@ void HelloJsonSerialize::Start()
 	// Execute base class startup
 	Sample::Start();
 
+	// Register object type with the context in order to serialize
 	JsonTestPayLoad::RegisterObject(context_);
 
 	// Save a file
@@ -139,4 +140,7 @@ void HelloJsonSerialize::Start()
 	{
 		URHO3D_LOGDEBUG("Error loading file.");
 	}
+
+	// Set the mouse mode to use in the sample
+	Sample::InitMouseMode(MM_FREE);
 }

@@ -34,12 +34,17 @@ namespace Urho3D
 	{
 		URHO3D_OBJECT(SqliteSerializer, AbstractDatabaseSerializer);
 
+	protected:
+		virtual String GetUpdateSql(const DatabaseTable* table, const Serializable* data);
+		virtual String GetInsertSql(const DatabaseTable* table, const Serializable* data);
+
 	public:
 		SqliteSerializer(Context* context) :
 			AbstractDatabaseSerializer(context)
 		{
 
 		}
+
 		virtual String GetColumnSql(const DatabaseColumn* column);
 		virtual String GetTableSql(const DatabaseTable* table);
 	};

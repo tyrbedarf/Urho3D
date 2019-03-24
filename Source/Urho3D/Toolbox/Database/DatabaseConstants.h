@@ -34,6 +34,7 @@ namespace Urho3D
 		static String META_PRIMARY_KEY;	// bool
 		static String META_NOT_NULL;	// bool
 		static String META_TABLE_NAME;	// String, Not in use
+		static String META_UNIQUE;		// bool
 	};
 }
 

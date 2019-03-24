@@ -43,6 +43,10 @@ namespace Urho3D
 
 		const String& GetTableName() const { return tableName_; }
 		const Vector<SharedPtr<DatabaseColumn>>& GetColumns() const { return columms_; }
+		const DatabaseColumn* GetPrimaryKey() const
+		{
+			return primaryKey_;
+		}
 
 	private:
 		String InitializeTableName(const TypeInfo* type);

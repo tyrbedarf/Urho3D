@@ -27,6 +27,7 @@ namespace Urho3D
 {
 	DatabaseContext::DatabaseContext(Context* context, String db_file) :
 		Object(context),
+		connectionString(db_file),
 		connection_(nullptr)
 	{
 		// TODO: Currently only SQLite is supported.
@@ -41,12 +42,12 @@ namespace Urho3D
 	void DatabaseContext::AddTable(const TypeInfo* t)
 	{
 		auto table = SharedPtr<DatabaseTable>(new DatabaseTable(context_, t));
-		tables_.Push(table);
+		tables_.Insert(Pair<StringHash, SharedPtr<DatabaseTable>>(t->GetTypeName(), table));
 	}
 
 	bool DatabaseContext::Open()
 	{
-		if (db_file.Empty())
+		if (connectionString.Empty())
 		{
 			URHO3D_LOGERROR("The connection string cannot be empty in order to open a database connection.");
 			return false;
@@ -58,7 +59,9 @@ namespace Urho3D
 			return true;
 		}
 
-		connection_ = GetSubsystem<Database>()->Connect(db_file);
+		URHO3D_LOGDEBUG("Opening database: " + connectionString);
+
+		connection_ = GetSubsystem<Database>()->Connect(connectionString);
 		return connection_ != nullptr;
 	}
 	void DatabaseContext::Close()
@@ -78,14 +81,43 @@ namespace Urho3D
 		Open();
 
 		URHO3D_LOGDEBUG("Creating database:");
-		for (unsigned int i = 0; i < tables_.Size(); i++)
+		for(auto it = tables_.Begin(); it != tables_.End(); it++)
 		{
-			auto table = tables_.At(i);
+			auto table = it->second_;
 			String sql = serializer_->GetTableSql(table);
 
-			URHO3D_LOGDEBUG(sql);
+			// URHO3D_LOGDEBUG(sql);
+			auto result = connection_->Execute(sql, false);
 		}
 
+		Close();
+	}
+
+	DatabaseTable* DatabaseContext::GetTable(const TypeInfo* t)
+	{
+		if (!tables_.Contains(t->GetTypeName()))
+		{
+			URHO3D_LOGDEBUG("The type " + t->GetTypeName() + " has not been registered with this database context. All inserts and update are beeing ignored.");
+			return nullptr;
+		}
+
+		return tables_[t->GetTypeName()];
+	}
+
+	void DatabaseContext::Update(Serializable* item)
+	{
+		auto table = GetTable(item->GetTypeInfo());
+		if (!table)
+		{
+			return;
+		}
+
+		String sql = serializer_->GetUpdateOrInsertSql(table, item);
+		/*URHO3D_LOGDEBUG(sql);*/
+
+		Open();
+		auto result = connection_->Execute(sql, false);
+		URHO3D_LOGDEBUG("Affected Rows: " + String(result.GetNumAffectedRows()));
 		Close();
 	}
 }

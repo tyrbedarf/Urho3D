@@ -33,6 +33,8 @@ namespace Urho3D
 	{
 		columnName_ = InitializeColumnName();
 		primaryKey = InitializePrimaryKey();
+		notNull = InitializeNotNull();
+		unique = InitializeUnique();
 	}
 
 	String DatabaseColumn::InitializeColumnName()
@@ -86,7 +88,28 @@ namespace Urho3D
 			if (metaData.GetType() != VAR_BOOL)
 			{
 				URHO3D_LOGWARNING(
-					"Found primnary key metadata on " + attribute_.name_ +
+					"Found not null metadata on " + attribute_.name_ +
+					" but it was not of type VAR_BOOL. The provided value will be ignored");
+			}
+			else
+			{
+				result = metaData.GetBool();
+			}
+		}
+
+		return result;
+	}
+
+	bool DatabaseColumn::InitializeUnique()
+	{
+		auto result = false;
+		auto metaData = attribute_.GetMetadata(DatabaseConstants::META_UNIQUE);
+		if (!metaData.IsEmpty())
+		{
+			if (metaData.GetType() != VAR_BOOL)
+			{
+				URHO3D_LOGWARNING(
+					"Found unique metadata on " + attribute_.name_ +
 					" but it was not of type VAR_BOOL. The provided value will be ignored");
 			}
 			else

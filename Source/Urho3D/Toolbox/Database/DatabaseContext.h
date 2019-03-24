@@ -47,12 +47,17 @@ namespace Urho3D
 		bool Open();
 		void Close();
 
+		void Update(Serializable* item);
+
 	private:
-		String db_file;
-		Vector<SharedPtr<DatabaseTable>> tables_;
+		String connectionString;
+		/*Vector<SharedPtr<DatabaseTable>> tables_;*/
+		HashMap<StringHash, SharedPtr<DatabaseTable>> tables_;
 		SharedPtr<AbstractDatabaseSerializer> serializer_;
 
 		SharedPtr<DbConnection> connection_;
+
+		DatabaseTable* GetTable(const TypeInfo* t);
 	};
 }
 

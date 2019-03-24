@@ -35,6 +35,10 @@ namespace Urho3D
 	{
 		URHO3D_OBJECT(AbstractDatabaseSerializer, Object);
 
+	protected:
+		virtual String GetUpdateSql(const DatabaseTable* table, const Serializable* data) = 0;
+		virtual String GetInsertSql(const DatabaseTable* table, const Serializable* data) = 0;
+
 	public:
 		AbstractDatabaseSerializer(Context* context) :
 			Object(context)
@@ -44,6 +48,21 @@ namespace Urho3D
 
 		virtual String GetColumnSql(const DatabaseColumn* column) = 0;
 		virtual String GetTableSql(const DatabaseTable* table) = 0;
+
+		String GetUpdateOrInsertSql(const DatabaseTable* table, const Serializable* data)
+		{
+			auto pk = table->GetPrimaryKey();
+			if (pk)
+			{
+				auto id = pk->Get(data).GetInt();
+				if (id > 0)
+				{
+					return GetUpdateSql(table, data);
+				}
+			}
+
+			return GetInsertSql(table, data);
+		}
 	};
 }
 
