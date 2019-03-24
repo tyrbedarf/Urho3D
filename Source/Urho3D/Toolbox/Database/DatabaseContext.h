@@ -49,9 +49,52 @@ namespace Urho3D
 
 		void Update(Serializable* item);
 
+		template<class T>
+		Vector<SharedPtr<T>> Select(String whereClause)
+		{
+			Vector<SharedPtr<T>> result;
+			auto type = T::GetTypeInfoStatic();
+			auto table = GetTable(type);
+			if (!table)
+			{
+				return result;
+			}
+
+			Open();
+			auto dbResult = connection_->Execute(serializer_->GetSelect(whereClause, table), false);
+			Close();
+
+			if (dbResult.GetRows().Size() < 1)
+			{
+				return result;
+			}
+
+			for (int i = 0; i < dbResult.GetRows().Size(); i++)
+			{
+				auto item = context_->CreateObject(T::GetTypeNameStatic());
+				if (!item)
+				{
+					URHO3D_LOGERROR("Could not create object of type " + T::GetTypeNameStatic() + ". Did you forget to register a factory with the context?");
+					return result;
+				}
+
+				if (!item->GetTypeInfo()->IsTypeOf<Serializable>())
+				{
+					URHO3D_LOGERROR("In order to use Urho3D ORM every object must inherit from Serializable.");
+					return result;
+				}
+
+				auto deserialized = static_cast<T*>(item.Get());
+				table->Select(dbResult, deserialized, i);
+
+				result.Push(SharedPtr<T>(deserialized));
+			}
+
+			return result;
+		}
+
 	private:
 		String connectionString;
-		/*Vector<SharedPtr<DatabaseTable>> tables_;*/
 		HashMap<StringHash, SharedPtr<DatabaseTable>> tables_;
 		SharedPtr<AbstractDatabaseSerializer> serializer_;
 

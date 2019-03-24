@@ -146,7 +146,7 @@ namespace Urho3D
 			attribute_.accessor_->Set(data, var);
 		}
 
-		void Set(Serializable* data, Variant& value)
+		void Set(Serializable* data, const Variant& value)
 		{
 			if (!data)
 			{

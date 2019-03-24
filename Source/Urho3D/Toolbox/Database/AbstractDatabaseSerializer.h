@@ -48,6 +48,7 @@ namespace Urho3D
 
 		virtual String GetColumnSql(const DatabaseColumn* column) = 0;
 		virtual String GetTableSql(const DatabaseTable* table) = 0;
+		virtual String GetSelect(const String& whereClause, const DatabaseTable* table) = 0;
 
 		String GetUpdateOrInsertSql(const DatabaseTable* table, const Serializable* data)
 		{

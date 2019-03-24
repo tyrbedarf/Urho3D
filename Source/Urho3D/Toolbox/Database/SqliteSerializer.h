@@ -47,6 +47,7 @@ namespace Urho3D
 
 		virtual String GetColumnSql(const DatabaseColumn* column);
 		virtual String GetTableSql(const DatabaseTable* table);
+		virtual String GetSelect(const String& whereClause, const DatabaseTable* table);
 	};
 }
 #endif

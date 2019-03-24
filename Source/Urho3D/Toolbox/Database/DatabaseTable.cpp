@@ -52,7 +52,7 @@ namespace Urho3D
 				primaryKey_ = column;
 			}
 
-			columms_.Push(column);
+			columms_.Insert(Pair<StringHash, SharedPtr<DatabaseColumn>>(column->GetColumnName(), column));
 		}
 
 		tableName_ = InitializeTableName(type);

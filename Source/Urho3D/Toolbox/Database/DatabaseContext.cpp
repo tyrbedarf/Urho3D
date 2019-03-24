@@ -64,6 +64,7 @@ namespace Urho3D
 		connection_ = GetSubsystem<Database>()->Connect(connectionString);
 		return connection_ != nullptr;
 	}
+
 	void DatabaseContext::Close()
 	{
 		if (!connection_)

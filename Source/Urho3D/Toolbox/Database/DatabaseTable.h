@@ -28,6 +28,7 @@
 #include "../../Core/Context.h"
 #include "../../Container/Vector.h"
 #include "../../IO/Log.h"
+#include "../../Database/DbResult.h"
 
 #include "DatabaseColumn.h"
 
@@ -42,17 +43,33 @@ namespace Urho3D
 		~DatabaseTable();
 
 		const String& GetTableName() const { return tableName_; }
-		const Vector<SharedPtr<DatabaseColumn>>& GetColumns() const { return columms_; }
+		const HashMap<StringHash, SharedPtr<DatabaseColumn>>& GetColumns() const { return columms_; }
 		const DatabaseColumn* GetPrimaryKey() const
 		{
 			return primaryKey_;
+		}
+
+		template<class T>
+		void Select(const DbResult& result, T* data, int row)
+		{
+			for (unsigned int i = 0; i < result.GetColumns().Size(); i++)
+			{
+				SharedPtr<DatabaseColumn> column;
+				if (!columms_.TryGetValue(result.GetColumns().At(i), column))
+				{
+					URHO3D_LOGWARNING(GetTableName() + " has no column named " + result.GetColumns().At(i));
+					continue;
+				}
+
+				column->Set(data, result.GetRows().At(row).At(i));
+			}
 		}
 
 	private:
 		String InitializeTableName(const TypeInfo* type);
 		String tableName_;
 
-		Vector<SharedPtr<DatabaseColumn>> columms_;
+		HashMap<StringHash, SharedPtr<DatabaseColumn>> columms_;
 		SharedPtr<DatabaseColumn> primaryKey_;
 	};
 }

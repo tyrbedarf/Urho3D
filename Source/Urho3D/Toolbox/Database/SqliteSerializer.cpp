@@ -72,10 +72,10 @@ namespace Urho3D
 		String result = "CREATE TABLE IF NOT EXISTS " + table->GetTableName();
 		String columnDescr = "";
 		auto columns = table->GetColumns();
-		for (unsigned int i = 0; i < columns.Size(); i++)
+		for(auto it = columns.Begin(); it != columns.End(); it++)
 		{
-			auto column = columns.At(i);
-			if (i > 0)
+			auto column = it->second_;
+			if (columnDescr.Length() > 0)
 			{
 				columnDescr += ", \n";
 			}
@@ -105,7 +105,7 @@ namespace Urho3D
 		String values = "";
 		for (auto it = columns.Begin(); it != columns.End(); it++)
 		{
-			auto column = *(it);
+			auto column = it->second_;
 			if (column->IsPrimaryKey())
 			{
 				continue;
@@ -143,7 +143,7 @@ namespace Urho3D
 		auto columns = table->GetColumns();
 		for (auto it = columns.Begin(); it != columns.End(); it++)
 		{
-			auto column = *(it);
+			auto column = it->second_;
 			if (column->IsPrimaryKey())
 			{
 				continue;
@@ -170,6 +170,11 @@ namespace Urho3D
 		}
 
 		return stmt + "(" + columnNames + ") VALUES (" + values + ");";
+	}
+
+	String SqliteSerializer::GetSelect(const String& whereClause, const DatabaseTable* table)
+	{
+		return "SELECT * FROM '" + table->GetTableName() + "' WHERE " + whereClause;
 	}
 }
 #endif

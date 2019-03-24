@@ -109,6 +109,10 @@ void HelloUrhoOrm::Start()
 
 	dbContext_->Update(object);
 
+	auto result = dbContext_->Select<Player>("PlayerId = 2");
+	auto item = result.At(0);
+	URHO3D_LOGERROR("Player Name: " + item->GetPlayerName() + " Velocity: " + String(item->GetVelocity()));
+
 	// Set the mouse mode to use in the sample
 	Sample::InitMouseMode(MM_FREE);
 
