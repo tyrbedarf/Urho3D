@@ -37,6 +37,7 @@ void Player::RegisterObject(Context* context)
 {
 	context->RegisterFactory<Player>();
 
+	// Only attributes can be serialized automatically.
 	URHO3D_ACCESSOR_ATTRIBUTE(
 		"PlayerId",
 		GetPlayerId,
@@ -44,7 +45,12 @@ void Player::RegisterObject(Context* context)
 		int,
 		-1,
 		AM_FILE)
-		.SetMetadata(DatabaseConstants::META_PRIMARY_KEY, Variant(true));
+		// Add meta information to the accessor. In this case a primary key
+		.SetMetadata(DatabaseConstants::META_PRIMARY_KEY, Variant(true))
+		// Add information about how the widget is beeing configured.
+		// This is only needed if the data is presented inside a database view
+		// widget.
+		.SetMetadata(DatabaseConstants::META_WIDGET_MIN_WIDTH, Variant(50));
 
 	URHO3D_ACCESSOR_ATTRIBUTE(
 		"PlayerName",
@@ -53,7 +59,9 @@ void Player::RegisterObject(Context* context)
 		String,
 		"A Players Name",
 		AM_FILE)
-		.SetMetadata(DatabaseConstants::META_NOT_NULL, Variant(true));
+		// Add meta information to the accessor. In this case a not null constraint.
+		.SetMetadata(DatabaseConstants::META_NOT_NULL, Variant(true))
+		.SetMetadata(DatabaseConstants::META_WIDGET_MIN_WIDTH, Variant(150));
 
 	URHO3D_ACCESSOR_ATTRIBUTE(
 		"eMail",
@@ -63,7 +71,9 @@ void Player::RegisterObject(Context* context)
 		"An eMail adress",
 		AM_FILE)
 		.SetMetadata(DatabaseConstants::META_NOT_NULL, Variant(true))
-		.SetMetadata(DatabaseConstants::META_UNIQUE, Variant(true));
+		// Add meta information to the accessor. In this case a unique constraint.
+		.SetMetadata(DatabaseConstants::META_UNIQUE, Variant(true))
+		.SetMetadata(DatabaseConstants::META_WIDGET_MIN_WIDTH, Variant(150));
 
 	URHO3D_ACCESSOR_ATTRIBUTE(
 		"Velocity",
@@ -71,7 +81,8 @@ void Player::RegisterObject(Context* context)
 		SetVelocity,
 		float,
 		0.0f,
-		AM_FILE);
+		AM_FILE)
+		.SetMetadata(DatabaseConstants::META_WIDGET_MIN_WIDTH, Variant(50));
 
 	URHO3D_ACCESSOR_ATTRIBUTE(
 		"Health",
@@ -79,7 +90,8 @@ void Player::RegisterObject(Context* context)
 		SetHealth,
 		int,
 		100,
-		AM_FILE);
+		AM_FILE)
+		.SetMetadata(DatabaseConstants::META_WIDGET_MIN_WIDTH, Variant(50));
 }
 
 HelloUrhoOrm::HelloUrhoOrm(Context* context) :
@@ -96,18 +108,39 @@ void HelloUrhoOrm::Start()
 
 	// Save a file
 	auto file = GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Databases/orm_test.sqlite";
-	auto connectionString = "file:" + file + "";
-	dbContext_ = SharedPtr<DatabaseContext>(new DatabaseContext(context_, connectionString));
-	dbContext_->AddTable(Player::GetTypeInfoStatic());
-	dbContext_->CreateDatabase();
+	if (!GetSubsystem<FileSystem>()->FileExists(file))
+	{
+		auto connectionString = "file:" + file + "";
+		dbContext_ = SharedPtr<DatabaseContext>(new DatabaseContext(context_, connectionString));
+		// Create a table for each type you want to store inside the database.
+		// All types must inherit from serializable.
+		dbContext_->AddTable(Player::GetTypeInfoStatic());
+		dbContext_->CreateDatabase();
 
-	auto object = SharedPtr<Player>(new Player(context_));
-	object->SetPlayerName("John Doe");
-	object->SetVelocity(1.5f);
-	object->SetHealth(100);
-	object->SetEMail("mail@example.de");
+		auto object = SharedPtr<Player>(new Player(context_));
+		object->SetPlayerName("John Doe");
+		object->SetVelocity(1.5f);
+		object->SetHealth(100);
+		object->SetEMail("mail@example.de");
 
-	dbContext_->Update(object);
+		dbContext_->Update(object);
+
+		object = SharedPtr<Player>(new Player(context_));
+		object->SetPlayerName("Timo Beil");
+		object->SetVelocity(2.5f);
+		object->SetHealth(86);
+		object->SetEMail("mail2@example.de");
+
+		dbContext_->Update(object);
+
+		object = SharedPtr<Player>(new Player(context_));
+		object->SetPlayerName("Anne Strasse");
+		object->SetVelocity(1.1f);
+		object->SetHealth(20);
+		object->SetEMail("mail3@example.de");
+
+		dbContext_->Update(object);
+	}
 
 	auto result = dbContext_->Select<Player>("PlayerId = 1");
 	auto item = result.At(0);

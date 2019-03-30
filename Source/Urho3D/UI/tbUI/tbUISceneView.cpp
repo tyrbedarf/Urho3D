@@ -229,7 +229,6 @@ namespace Urho3D
 		x += 0.5f;
 		y += 0.5f;
 #endif
-
 #endif
 
 		data[3] = color;

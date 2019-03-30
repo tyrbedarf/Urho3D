@@ -295,6 +295,21 @@ elements
 	TBWindow.close.pressed
 		bitmap window_close_pressed.png
 		type Image
+	
+	TBWindow.minimize
+		bitmap arrow_down.png
+		type Image
+	
+	TBWindow.node_pin
+		bitmap radio.png
+		type Image
+		children
+			element TBWindow.node_pin.pressed
+				state pressed
+	TBWindow.node_pin.pressed
+		bitmap radio_mark.png
+		type Image
+	
 	TBWindow.mover
 		text-color #b8b8b8
 		bitmap window_mover_bg_tile.png

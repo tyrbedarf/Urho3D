@@ -32,6 +32,8 @@ namespace Urho3D
 	String DatabaseConstants::META_NOT_NULL		= "not_null";
 	String DatabaseConstants::META_TABLE_NAME	= "table_name";
 	String DatabaseConstants::META_UNIQUE		= "unique";
+
+	String DatabaseConstants::META_WIDGET_MIN_WIDTH = "widget_min_width";
 }
 
 #endif

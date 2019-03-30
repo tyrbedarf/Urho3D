@@ -1,0 +1,34 @@
+TBLayout 
+	distribution gravity
+	spacing 4
+	axis y
+	id "settings window"
+	TBLayout: distribution: gravity, spacing: 4, axis: x
+		TBTextField 
+			text Databasefile
+			lp: min-width: 100
+			gravity left 
+		TBEditField
+			placeholder Databasefile
+			id settings database file name
+			lp: min-width: 350
+		TBButton
+			id btn settings choose file
+			text Choose
+		TBLayout: gravity: left right
+			TBWidget
+	
+	TBLayout: distribution: gravity, spacing: 4, axis: x
+		TBTextField 
+			text Asset Importer
+			lp: min-width: 100
+			gravity left 
+		TBEditField
+			placeholder Asset Importer
+			id settings asset importer
+			lp: min-width: 350
+		TBButton
+			id btn settings find asset importer
+			text Choose
+		TBLayout: gravity: left right
+			TBWidget
