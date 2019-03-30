@@ -25,8 +25,10 @@
 #include "Sample.h"
 #include <Urho3D/Core/Variant.h>
 #include <Urho3D/Math/Vector3.h>
+#include <Urho3D/ThirdParty/TurboBadger/tb_widgets.h>
 
 #include <Urho3D/Toolbox/Database/DatabaseContext.h>
+#include <Urho3D/Toolbox/Database/DatatableViewWidget.h>
 
 namespace Urho3D
 {
@@ -70,6 +72,13 @@ public:
 	void SetHealth(int value)				{ mHealth = value; }
 };
 
+namespace Urho3D
+{
+	class tbUIWidget;
+	class tbUIView;
+}
+
+
 class HelloUrhoOrm : public Sample
 {
 	URHO3D_OBJECT(HelloUrhoOrm, Sample)
@@ -83,6 +92,18 @@ public:
 
 protected:
 	SharedPtr<DatabaseContext> dbContext_;
+
+	WeakPtr<DatatableViewWidget> window_;
+	WeakPtr<tbUIView> uiView_;
+
+	void CreateUI();
+
+	/// Subscribe to application-wide logic update events.
+	void SubscribeToEvents();
+
+	/// Handle the logic update event.
+	void HandleWidgetEvent(StringHash eventType, VariantMap& eventData);
+
 
 private:
 };

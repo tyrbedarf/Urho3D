@@ -283,7 +283,7 @@ namespace Urho3D
 		if (skin == "TB/resources/skin/skin.tb.txt")
 		{
 			AddFont("Fonts/BlueHighway.ttf", "BlueHighway");
-			SetDefaultFont("BlueHighway", 14);
+			SetDefaultFont("BlueHighway", 18);
 		}
 	}
 

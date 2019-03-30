@@ -125,9 +125,9 @@ DbResult DbConnection::Execute(const String& sql, bool useCursorEvent)
                         colValues[i] = sqlite3_column_double(pStmt, i);
                         break;
 
-					case SQLITE_BLOB:
-						colValues[i] = sqlite3_column_blob(pStmt, i);
-						break;
+					//case SQLITE_BLOB:
+					//	colValues[i] = sqlite3_column_blob(pStmt, i);
+					//	break;
 
                     default:
                         // All other types are stored using their string representation in the Variant

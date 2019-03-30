@@ -26,6 +26,10 @@
 #include <Urho3D/Graphics/Graphics.h>
 #include <Urho3D/Resource/ResourceCache.h>
 #include <Urho3D/Toolbox/Database/DatabaseConstants.h>
+#include <Urho3D/UI/tbUI/tbUI.h>
+#include <Urho3D/UI/tbUI/tbUIView.h>
+#include <Urho3D/UI/tbUI/tbUIEvents.h>
+#include <Urho3D/Toolbox/Database/DatatableViewWidget.h>
 
 #include "HelloUrhoOrm.h"
 
@@ -61,7 +65,7 @@ void Player::RegisterObject(Context* context)
 		AM_FILE)
 		// Add meta information to the accessor. In this case a not null constraint.
 		.SetMetadata(DatabaseConstants::META_NOT_NULL, Variant(true))
-		.SetMetadata(DatabaseConstants::META_WIDGET_MIN_WIDTH, Variant(150));
+		.SetMetadata(DatabaseConstants::META_WIDGET_MIN_WIDTH, Variant(200));
 
 	URHO3D_ACCESSOR_ATTRIBUTE(
 		"eMail",
@@ -73,7 +77,7 @@ void Player::RegisterObject(Context* context)
 		.SetMetadata(DatabaseConstants::META_NOT_NULL, Variant(true))
 		// Add meta information to the accessor. In this case a unique constraint.
 		.SetMetadata(DatabaseConstants::META_UNIQUE, Variant(true))
-		.SetMetadata(DatabaseConstants::META_WIDGET_MIN_WIDTH, Variant(150));
+		.SetMetadata(DatabaseConstants::META_WIDGET_MIN_WIDTH, Variant(200));
 
 	URHO3D_ACCESSOR_ATTRIBUTE(
 		"Velocity",
@@ -82,7 +86,7 @@ void Player::RegisterObject(Context* context)
 		float,
 		0.0f,
 		AM_FILE)
-		.SetMetadata(DatabaseConstants::META_WIDGET_MIN_WIDTH, Variant(50));
+		.SetMetadata(DatabaseConstants::META_WIDGET_MIN_WIDTH, Variant(80));
 
 	URHO3D_ACCESSOR_ATTRIBUTE(
 		"Health",
@@ -91,7 +95,7 @@ void Player::RegisterObject(Context* context)
 		int,
 		100,
 		AM_FILE)
-		.SetMetadata(DatabaseConstants::META_WIDGET_MIN_WIDTH, Variant(50));
+		.SetMetadata(DatabaseConstants::META_WIDGET_MIN_WIDTH, Variant(80));
 }
 
 HelloUrhoOrm::HelloUrhoOrm(Context* context) :
@@ -106,15 +110,26 @@ void HelloUrhoOrm::Start()
 
 	Player::RegisterObject(context_);
 
-	// Save a file
+	CreateUI();
+
+	SubscribeToEvents();
+
+	// Set the mouse mode to use in the sample
+	Sample::InitMouseMode(MM_FREE);
+
+	// The database file.
 	auto file = GetSubsystem<FileSystem>()->GetProgramDir() + "Data/Databases/orm_test.sqlite";
+
+	// Create the actual database context.
+	auto connectionString = "file:" + file + "";
+	dbContext_ = SharedPtr<DatabaseContext>(new DatabaseContext(context_, connectionString));
+	// Create a table for each type you want to store inside the database.
+	// All types must inherit from serializable.
+	dbContext_->AddTable(Player::GetTypeInfoStatic());
+
 	if (!GetSubsystem<FileSystem>()->FileExists(file))
 	{
-		auto connectionString = "file:" + file + "";
-		dbContext_ = SharedPtr<DatabaseContext>(new DatabaseContext(context_, connectionString));
-		// Create a table for each type you want to store inside the database.
-		// All types must inherit from serializable.
-		dbContext_->AddTable(Player::GetTypeInfoStatic());
+		// Database does not exist, so create tables and add some samples
 		dbContext_->CreateDatabase();
 
 		auto object = SharedPtr<Player>(new Player(context_));
@@ -142,10 +157,35 @@ void HelloUrhoOrm::Start()
 		dbContext_->Update(object);
 	}
 
-	auto result = dbContext_->Select<Player>("PlayerId = 1");
+	// Select a player object. The argument is the where part of an sql query.
+	auto result = dbContext_->Select<Player>("PlayerId = 2");
 	auto item = result.At(0);
 	URHO3D_LOGERROR("Player Name: " + item->GetPlayerName() + " Velocity: " + String(item->GetVelocity()));
 
 	// Set the mouse mode to use in the sample
 	Sample::InitMouseMode(MM_FREE);
+
+	window_ = SharedPtr<DatatableViewWidget>(new DatatableViewWidget(context_, Player::GetTypeInfoStatic()));
+	window_->SetData(result);
+	window_->SetSize(200, 200);
+
+	uiView_->AddChild(window_);
+}
+
+void HelloUrhoOrm::CreateUI()
+{
+	tbUI* ui = GetSubsystem<tbUI>();
+	ui->Initialize("TB/resources/language/lng_en.tb.txt");
+	ui->LoadDefaultPlayerSkin();
+
+	uiView_ = new tbUIView(context_);
+}
+
+void HelloUrhoOrm::SubscribeToEvents()
+{
+	SubscribeToEvent(E_WIDGETEVENT, URHO3D_HANDLER(HelloUrhoOrm, HandleWidgetEvent));
+}
+
+void HelloUrhoOrm::HandleWidgetEvent(StringHash eventType, VariantMap& eventData)
+{
 }

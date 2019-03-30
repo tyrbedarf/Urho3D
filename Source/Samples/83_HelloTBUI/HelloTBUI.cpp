@@ -114,9 +114,6 @@ void HelloGui::CreateUI()
 	edit_health->SetLimits(0.0f, 100.0f);
 	edit_health->SetLayoutMinWidth(min_with);
 
-	// edit_name->SetSerializable(example_, "PlayerName");
-	// edit_health->SetSerializable(example_, "PlayerHealth");
-
 	input_layout->AddChild(name_layout);
 	input_layout->AddChild(health_layout);
 

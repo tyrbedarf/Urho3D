@@ -168,6 +168,9 @@ namespace Urho3D
 			}
 		}
 
+		/// Return the attribute info found while constructing this type.
+		const AttributeInfo& GetAttributeInfo() const { return attribute_; }
+
 	private:
 		String InitializeColumnName();
 		bool InitializePrimaryKey();

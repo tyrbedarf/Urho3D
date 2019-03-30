@@ -174,7 +174,13 @@ namespace Urho3D
 
 	String SqliteSerializer::GetSelect(const String& whereClause, const DatabaseTable* table)
 	{
-		return "SELECT * FROM '" + table->GetTableName() + "' WHERE " + whereClause + ";";
+		auto r = "SELECT * FROM '" + table->GetTableName() + "'";
+		if (whereClause.Length() > 0)
+		{
+			r += " WHERE " + whereClause;
+		}
+
+		return r + ";";
 	}
 }
 #endif

@@ -98,7 +98,7 @@ namespace Urho3D
 	{
 		if (!tables_.Contains(t->GetTypeName()))
 		{
-			URHO3D_LOGDEBUG("The type " + t->GetTypeName() + " has not been registered with this database context. All inserts and update are beeing ignored.");
+			URHO3D_LOGWARNING("The type " + t->GetTypeName() + " has not been registered with this database context. All inserts and update are beeing ignored.");
 			return nullptr;
 		}
 
