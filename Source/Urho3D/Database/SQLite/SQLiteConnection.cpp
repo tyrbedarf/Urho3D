@@ -83,6 +83,7 @@ DbResult DbConnection::Execute(const String& sql, bool useCursorEvent)
         assert(!pStmt);
         return result;
     }
+
     if (*zLeftover)
     {
         URHO3D_LOGERROR("Could not execute: only one SQL statement is allowed");
@@ -114,13 +115,19 @@ DbResult DbConnection::Execute(const String& sql, bool useCursorEvent)
                     {
                     case SQLITE_INTEGER:
                         colValues[i] = sqlite3_column_int(pStmt, i);
+
                         if (String(sqlite3_column_decltype(pStmt, i)).Compare("BOOLEAN", false) == 0)
                             colValues[i] = colValues[i] != 0;
+
                         break;
 
                     case SQLITE_FLOAT:
                         colValues[i] = sqlite3_column_double(pStmt, i);
                         break;
+
+					case SQLITE_BLOB:
+						colValues[i] = sqlite3_column_blob(pStmt, i);
+						break;
 
                     default:
                         // All other types are stored using their string representation in the Variant

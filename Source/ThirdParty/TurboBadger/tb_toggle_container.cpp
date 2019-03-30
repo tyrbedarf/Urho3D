@@ -50,14 +50,12 @@ TBSection::TBSection()
     m_layout.SetGravity(WIDGET_GRAVITY_ALL);
     m_layout.SetLayoutSize(LAYOUT_SIZE_AVAILABLE);
 
-    // ATOMIC BEGIN
     m_toggle_container_layout.SetSkinBg(TBIDC("TBSection.layout"), WIDGET_INVOKE_INFO_NO_CALLBACKS);
     m_toggle_container_layout.SetAxis(AXIS_Y);
     m_toggle_container_layout.SetGravity(WIDGET_GRAVITY_ALL);
     m_toggle_container_layout.SetLayoutSize(LAYOUT_SIZE_AVAILABLE);
 
     m_toggle_container.AddChild(&m_toggle_container_layout);
-    // ATOMIC END
 
     AddChild(&m_layout);
     m_layout.AddChild(&m_header);
@@ -66,13 +64,12 @@ TBSection::TBSection()
 
 TBSection::~TBSection()
 {
-    // ATOMIC BEGIN
     while (TBWidget* child = m_toggle_container_layout.GetFirstChild())
     {
         m_toggle_container_layout.RemoveChild(child);
     }
     m_toggle_container.RemoveChild(&m_toggle_container_layout);
-    // ATOMIC END
+
     m_layout.RemoveChild(&m_toggle_container);
     m_layout.RemoveChild(&m_header);
     RemoveChild(&m_layout);
@@ -84,7 +81,6 @@ void TBSection::SetValue(int value)
     m_toggle_container.SetValue(value);
 }
 
-// ATOMIC BEGIN
 void TBSection::AddToggleChild(TBWidget *child, WIDGET_Z z, WIDGET_INVOKE_INFO info)
 {
     m_toggle_container_layout.AddChild(child, z, info);
@@ -114,7 +110,6 @@ TBWidget* TBSection::GetToggleWidgetById(const TBID &id)
 {
     return m_toggle_container_layout.GetWidgetByTouchId(id);
 }
-// ATOMIC END
 
 void TBSection::OnProcessAfterChildren()
 {

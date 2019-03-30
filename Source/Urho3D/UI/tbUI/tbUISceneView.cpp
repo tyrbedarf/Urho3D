@@ -223,9 +223,8 @@ namespace Urho3D
 		float w = (float)rect.w;
 		float h = (float)rect.h;
 
-#ifdef ATOMIC_PLATFORM_WINDOWS
-
-#ifndef ATOMIC_D3D11
+#ifdef WIN32
+#ifndef URHO3D_D3D11
 		//Direct3D9 Adjustment
 		x += 0.5f;
 		y += 0.5f;

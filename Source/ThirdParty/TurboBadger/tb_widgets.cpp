@@ -143,16 +143,6 @@ namespace tb {
 
 		StopLongClickTimer();
 
-		//if (m_listeners.HasLinks())
-		//{
-		//	auto it = m_listeners.IterateForward();
-		//	TBWidgetListener* item = nullptr;
-		//	while ((item = it.GetAndStep()) != nullptr)
-		//	{
-		//		printf("Item");
-		//	}
-		//}
-
 		// assert(!m_listeners.HasLinks()); // There's still listeners added to this widget!
 	}
 
@@ -403,14 +393,9 @@ namespace tb {
 
 	void TBWidget::RemoveChild(TBWidget *child, WIDGET_INVOKE_INFO info)
 	{
-
-		// ATOMIC BEGIN
-
-			// this was an assert(child->m_parent)
+		// this was an assert(child->m_parent)
 		if (child->m_parent != this)
 			return;
-
-		// ATOMIC END
 
 		if (info == WIDGET_INVOKE_INFO_NORMAL)
 		{
@@ -785,8 +770,6 @@ namespace tb {
 		return last_match;
 	}
 
-	// ATOMIC BEGIN
-
 	/** Returns the number of children this widget contains. */
 	int TBWidget::numChildren()
 	{
@@ -879,10 +862,6 @@ namespace tb {
 			child->SearchWidgetText(searchText, results);
 		}
 	}
-
-
-	// ATOMIC END
-
 
 	TBWidget *TBWidget::GetChildFromIndex(int index) const
 	{
@@ -1027,9 +1006,7 @@ namespace tb {
 
 	void TBWidget::OnResized(int old_w, int old_h)
 	{
-		// ATOMIC BEGIN  So pure UIWidgets can handle resize
 		if (GetDelegate()) { GetDelegate()->OnResized(old_w, old_h); }
-		// ATOMIC END
 
 		int dw = m_rect.w - old_w;
 		int dh = m_rect.h - old_h;
@@ -1577,8 +1554,6 @@ namespace tb {
 			TBWidgetEvent ev_click(EVENT_TYPE_CLICK, x, y, touch, modifierkeys);
 			captured_widget->OnCaptureChanged(false);
 
-			// ATOMIC BEGIN
-
 			// Atomic's TurboBadger multitouch support is a hack, TurboBadger has since added better support
 			// https://github.com/AtomicGameEngine/AtomicGameEngine/issues/1206
 
@@ -1592,8 +1567,6 @@ namespace tb {
 
 			if (captured_widget)
 				captured_widget->ReleaseCapture();
-
-			// ATOMIC END
 		}
 		//restore x and y coords, to use with down_widget
 		x = ox;

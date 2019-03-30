@@ -106,6 +106,9 @@ public:
     /** Draw a filled rectangle. */
     virtual void DrawRectFill(const TBRect &dst_rect, const TBColor &color) = 0;
 
+	/** Draw a line from point a to point b. */
+	virtual void DrawLine(const TBPoint& a, const TBPoint& b, const TBColor& c, int thickness = 1) = 0;
+
     /** Make sure the given bitmap fragment is flushed from any batching, because it may
         be changed or deleted after this call. */
     virtual void FlushBitmapFragment(TBBitmapFragment *bitmap_fragment) = 0;

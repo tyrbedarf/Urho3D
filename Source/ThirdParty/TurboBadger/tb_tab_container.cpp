@@ -6,11 +6,10 @@
 #include "tb_tab_container.h"
 #include <assert.h>
 
-// ATOMIC BEGIN
 #include "tb_node_tree.h"
 #include "tb_widgets_reader.h"
 #include "tb_atomic_widgets.h"
-// ATOMIC END
+
 
 namespace tb {
 
@@ -114,7 +113,7 @@ void TBTabContainer::SetValue(int index)
             if (page->GetVisibility() == WIDGET_VISIBILITY_GONE)
                 continue;
 
-            TBRect contentRect = m_content_root.GetRect();            
+            TBRect contentRect = m_content_root.GetRect();
             TBSkinElement* skin = m_content_root.GetSkinBgElement();
             contentRect = contentRect.Shrink(skin->padding_left, skin->padding_top, skin->padding_right, skin->padding_bottom);
 
@@ -188,9 +187,7 @@ void TBTabContainer::OnProcess()
     }
 }
 
-// ATOMIC BEGIN
-
-/// takes the contents of a DockWindow into a tab in a tabcontainer 
+/// takes the contents of a DockWindow into a tab in a tabcontainer
 bool TBTabContainer::DockFromWindow ( TBStr windowTitle )
 {
     int nn = 0;
@@ -200,7 +197,7 @@ bool TBTabContainer::DockFromWindow ( TBStr windowTitle )
         if ( mxw->GetText().Equals(windowTitle) )
         {
             TBDockWindow *dw1 = TBSafeCast<TBDockWindow>( mxw );
-            if (dw1) 
+            if (dw1)
                 dw1->Dock ( this );
             return true;
         }
@@ -212,7 +209,7 @@ bool TBTabContainer::DockFromWindow ( TBStr windowTitle )
 /// undocks the page into a window with the tab name, and removes the tab
 void TBTabContainer::UndockPage ( int page )
 {
-    TBWidget *mytab = GetTabLayout()->GetChildFromIndex(page);  // find the offending tab 
+    TBWidget *mytab = GetTabLayout()->GetChildFromIndex(page);  // find the offending tab
     TBWidget *mypage = GetContentRoot()->GetChildFromIndex(page);   // find the offending page (layout)
 
     if (mytab == NULL || mypage == NULL ) return; // nobody home
@@ -223,12 +220,10 @@ void TBTabContainer::UndockPage ( int page )
     GetContentRoot()->RemoveChild(mypage);  // remove the pagewidget[page] from the content root (without deleting it, hopefully)
     TBDockWindow *mywindow = new TBDockWindow(tabstr, mypage); // create an undock window.
     mywindow->SetDockOrigin( GetID() );  //tell it to redock here
-    mywindow->Show(GetParentRoot(true)); 
+    mywindow->Show(GetParentRoot(true));
 
     Invalidate(); // and tell everyone the party is over.
 
 }
-
-// ATOMIC END
 
 }; // namespace tb

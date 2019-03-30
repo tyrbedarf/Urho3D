@@ -87,7 +87,7 @@ enum EVENT_TYPE {
 
     /** Custom event. Not used internally. ref_id may be used for additional type info. */
     EVENT_TYPE_CUSTOM,
-    
+
     /** Turbobadger implementation for touch events */
     EVENT_TYPE_TOUCH_DOWN,
     EVENT_TYPE_TOUCH_UP,
@@ -181,11 +181,7 @@ enum WIDGET_STATE {
     WIDGET_STATE_SELECTED		= 8,
     WIDGET_STATE_HOVERED		= 16,
 
-    WIDGET_STATE_ALL			=	WIDGET_STATE_DISABLED |
-    WIDGET_STATE_FOCUSED |
-    WIDGET_STATE_PRESSED |
-    WIDGET_STATE_SELECTED |
-    WIDGET_STATE_HOVERED
+    WIDGET_STATE_ALL			=	WIDGET_STATE_DISABLED | WIDGET_STATE_FOCUSED | WIDGET_STATE_PRESSED | WIDGET_STATE_SELECTED | WIDGET_STATE_HOVERED
 };
 MAKE_ENUM_FLAG_COMBO(WIDGET_STATE);
 
@@ -622,7 +618,6 @@ public:
     TBLinkListOf<TBWidget>::Iterator GetIteratorBackward() { return m_children.IterateBackward(); }
 
 // ATOMIC BEGIN
-
     /** Returns the number of children this widget contains. */
     int numChildren();
     /// searches for specified widget ID from the top of the widget tree, returns the 1st one found.
@@ -631,12 +626,11 @@ public:
     /// print out the widget tree to stdout
     void PrintPretty( TBStr indent, bool last);
     /// return all of the widgets of the specified classname
-    void SearchWidgetClass ( TBStr className, TBValue &results );  
+    void SearchWidgetClass ( TBStr className, TBValue &results );
     ///  return all of the widgets of the specified id
     void SearchWidgetId ( TBID searchid, TBValue &results );
     /// return all of the widgets with the specified text
     void SearchWidgetText ( TBStr searchText, TBValue &results );
-
 // ATOMIC END
 
     /** Return true if this widget is the same or a ancestor of other_widget. */

@@ -18,10 +18,21 @@ public:
     int x, y;
     TBPoint() : x(0), y(0) {}
     TBPoint(int x, int y) : x(x), y(y) {}
+
+	TBPoint operator- (const TBPoint& rhs) const { return TBPoint(x - rhs.x, y - rhs.y); }
+	TBPoint operator+ (const TBPoint& rhs) const { return TBPoint(x + rhs.x, y + rhs.y); }
+	TBPoint operator* (const TBPoint& rhs) const { return TBPoint(x * rhs.x, y * rhs.y); }
+
+	TBPoint& operator+= (const TBPoint& rhs)
+	{
+		x += rhs.x;
+		y += rhs.y;
+
+		return *this;
+	}
 };
 
 /** Simple rectangle class. */
-
 class TBRect
 {
 public:

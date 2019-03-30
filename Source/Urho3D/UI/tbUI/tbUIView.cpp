@@ -220,7 +220,7 @@ namespace Urho3D
 
 		// On OpenGL, flip the projection if rendering to a texture so that the texture can be addressed in the same way
 		// as a render texture produced on Direct3D
-#ifdef ATOMIC_OPENGL
+#ifdef URHO3D_OPENGL
 		if (renderTexture_)
 		{
 			// ATOMIC ISSUE: https://github.com/AtomicGameEngine/AtomicGameEngine/issues/1581

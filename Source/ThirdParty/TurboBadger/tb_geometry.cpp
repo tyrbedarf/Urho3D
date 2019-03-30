@@ -9,7 +9,6 @@
 namespace tb {
 
 // == TBRect ============================================================================
-
 bool TBRect::Intersects(const TBRect &rect) const
 {
     if (IsEmpty() || rect.IsEmpty())
@@ -65,7 +64,6 @@ TBRect TBRect::Clip(const TBRect &clip_rect) const
 }
 
 // == TBRegion ==========================================================================
-
 TBRegion::TBRegion()
     : m_rects(nullptr)
     , m_num_rects(0)

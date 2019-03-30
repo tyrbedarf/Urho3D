@@ -27,78 +27,76 @@
 namespace Urho3D
 {
 
-class Viewport;
-class tbUIView;
-class StaticModel;
-class Material;
+	class Viewport;
+	class tbUIView;
+	class StaticModel;
+	class Material;
 
-// UI Component which can be attached to a scene node with a StaticModel
-class URHO3D_API tbUIComponent : public Component
-{
-    URHO3D_OBJECT(tbUIComponent, Component)
+	// UI Component which can be attached to a scene node with a StaticModel
+	class URHO3D_API tbUIComponent : public Component
+	{
+		URHO3D_OBJECT(tbUIComponent, Component)
 
-public:
-    /// Construct.
-    tbUIComponent(Context* context);
-    /// Destruct.
-    virtual ~tbUIComponent();
+	public:
+		/// Construct.
+		tbUIComponent(Context* context);
+		/// Destruct.
+		virtual ~tbUIComponent();
 
-    /// Register object factory.
-    static void RegisterObject(Context* context);
+		/// Register object factory.
+		static void RegisterObject(Context* context);
 
-    /// Handle enabled/disabled state change.
-    virtual void OnSetEnabled();
+		/// Handle enabled/disabled state change.
+		virtual void OnSetEnabled();
 
-    /// Set the UIView for this UIComponent, note this is optional as one will be autocreated
-    void SetUIView(tbUIView* view);
-    /// Get the UIView for this UIComponent
-    tbUIView* GetUIView() const { return uiView_; }
+		/// Set the UIView for this UIComponent, note this is optional as one will be autocreated
+		void SetUIView(tbUIView* view);
 
-    /// Get the viewport associated with this UIComponent
-    Viewport* GetViewport() const;
+		/// Get the UIView for this UIComponent
+		tbUIView* GetUIView() const { return uiView_; }
 
-    /// Set the static model used for rendering and ray casting
-    void SetStaticModel(StaticModel* staticModel);
-    /// Get the static model used for rendering and ray casting
-    StaticModel* GetStaticModel() const;
+		/// Get the viewport associated with this UIComponent
+		Viewport* GetViewport() const;
 
-    /// Calculate position in UI space given a screen position
-    bool CalcUIViewPos(const IntVector2& screenPos, IntVector2& viewPos);
+		/// Set the static model used for rendering and ray casting
+		void SetStaticModel(StaticModel* staticModel);
 
-protected:
+		/// Get the static model used for rendering and ray casting
+		StaticModel* GetStaticModel() const;
 
-    /// Handle scene node being assigned at creation.
-    virtual void OnNodeSet(Node* node);
+		/// Calculate position in UI space given a screen position
+		bool CalcUIViewPos(const IntVector2& screenPos, IntVector2& viewPos);
 
-    /// Handle scene being assigned. This may happen several times during the component's lifetime. Scene-wide subsystems and events are subscribed to here.
-    virtual void OnSceneSet(Scene* scene);
+	protected:
+		/// Handle scene node being assigned at creation.
+		virtual void OnNodeSet(Node* node);
 
-private:
+		/// Handle scene being assigned. This may happen several times during the component's lifetime. Scene-wide subsystems and events are subscribed to here.
+		virtual void OnSceneSet(Scene* scene);
 
-    const IntVector2& GetSizeAttr() const;
-    void SetSizeAttr(const IntVector2& value);
+	private:
+		const IntVector2& GetSizeAttr() const;
+		void SetSizeAttr(const IntVector2& value);
 
-    void UpdateEventSubscriptions(bool subscribe);
-    void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
+		void UpdateEventSubscriptions(bool subscribe);
+		void HandleScenePostUpdate(StringHash eventType, VariantMap& eventData);
 
-    bool FilterInput() const;
+		bool FilterInput() const;
 
-    void UpdateMouseEventSubscriptions(bool unsubscribe = false);
-    void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData);
-    void HandleMouseButtonUp(StringHash eventType, VariantMap& eventData);
-    void HandleMouseMove(StringHash eventType, VariantMap& eventData);
-    void HandleMouseWheel(StringHash eventType, VariantMap& eventData);
+		void UpdateMouseEventSubscriptions(bool unsubscribe = false);
+		void HandleMouseButtonDown(StringHash eventType, VariantMap& eventData);
+		void HandleMouseButtonUp(StringHash eventType, VariantMap& eventData);
+		void HandleMouseMove(StringHash eventType, VariantMap& eventData);
+		void HandleMouseWheel(StringHash eventType, VariantMap& eventData);
 
-    /// WeakPtr to UIView as we don't want to hold after UI subsystem has released
-    WeakPtr<tbUIView> uiView_;
-    WeakPtr<StaticModel> staticModel_;
+		/// WeakPtr to UIView as we don't want to hold after UI subsystem has released
+		WeakPtr<tbUIView> uiView_;
+		WeakPtr<StaticModel> staticModel_;
 
-    IntVector2 viewSize_;
+		IntVector2 viewSize_;
 
-    IntRect mouseScreenRect_;
+		IntRect mouseScreenRect_;
 
-    SharedPtr<Material> defaultMaterial_;
-
-};
-
+		SharedPtr<Material> defaultMaterial_;
+	};
 }
