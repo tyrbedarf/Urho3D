@@ -50,7 +50,7 @@ namespace Urho3D
 		void Update(Serializable* item);
 
 		template<class T>
-		Vector<SharedPtr<T>> Select(String whereClause)
+		Vector<SharedPtr<T>> SelectQuery(const String& query)
 		{
 			Vector<SharedPtr<T>> result;
 			auto type = T::GetTypeInfoStatic();
@@ -61,7 +61,7 @@ namespace Urho3D
 			}
 
 			Open();
-			auto dbResult = connection_->Execute(serializer_->GetSelect(whereClause, table), false);
+			auto dbResult = connection_->Execute(query, false);
 			Close();
 
 			if (dbResult.GetRows().Size() < 1)
@@ -91,6 +91,18 @@ namespace Urho3D
 			}
 
 			return result;
+		}
+
+		template<class T>
+		Vector<SharedPtr<T>> Select(String whereClause)
+		{
+			auto table = GetTable(T::GetTypeInfoStatic());
+			if (!table)
+			{
+				return Vector<SharedPtr<T>>();
+			}
+
+			return SelectQuery<T>(serializer_->GetSelect(whereClause, table));
 		}
 
 	private:

@@ -33,6 +33,7 @@
 #include "../../UI/tbUI/tbUITextField.h"
 #include "../../UI/tbUI/tbUILayout.h"
 #include "../../UI/tbUI/tbUIEditField.h"
+#include "../../UI/tbUI/tbUICheckBox.h"
 
 namespace Urho3D
 {
@@ -50,6 +51,8 @@ namespace Urho3D
 
 		int GetColumnWidth(const DatabaseColumn* column);
 
+		SharedPtr<tbUIWidget> GetWidget(const DatabaseColumn* column, Serializable* item) const;
+
 	public:
 		DatatableViewWidget(Context* context, const TypeInfo* type);
 		~DatatableViewWidget();
@@ -61,7 +64,6 @@ namespace Urho3D
 		{
 			data_.Clear();
 
-			int min_width = 0;
 			auto columns = table_->GetColumns();
 			for (auto it : elements)
 			{
@@ -69,23 +71,10 @@ namespace Urho3D
 				auto layout = SharedPtr<tbUILayout>(new tbUILayout(context_));
 				data_.Push(SharedPtr<Serializable>(item));
 
+				int overall = 0;
 				for (auto col : columns)
 				{
-					auto edit = SharedPtr<tbUIEditField>(new tbUIEditField(context_));
-
-					switch (col.second_->GetDatabaseType())
-					{
-					case VAR_STRING: edit->SetText(col.second_->Get(item).GetString()); break;
-					case VAR_INT: edit->SetText(String(col.second_->Get(item).GetInt())); break;
-					case VAR_FLOAT: edit->SetText(String(col.second_->Get(item).GetFloat())); break;
-					case VAR_DOUBLE: edit->SetText(String(col.second_->Get(item).GetDouble())); break;
-					case VAR_BOOL: edit->SetText(String(col.second_->Get(item).GetBool())); break;
-
-					default:
-						break;
-					}
-
-					edit->SetSerializable(item, col.second_->GetAttributeInfo().name_);
+					auto edit = GetWidget(col.second_, item);
 
 					int width = GetColumnWidth(col.second_);
 					if (width < 1)
@@ -93,16 +82,17 @@ namespace Urho3D
 						width = 100;
 					}
 
-					min_width += width;
+					overall += width;
 
 					edit->SetSize(width, 30);
+					edit->SetLayoutMinWidth(width);
+					edit->SetLayoutMaxWidth(width);
 					layout->AddChild(edit);
 				}
 
 				widget_root_->AddChild(layout);
+				widget_root_->SetLayoutMinWidth(overall);
 			}
-
-			widget_root_->SetLayoutMinWidth(min_width);
 		}
 	};
 }

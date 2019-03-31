@@ -93,4 +93,79 @@ namespace Urho3D
 		return result.GetInt();
 	}
 
+	SharedPtr<tbUIWidget> DatatableViewWidget::GetWidget(const DatabaseColumn* column, Serializable* item) const
+	{
+		SharedPtr<tbUIWidget> result = nullptr;
+
+		switch (column->GetDatabaseType())
+		{
+		case VAR_STRING:
+		{
+			auto edit = SharedPtr<tbUIEditField>(new tbUIEditField(context_));
+			edit->SetText(column->Get(item).GetString());
+			edit->SetTextAlign(UI_TEXT_ALIGN_LEFT);
+			result = edit;
+			break;
+		}
+		case VAR_INT:
+		{
+			if (column->IsPrimaryKey())
+			{
+				auto edit = SharedPtr<tbUITextField>(new tbUITextField(context_));
+				edit->SetText(String(column->Get(item).GetInt()));
+				edit->SetTextAlign(UI_TEXT_ALIGN_RIGHT);
+				result = edit;
+			}
+			else
+			{
+				auto edit = SharedPtr<tbUIEditField>(new tbUIEditField(context_));
+				edit->SetText(String(column->Get(item).GetInt()));
+				edit->SetTextAlign(UI_TEXT_ALIGN_RIGHT);
+				edit->SetEditType(UI_EDIT_TYPE_NUMBER);
+				result = edit;
+			}
+
+			break;
+		}
+
+		case VAR_FLOAT:
+		{
+			auto edit = SharedPtr<tbUIEditField>(new tbUIEditField(context_));
+			edit->SetText(String(column->Get(item).GetFloat()));
+			edit->SetTextAlign(UI_TEXT_ALIGN_RIGHT);
+			edit->SetEditType(UI_EDIT_TYPE_NUMBER);
+			result = edit;
+			break;
+		}
+
+		case VAR_DOUBLE:
+		{
+			auto edit = SharedPtr<tbUIEditField>(new tbUIEditField(context_));
+			edit->SetText(String(column->Get(item).GetDouble()));
+			edit->SetTextAlign(UI_TEXT_ALIGN_RIGHT);
+			edit->SetEditType(UI_EDIT_TYPE_NUMBER);
+			result = edit;
+			break;
+		}
+
+		case VAR_BOOL:
+		{
+			auto edit = SharedPtr<tbUICheckBox>(new tbUICheckBox(context_));
+			edit->SetValue(column->Get(item).GetBool() ? 1 : 0);
+
+			break;
+		}
+
+		default:
+			URHO3D_LOGWARNING("Cannot handle variant type for column " + column->GetColumnName() + ".");
+			auto edit = SharedPtr<tbUITextField>(new tbUITextField(context_));
+			edit->SetText("Unsupported variant type");
+			result = edit;
+			break;
+		}
+
+		result->SetSerializable(item, column->GetAttributeInfo().name_);
+
+		return result;
+	}
 }

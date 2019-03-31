@@ -211,7 +211,7 @@ void tbUIEditField::OnFocusChanged(bool focused)
                 styleEdit->selection.SelectAll();
             firstFocusFlag_ = true;
 
-#if defined(ATOMIC_PLATFORM_ANDROID) || defined(ATOMIC_PLATFORM_IOS)
+#if defined(URHO3D_PLATFORM_ANDROID) || defined(URHO3D_PLATFORM_IOS)
 
             // click on field to gain focus and bring up the onscreen keyboard to edit
             if ( !(w->GetReadOnly() || w->GetState(WIDGET_STATE_DISABLED)) )
@@ -232,6 +232,8 @@ void tbUIEditField::OnFocusChanged(bool focused)
 
 bool tbUIEditField::OnEvent(const tb::TBWidgetEvent &ev)
 {
+	URHO3D_LOGDEBUG("Edit field event " + ev.ref_id);
+
     if (ev.type == EVENT_TYPE_CUSTOM && ev.ref_id == TBIDC("edit_complete"))
     {
         VariantMap eventData;
@@ -256,7 +258,7 @@ bool tbUIEditField::OnEvent(const tb::TBWidgetEvent &ev)
             }
         }
 
-#if defined(ATOMIC_PLATFORM_ANDROID) || defined(ATOMIC_PLATFORM_IOS)
+#if defined(URHO3D_PLATFORM_ANDROID) || defined(URHO3D_PLATFORM_IOS)
 
         // triple click to get the onscreen keyboard, in case it is auto-focused
         else if ( ev.count == 3 )

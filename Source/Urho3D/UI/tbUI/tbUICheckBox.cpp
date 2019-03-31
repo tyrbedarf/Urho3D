@@ -34,19 +34,27 @@ using namespace tb;
 namespace Urho3D
 {
 
-tbUICheckBox::tbUICheckBox(Context* context, bool createWidget) : tbUIWidget(context, false)
-{
-    if (createWidget)
-    {
-        widget_ = new TBCheckBox();
-		widget_->AddListener(this);
-        GetSubsystem<tbUI>()->WrapWidget(this, widget_);
-    }
-}
+	tbUICheckBox::tbUICheckBox(Context* context, bool createWidget) : tbUIWidget(context, false)
+	{
+		if (createWidget)
+		{
+			widget_ = new TBCheckBox();
+			widget_->AddListener(this);
+			GetSubsystem<tbUI>()->WrapWidget(this, widget_);
+		}
+	}
 
-bool tbUICheckBox::OnEvent(const tb::TBWidgetEvent &ev)
-{
-    return tbUIWidget::OnEvent(ev);
-}
+	bool tbUICheckBox::OnEvent(const tb::TBWidgetEvent &ev)
+	{
+		if (value_ && widget_)
+		{
+			URHO3D_LOGDEBUG("Checkbox Value: " + String(widget_->GetValue()));
+			auto value = widget_->GetValue() > 0;
+			value_->Set(value);
+			return true;
+		}
+
+		return tbUIWidget::OnEvent(ev);
+	}
 
 }

@@ -158,7 +158,7 @@ void HelloUrhoOrm::Start()
 	}
 
 	// Select a player object. The argument is the where part of an sql query.
-	auto result = dbContext_->Select<Player>("PlayerId = 2");
+	auto result = dbContext_->SelectQuery<Player>("SELECT * FROM 'Player'");
 	auto item = result.At(0);
 	URHO3D_LOGERROR("Player Name: " + item->GetPlayerName() + " Velocity: " + String(item->GetVelocity()));
 

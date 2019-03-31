@@ -129,6 +129,8 @@ namespace Urho3D
 			return false;
 		}
 
+		/*URHO3D_LOGDEBUG("Widget Invoke Event " + String((int) ev.type));*/
+
 		if (ev.type == EVENT_TYPE::EVENT_TYPE_CHANGED)
 		{
 			UpdateData();
@@ -149,7 +151,7 @@ namespace Urho3D
 	{
 		if (!ser)
 		{
-			URHO3D_LOGWARNING("Could not set serializable to widet. The reference was NULL.");
+			URHO3D_LOGWARNING("Could not set serializable. The reference was NULL.");
 			return;
 		}
 
@@ -161,7 +163,7 @@ namespace Urho3D
 		auto widget = FindWidget(widget_id);
 		if (!widget)
 		{
-			URHO3D_LOGWARNING("Could not set serializable to widet. Could not find the widget: " + widget_id);
+			URHO3D_LOGWARNING("Could not set serializable. Could not find the widget: " + widget_id);
 			return;
 		}
 
@@ -195,6 +197,11 @@ namespace Urho3D
 		case VariantType::VAR_STRING:
 		{
 			value_->Set(widget_->GetText().CStr());
+			break;
+		}
+		case  VariantType::VAR_BOOL :
+		{
+			value_->Set(widget_->GetValue() > 0);
 			break;
 		}
 		default:
@@ -1171,6 +1178,8 @@ namespace Urho3D
 
 	bool tbUIWidget::OnEvent(const tb::TBWidgetEvent &ev)
 	{
+		URHO3D_LOGDEBUG("Widget field event " + ev.ref_id);
+
 		//tbUI* ui = GetSubsystem<tbUI>();
 
 		//if ((ev.type == EVENT_TYPE_CHANGED && !ui->GetBlockChangedEvents()) || ev.type == EVENT_TYPE_KEY_UP)
