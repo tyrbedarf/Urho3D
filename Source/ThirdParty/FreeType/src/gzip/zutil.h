@@ -10,8 +10,6 @@
 
 /* @(#) $Id$ */
 
-// Modified by Lasse Oorni for Urho3D
-
 #ifndef _Z_UTIL_H
 #define _Z_UTIL_H
 
@@ -184,8 +182,7 @@ typedef unsigned long  ulg;
 #endif
 
 /* Diagnostic functions */
-// Urho3D: disabled to prevent clash with Assimp's zlib
-#if 0
+#ifdef DEBUG
 #  include <stdio.h>
    extern int z_verbose;
    extern void z_error    OF((char *m));
