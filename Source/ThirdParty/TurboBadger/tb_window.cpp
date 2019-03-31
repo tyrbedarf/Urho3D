@@ -13,18 +13,17 @@ namespace tb {
 TBWindow::TBWindow()
     : m_settings(WINDOW_SETTINGS_DEFAULT)
 {
-// ATOMIC BEGIN
     m_axis = AXIS_Y;
-// ATOMIC END
+
     SetSkinBg(TBIDC("TBWindow"), WIDGET_INVOKE_INFO_NO_CALLBACKS);
     AddChild(&m_mover);
     AddChild(&m_resizer);
     m_mover.SetSkinBg(TBIDC("TBWindow.mover"));
     m_mover.AddChild(&m_textfield);
     m_textfield.SetIgnoreInput(true);
-// ATOMIC BEGIN
+
     m_textfield.SetSqueezable(true);
-// ATOMIC END
+
     m_mover.AddChild(&m_close_button);
     m_close_button.SetSkinBg(TBIDC("TBWindow.close"));
     m_close_button.SetIsFocusable(false);
@@ -70,9 +69,8 @@ void TBWindow::ResizeToFitContent(RESIZE_FIT fit)
 
 void TBWindow::Close()
 {
-// ATOMIC BEGIN
     TBWidgetListener::InvokeWindowClose(this);
-// ATOMIC END
+
     Die();
 }
 
@@ -203,20 +201,18 @@ TBRect TBWindow::GetPaddingRect()
 {
     TBRect padding_rect = TBWidget::GetPaddingRect();
     int title_height = GetTitleHeight();
-// ATOMIC BEGIN
+
     if ( m_axis == AXIS_Y )  // default axis
     {
-// ATOMIC END
+
         padding_rect.y += title_height;
         padding_rect.h -= title_height;
-// ATOMIC BEGIN
     }
     else if ( m_axis == AXIS_X )  // rotated sideways
     {
         padding_rect.x += title_height;
         padding_rect.w -= title_height;
     }
-// ATOMIC END
     return padding_rect;
 }
 
@@ -234,20 +230,16 @@ PreferredSize TBWindow::OnCalculatePreferredSize(const SizeConstraints &constrai
     }
     // Add window title bar height
     int title_height = GetTitleHeight();
-// ATOMIC BEGIN
     if ( m_axis == AXIS_Y )  // default axis
     {
-// ATOMIC END
         ps.min_h += title_height;
         ps.pref_h += title_height;
-// ATOMIC BEGIN
     }
     else if ( m_axis == AXIS_X )  // rotated sideways
     {
         ps.min_w += title_height;
         ps.pref_w += title_height;
     }
-// ATOMIC END
     return ps;
 }
 
@@ -290,10 +282,9 @@ void TBWindow::OnResized(int old_w, int old_h)
     // Manually move our own decoration children
     // FIX: Put a layout in the TBMover so we can add things there nicely.
     int title_height = GetTitleHeight();
-// ATOMIC BEGIN
+
     if ( m_axis == AXIS_Y )  // default axis
     {
-// ATOMIC END
         m_mover.SetRect(TBRect(0, 0, GetRect().w, title_height));
         PreferredSize ps = m_resizer.GetPreferredSize();
         m_resizer.SetRect(TBRect(GetRect().w - ps.pref_w, GetRect().h - ps.pref_h, ps.pref_w, ps.pref_h));
@@ -303,7 +294,6 @@ void TBWindow::OnResized(int old_w, int old_h)
         if (m_settings & WINDOW_SETTINGS_CLOSE_BUTTON)
             mover_rect.w -= button_size;
         m_textfield.SetRect(mover_rect);
-// ATOMIC BEGIN
     }
     else if ( m_axis == AXIS_X )  // rotated sideways
     {
@@ -317,15 +307,12 @@ void TBWindow::OnResized(int old_w, int old_h)
             mover_rect.w -= button_size;
         m_textfield.SetRect(TBRect(mover_rect.x + 5, mover_rect.y + mover_rect.h - button_size, button_size - 1, button_size));
     }
-// ATOMIC END
 }
 
-// ATOMIC BEGIN
 void TBWindow::SetAxis(AXIS axis)
 {
     m_axis = axis;
     Invalidate();
 }
-// ATOMIC END
 
 }; // namespace tb

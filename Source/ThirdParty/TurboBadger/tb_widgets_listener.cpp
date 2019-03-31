@@ -86,7 +86,7 @@ bool TBWidgetListener::InvokeWidgetInvokeEvent(TBWidget *widget, const TBWidgetE
     return handled;
 }
 
-// ATOMIC BEGIN
+
 void TBWidgetListener::InvokeWindowClose(TBWindow *window)
 {
     TBLinkListOf<TBWidgetListenerGlobalLink>::Iterator global_i = g_listeners.IterateForward();
@@ -96,10 +96,8 @@ void TBWidgetListener::InvokeWindowClose(TBWindow *window)
     while (TBWidgetListenerGlobalLink *link = global_i.GetAndStep())
         static_cast<TBWidgetListener*>(link)->OnWindowClose(window);
 }
-// ATOMIC END
 
 // == TBWidgetSafePointer ===================================================================================
-
 void TBWidgetSafePointer::Set(TBWidget *widget)
 {
     if (m_widget == widget)

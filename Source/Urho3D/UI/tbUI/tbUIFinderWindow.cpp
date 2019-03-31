@@ -525,7 +525,7 @@ namespace Urho3D
 		String basepath = filesystem->GetUserDocumentsDir();
 		tbUISelectList *bklist = static_cast<tbUISelectList *>(GetBookmarksWidget());
 
-#if defined(ATOMIC_PLATFORM_LINUX)
+#if defined(_LINUX)
 		if (filesystem->DirExists(basepath)) CreateBookmark("Home", basepath);
 		if (filesystem->DirExists(basepath + "Documents")) CreateBookmark("Documents", basepath + "Documents/");
 		if (filesystem->DirExists(basepath + "Music")) CreateBookmark("Music", basepath + "Music/");
@@ -540,7 +540,7 @@ namespace Urho3D
 		if (filesystem->DirExists(basepath + "Music")) CreateBookmark("Music", basepath + "Music/");
 		if (filesystem->DirExists(basepath + "Pictures")) CreateBookmark("Pictures", basepath + "Pictures/");
 		if (filesystem->DirExists(basepath + "Videos")) CreateBookmark("Videos", basepath + "Videos/");
-#elif defined(ATOMIC_PLATFORM_OSX)
+#elif defined(_OSX)
 		if (filesystem->DirExists(basepath)) CreateBookmark("Home", basepath);
 		if (filesystem->DirExists(basepath + "Documents")) CreateBookmark("Documents", basepath + "Documents/");
 		if (filesystem->DirExists(basepath + "Downloads")) CreateBookmark("Downloads", basepath + "Downloads/");
@@ -703,7 +703,7 @@ namespace Urho3D
 		String bkdata = "";
 		String bkpath = "";
 
-#if defined(ATOMIC_PLATFORM_ANDROID) || defined(ATOMIC_PLATFORM_IOS)
+#if defined(_ANDROID) || defined(_IOS)
 		bkpath = filesystem->GetUserDocumentsDir(); // somewhere writable on mobile
 #else
 		bkpath = filesystem->GetAppPreferencesDir("urho3d", "Bookmarks"); // desktop systems
@@ -737,7 +737,7 @@ namespace Urho3D
 			FileSystem* filesystem = GetSubsystem<FileSystem>();
 			String bkpath = "";
 
-#if defined(ATOMIC_PLATFORM_ANDROID) || defined(ATOMIC_PLATFORM_IOS)
+#if defined(_ANDROID) || defined(_IOS)
 			bkpath = filesystem->GetUserDocumentsDir();
 #else
 			bkpath = filesystem->GetAppPreferencesDir("urho3d", "bookmarks");

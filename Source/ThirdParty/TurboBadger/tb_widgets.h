@@ -350,7 +350,7 @@ enum WIDGET_HIT_STATUS {
     WIDGET_HIT_STATUS_HIT_NO_CHILDREN		///< The widget was hit, no children should be hit.
 };
 
-// ATOMIC BEGIN: this must only be used by UIWidget, as we are casting to it
+
 class TBWidgetDelegate
 {
 public:
@@ -359,7 +359,6 @@ public:
     virtual void OnDelete() = 0;
     virtual void OnResized(int old_w, int old_h) = 0;
 };
-// ATOMIC END
 
 /** The base TBWidget class.
     Make a subclass to implement UI controls.
@@ -617,8 +616,7 @@ public:
     TBLinkListOf<TBWidget>::Iterator GetIteratorForward() { return m_children.IterateForward(); }
     TBLinkListOf<TBWidget>::Iterator GetIteratorBackward() { return m_children.IterateBackward(); }
 
-// ATOMIC BEGIN
-    /** Returns the number of children this widget contains. */
+	/** Returns the number of children this widget contains. */
     int numChildren();
     /// searches for specified widget ID from the top of the widget tree, returns the 1st one found.
     TBWidget *FindWidget ( TBID searchid );
@@ -631,7 +629,6 @@ public:
     void SearchWidgetId ( TBID searchid, TBValue &results );
     /// return all of the widgets with the specified text
     void SearchWidgetText ( TBStr searchText, TBValue &results );
-// ATOMIC END
 
     /** Return true if this widget is the same or a ancestor of other_widget. */
     bool IsAncestorOf(TBWidget *other_widget) const;
