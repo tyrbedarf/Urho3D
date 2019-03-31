@@ -395,7 +395,8 @@ void TBFontFace::DrawString(int x, int y, const TBColor &color, const char *str,
             if (glyph->frag)
             {
                 TBRect dst_rect(x + glyph->metrics.x, y + glyph->metrics.y + GetAscent(), glyph->frag->Width(), glyph->frag->Height());
-                TBRect src_rect(0, 0, glyph->frag->Width(), glyph->frag->Height());
+				TBRect src_rect(1, 1, glyph->frag->Width() - 1, glyph->frag->Height() - 1);
+
                 if (glyph->has_rgb)
                     g_renderer->DrawBitmap(dst_rect, src_rect, glyph->frag);
                 else
