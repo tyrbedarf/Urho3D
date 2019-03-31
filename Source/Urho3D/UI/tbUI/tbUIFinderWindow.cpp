@@ -99,6 +99,158 @@ namespace Urho3D
 		}
 	}
 
+	bool tbUIFinderWindow::OnWidgetInvokeEvent(tb::TBWidget *widget, const tb::TBWidgetEvent &ev)
+	{
+		if (!widget)
+		{
+			return false;
+		}
+
+		if (ev.type == EVENT_TYPE_CHANGED && ev.target && ((uint32)ev.target->GetID()) == UIFINDEREDITPATHID)
+		{
+			FileSystem* filesystem = GetSubsystem<FileSystem>();
+			tbUIWidget *pathwidget = GetPathWidget();  // paste or type in currentpath widget
+			if (pathwidget)
+			{
+				if (filesystem->DirExists(pathwidget->GetText()))
+				{
+					if (pathwidget->GetText() != currentPath_)
+					{
+						resultPath_ = "";
+						SetCurrentPath(pathwidget->GetText());
+						UpdateUiList();
+						UpdateUiResult();
+					}
+				}
+			}
+			return true;
+		}
+
+		if (ev.type == EVENT_TYPE_POINTER_UP && ev.target && ((uint32)ev.target->GetID()) == UIFINDERUPBUTTONID) // go up
+		{
+			GoFolderUp();
+			return true;
+		}
+
+		if (ev.type == EVENT_TYPE_POINTER_UP && ev.target && ((uint32)ev.target->GetID()) == UIFINDERBOOKBUTTONID) // add bookmark request
+		{
+			// this check is necessary because you can kill the bookmark window with the "X" and
+			// this kills the UI but not the newBookmarkPtr to it, and it doesnt get cleaned up properly.
+			if (newBookmarkPtr_.NotNull())
+			{
+				newBookmarkPtr_->UnsubscribeFromAllEvents();
+				newBookmarkPtr_.Reset();
+			}
+			newBookmarkPtr_ = new tbUIPromptWindow(context_, this, "createbookmark", true);
+			SubscribeToEvent(newBookmarkPtr_, E_UIPROMPTCOMPLETE, URHO3D_HANDLER(tbUIFinderWindow, HandleCreateBookmark));
+
+			String prospect = "";
+			char delim = '/';
+			Vector <String> tokens = currentPath_.Split(delim, false);
+			prospect = tokens[tokens.Size() - 1]; // get the last folder name as preset
+
+			newBookmarkPtr_->Show("Create New Bookmark", "Enter a name for the new bookmark", prospect);
+			return true;
+		}
+
+		if (ev.type == EVENT_TYPE_POINTER_UP && ev.target && ((uint32)ev.target->GetID()) == UIFINDERFOLDERBUTTONID) // add folder request
+		{
+			if (newFolderPtr_.NotNull())
+			{
+				newFolderPtr_->UnsubscribeFromAllEvents();
+				newFolderPtr_.Reset();
+			}
+			newFolderPtr_ = new tbUIPromptWindow(context_, this, "createfolder", true);
+			SubscribeToEvent(newFolderPtr_, E_UIPROMPTCOMPLETE, URHO3D_HANDLER(tbUIFinderWindow, HandleCreateFolder));
+			newFolderPtr_->Show("Create new folder", "Enter a name for the new folder", "");
+			return true;
+		}
+
+		if (ev.type == EVENT_TYPE_CLICK && ev.target && ((uint32)ev.target->GetID()) == 5) // clicked in bookmarks
+		{
+			tbUISelectList *bklist = static_cast<tbUISelectList *>(GetBookmarksWidget());
+			int selected = bklist->GetValue();
+			if (selected >= 0)
+			{
+				resultPath_ = "";  // were going back, give up file.
+				SetCurrentPath(bookmarkPaths_[selected]);
+				UpdateUiPath();
+				UpdateUiList();
+				UpdateUiResult();
+				bklist->SetValue(-1); // clear the select visuals
+			}
+			return true;
+		}
+
+		if (ev.type == EVENT_TYPE_CUSTOM && ev.target && ((uint32)ev.target->GetID()) == UIFINDERBOOKLISTID) // bookmarks TB context menu result
+		{
+			tbUI* ui = GetSubsystem<tbUI>();
+			if (ev.special_key == tb::TB_KEY_DELETE) // we wanna delete something
+			{
+				String myid;
+				ui->GetTBIDString(ev.target ? ((uint32)ev.target->GetID()) : 0, myid);
+				tbUISelectList *bklist = static_cast<tbUISelectList *>(GetBookmarksWidget());
+				if (bklist)
+				{
+					int myindex = bklist->FindId((uint32)ev.ref_id);
+					if (myindex >= 0)
+					{
+						DeleteBookmark(myindex);
+					}
+				}
+			}
+			return true;
+		}
+
+		if (ev.type == EVENT_TYPE_CLICK && ev.target && ((uint32)ev.target->GetID()) == UIFINDERFILELISTID) // clicked dirfiles list
+		{
+			tbUISelectList *filelist = static_cast<tbUISelectList *>(GetFilesWidget());
+			ComposePath(filelist->GetSelectedItemString());
+			return true;
+		}
+
+		if (ev.type == EVENT_TYPE_CLICK && (ev.ref_id == UIFINDEROKBUTTONID || ev.ref_id == UIFINDERCANCELBUTTONID)) // clicked ok or cancel button
+		{
+			tbUI* ui = GetSubsystem<tbUI>();
+			VariantMap eventData;
+
+			String title = "FinderWindow";
+			TBStr tbtext;
+			if (widget_ && (TBWindow*)widget_->GetText(tbtext))
+				title = tbtext.CStr();
+
+			eventData[UIFinderComplete::P_TITLE] = title;
+			eventData[UIFinderComplete::P_SELECTED] = "";
+			eventData[UIFinderComplete::P_REASON] = "CANCEL";
+
+			if (ev.ref_id == UIFINDEROKBUTTONID) // ok button was pressed, otherwise it was cancel button
+			{
+				eventData[UIFinderComplete::P_REASON] = "OK";
+				if (finderMode_ == 0) // finding a file
+				{   // get from widget, in case the user had been typing.
+					tbUIWidget *ewidget = GetResultWidget();
+					if (ewidget) eventData[UIFinderComplete::P_SELECTED] = ewidget->GetText();
+
+					tbUIWidget *cwidget = GetPathWidget();
+					if (cwidget) eventData[UIFinderComplete::P_SELECTED_PATH] = cwidget->GetText();
+				}
+				else  // finding a folder
+				{
+					tbUIWidget *cwidget = GetPathWidget();
+					if (cwidget) eventData[UIFinderComplete::P_SELECTED_PATH] = cwidget->GetText();
+				}
+			}
+
+			ConvertEvent(this, ui->WrapWidget(ev.target), ev, eventData);
+			SendEvent(E_UIFINDERCOMPLETE, eventData);
+
+			if (eventData[WidgetEvent::P_HANDLED].GetBool())
+				return true;
+		}
+
+		return false;
+	}
+
 	bool tbUIFinderWindow::OnEvent(const tb::TBWidgetEvent &ev)
 	{
 		if (ev.type == EVENT_TYPE_CHANGED && ev.target && ((uint32)ev.target->GetID()) == UIFINDEREDITPATHID)

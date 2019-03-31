@@ -48,6 +48,7 @@ protected:
     void HandleCreateBookmark(StringHash eventType, VariantMap& eventData); /// event handler for bookmark creation
     void HandleCreateFolder(StringHash eventType, VariantMap& eventData); /// event handler for folder creation
     virtual bool OnEvent(const tb::TBWidgetEvent &ev); /// general event handler
+	virtual bool OnWidgetInvokeEvent(tb::TBWidget *widget, const tb::TBWidgetEvent &ev);
     tbUIWidget* GetWindowWidget(); /// get internal widgets
     tbUIWidget* GetPathWidget();
     tbUIWidget* GetResultWidget();
