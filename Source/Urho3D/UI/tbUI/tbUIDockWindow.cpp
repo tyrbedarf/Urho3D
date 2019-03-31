@@ -42,7 +42,7 @@ tbUIDockWindow::tbUIDockWindow(Context* context, bool createWidget, const String
     {
         tb:TBWidget *contents = contentptr->GetInternalWidget();
         widget_ = new TBDockWindow( title.CString(), contents, minwidth, minheight );
-		widget_->AddListener(this);
+		widget_->SetDelegate(this);
         GetSubsystem<tbUI>()->WrapWidget(this, widget_);
     }
 }

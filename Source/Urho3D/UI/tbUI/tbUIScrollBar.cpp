@@ -40,7 +40,7 @@ tbUIScrollBar::tbUIScrollBar(Context* context, bool createWidget) : tbUIWidget(c
     if (createWidget)
     {
         widget_ = new TBScrollBar();
-		widget_->AddListener(this);
+		widget_->SetDelegate(this);
         GetSubsystem<tbUI>()->WrapWidget(this, widget_);
     }
 }

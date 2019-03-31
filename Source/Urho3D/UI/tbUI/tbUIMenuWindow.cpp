@@ -39,7 +39,7 @@ tbUIMenuWindow::tbUIMenuWindow(Context* context, tbUIWidget* target, const Strin
   , source_(0)
 {
     widget_ = new TBMenuWindow(target->GetInternalWidget(), TBID(id.CString()));
-	widget_->AddListener(this);
+	widget_->SetDelegate(this);
     GetSubsystem<tbUI>()->WrapWidget(this, widget_);
 
 }
@@ -48,11 +48,6 @@ tbUIMenuWindow::~tbUIMenuWindow()
 {
     if (source_)
         delete source_;
-
-	if (widget_ && widget_->HasListener(this))
-	{
-		widget_->RemoveListener(this);
-	}
 }
 
 void tbUIMenuWindow::Show(tbUISelectItemSource* source, int x, int y)

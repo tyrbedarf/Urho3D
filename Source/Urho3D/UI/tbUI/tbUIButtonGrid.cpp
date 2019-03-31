@@ -47,7 +47,7 @@ tbUIButtonGrid::tbUIButtonGrid(Context* context, int numRows, int numCols, int m
     if (createWidget)
     {
         widget_ = new TBLayout(AXIS_Y); // build upon a stock TBLayout
-		widget_->AddListener(this);
+		widget_->SetDelegate(this);
         widget_->SetGravity(WIDGET_GRAVITY_ALL);
         GetSubsystem<tbUI>()->WrapWidget(this, widget_);
         GenerateGrid();

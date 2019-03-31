@@ -41,7 +41,6 @@ using namespace tb;
 
 namespace Urho3D
 {
-
 	/// finder window
 	tbUIFinderWindow::tbUIFinderWindow(Context* context, tbUIWidget* target, const String& id, bool createWidget) :
 		tbUIWindow(context, false),
@@ -51,7 +50,7 @@ namespace Urho3D
 		if (createWidget)
 		{
 			widget_ = new TBFinderWindow(target ? target->GetInternalWidget() : 0, TBIDC(id.CString()));
-			widget_->AddListener(this);
+			widget_->SetDelegate(this);
 			GetSubsystem<tbUI>()->WrapWidget(this, widget_);
 		}
 	}
@@ -64,12 +63,6 @@ namespace Urho3D
 			newFolderPtr_->UnsubscribeFromAllEvents();
 		if (!newBookmarkPtr_.Expired())
 			newBookmarkPtr_->UnsubscribeFromAllEvents();
-
-		if (widget_ && widget_->HasListener(this))
-		{
-			widget_->RemoveListener(this);
-		}
-
 	}
 
 	void tbUIFinderWindow::FindFile(const String& title, const String& preset, int dimmer, int width, int height)
@@ -108,7 +101,6 @@ namespace Urho3D
 
 	bool tbUIFinderWindow::OnEvent(const tb::TBWidgetEvent &ev)
 	{
-
 		if (ev.type == EVENT_TYPE_CHANGED && ev.target && ((uint32)ev.target->GetID()) == UIFINDEREDITPATHID)
 		{
 			FileSystem* filesystem = GetSubsystem<FileSystem>();
@@ -277,6 +269,7 @@ namespace Urho3D
 
 		if (Reason == "OK")
 			CreateFolder(Selected);
+
 		if (newFolderPtr_)
 		{
 			newFolderPtr_->UnsubscribeFromAllEvents();

@@ -45,17 +45,14 @@ namespace Urho3D
 		if (createWidget)
 		{
 			widget_ = new TBWidget();
-			widget_->AddListener(this);
+			widget_->SetDelegate(this);
 			GetSubsystem<tbUI>()->WrapWidget(this, widget_);
 		}
 	}
 
 	tbUIWidget::~tbUIWidget()
 	{
-		if (widget_ && widget_->HasListener(this))
-		{
-			widget_->RemoveListener(this);
-		}
+
 	}
 
 	void tbUIWidget::SetIsFocusable(bool value)
@@ -108,10 +105,10 @@ namespace Urho3D
 	void tbUIWidget::SetWidget(tb::TBWidget* widget)
 	{
 		widget_ = widget;
-		widget_->AddListener(this);
+		widget_->SetDelegate(this);
 	}
 
-	bool tbUIWidget::OnWidgetDying(tb::TBWidget *widget)
+	/*bool tbUIWidget::OnWidgetDying(tb::TBWidget *widget)
 	{
 		if (widget && widget->HasListener(this))
 		{
@@ -120,23 +117,23 @@ namespace Urho3D
 		}
 
 		return false;
-	}
+	}*/
 
-	bool tbUIWidget::OnWidgetInvokeEvent(tb::TBWidget *widget, const tb::TBWidgetEvent &ev)
+	/*bool tbUIWidget::OnWidgetInvokeEvent(tb::TBWidget *widget, const tb::TBWidgetEvent &ev)
 	{
 		if (!widget || widget != widget_)
 		{
 			return false;
 		}
 
-		/*URHO3D_LOGDEBUG("Widget Invoke Event " + String((int) ev.type));*/
+		URHO3D_LOGDEBUG("Widget Invoke Event " + String((int) ev.type));
 
 		if (ev.type == EVENT_TYPE::EVENT_TYPE_CHANGED)
 		{
 			UpdateData();
 		}
 
-		return false;
+		return OnEvent(ev);
 	}
 
 	void tbUIWidget::OnWidgetFocusChanged(tb::TBWidget *widget, bool focused)
@@ -145,7 +142,7 @@ namespace Urho3D
 		{
 			return;
 		}
-	}
+	}*/
 
 	void tbUIWidget::SetSerializable(Serializable* ser, const String& attribute)
 	{
@@ -296,11 +293,6 @@ namespace Urho3D
 			if (ui)
 			{
 				ui->UnwrapWidget(widget_);
-			}
-
-			if (widget_->HasListener(this))
-			{
-				widget_->RemoveListener(this);
 			}
 		}
 
@@ -1178,8 +1170,6 @@ namespace Urho3D
 
 	bool tbUIWidget::OnEvent(const tb::TBWidgetEvent &ev)
 	{
-		URHO3D_LOGDEBUG("Widget field event " + ev.ref_id);
-
 		//tbUI* ui = GetSubsystem<tbUI>();
 
 		//if ((ev.type == EVENT_TYPE_CHANGED && !ui->GetBlockChangedEvents()) || ev.type == EVENT_TYPE_KEY_UP)

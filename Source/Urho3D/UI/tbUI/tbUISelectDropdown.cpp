@@ -39,7 +39,7 @@ tbUISelectDropdown::tbUISelectDropdown(Context* context, bool createWidget) : tb
     if (createWidget)
     {
         widget_ = new TBSelectDropdown();
-		widget_->AddListener(this);
+		widget_->SetDelegate(this);
         GetSubsystem<tbUI>()->WrapWidget(this, widget_);
     }
 }

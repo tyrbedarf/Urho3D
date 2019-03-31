@@ -41,7 +41,7 @@ tbUIPopupWindow::tbUIPopupWindow(Context* context, bool createWidget, tbUIWidget
         assert(target);
         widget_ = new TBPopupWindow(target->GetInternalWidget());
         widget_->SetID(TBIDC(id.CString()));
-		widget_->AddListener(this);
+		widget_->SetDelegate(this);
         GetSubsystem<tbUI>()->WrapWidget(this, widget_);
     }
 }

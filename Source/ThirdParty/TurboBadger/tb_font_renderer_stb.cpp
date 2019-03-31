@@ -7,12 +7,14 @@
 #include "tb_renderer.h"
 #include "tb_system.h"
 
+#define TB_FONT_RENDERER_STB
+
 #ifdef TB_FONT_RENDERER_STB
 
 using namespace tb;
 
 #define STB_TRUETYPE_IMPLEMENTATION  // force following include to generate implementation
-#include "../../ThirdParty/STB/stb_truetype.h"
+#include "../STB/include/STB/stb_truetype.h"
 
 /** STBFontRenderer renders fonts using stb_truetype.h (http://nothings.org/) */
 

@@ -7,6 +7,8 @@
 #include "tb_renderer.h"
 #include "tb_system.h"
 
+#undef TB_FONT_RENDERER_FREETYPE
+
 #ifdef TB_FONT_RENDERER_FREETYPE
 
 #include <ft2build.h>

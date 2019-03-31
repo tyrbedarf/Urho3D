@@ -51,7 +51,7 @@ namespace Urho3D
 		renderer_ = ui_->GetRenderer();
 
 		widget_ = new TBWidget();
-		widget_->AddListener(this);
+		widget_->SetDelegate(this);
 
 		// Set gravity all so we resize correctly
 		widget_->SetGravity(WIDGET_GRAVITY_ALL);

@@ -41,7 +41,7 @@ tbUIInlineSelect::tbUIInlineSelect(Context* context, bool createWidget) : tbUIWi
     if (createWidget)
     {
         widget_ = new TBInlineSelect();
-		widget_->AddListener(this);
+		widget_->SetDelegate(this);
         GetSubsystem<tbUI>()->WrapWidget(this, widget_);
     }
 }

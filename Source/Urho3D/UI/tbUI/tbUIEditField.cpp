@@ -41,7 +41,7 @@ tbUIEditField::tbUIEditField(Context* context, bool createWidget) : tbUIWidget(c
     if (createWidget)
     {
         widget_ = new TBEditField();
-		widget_->AddListener(this);
+		widget_->SetDelegate(this);
         GetSubsystem<tbUI>()->WrapWidget(this, widget_);
     }
 }
@@ -232,8 +232,6 @@ void tbUIEditField::OnFocusChanged(bool focused)
 
 bool tbUIEditField::OnEvent(const tb::TBWidgetEvent &ev)
 {
-	URHO3D_LOGDEBUG("Edit field event " + ev.ref_id);
-
     if (ev.type == EVENT_TYPE_CUSTOM && ev.ref_id == TBIDC("edit_complete"))
     {
         VariantMap eventData;

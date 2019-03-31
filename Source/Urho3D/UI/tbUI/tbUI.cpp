@@ -221,8 +221,8 @@ namespace Urho3D
 		tb_core_init(renderer_, languageFile.CString());
 
 		//register_tbbf_font_renderer();
-		//register_stb_font_renderer();
-		register_freetype_font_renderer();
+		register_stb_font_renderer();
+		// register_freetype_font_renderer();
 
 		rootWidget_ = new TBWidget();
 

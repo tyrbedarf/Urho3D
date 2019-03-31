@@ -42,7 +42,7 @@ tbUIColorWheel::tbUIColorWheel(Context* context, bool createWidget) : tbUIWidget
     if (createWidget)
     {
         widget_ = new TBColorWheel();
-		widget_->AddListener(this);
+		widget_->SetDelegate(this);
         ui->WrapWidget(this, widget_);
     }
 

@@ -56,7 +56,7 @@ namespace Urho3D
 			viewport_ = new Viewport(context_);
 
 			widget_ = new tbSceneViewWidget();
-			widget_->AddListener(this);
+			widget_->SetDelegate(this);
 			widget_->SetGravity(WIDGET_GRAVITY_ALL);
 			((tbSceneViewWidget*)widget_)->sceneView_ = this;
 

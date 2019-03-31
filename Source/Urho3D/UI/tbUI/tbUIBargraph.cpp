@@ -41,7 +41,7 @@ tbUIBargraph::tbUIBargraph(Context* context, bool createWidget) : tbUIWidget(con
     if (createWidget)
     {
         widget_ = new TBBarGraph();
-		widget_->AddListener(this);
+		widget_->SetDelegate(this);
         GetSubsystem<tbUI>()->WrapWidget(this, widget_);
     }
 }

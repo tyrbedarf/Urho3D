@@ -43,7 +43,7 @@ tbUIPromptWindow::tbUIPromptWindow(Context* context, tbUIWidget* target, const S
     if (createWidget)
     {
         widget_ = new TBPromptWindow(target ? target->GetInternalWidget() : 0, TBIDC(id.CString()));
-		widget_->AddListener(this);
+		widget_->SetDelegate(this);
         GetSubsystem<tbUI>()->WrapWidget(this, widget_);
     }
 }

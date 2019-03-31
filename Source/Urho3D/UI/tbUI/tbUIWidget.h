@@ -235,8 +235,6 @@ namespace Urho3D
 				return;
 			}
 
-			/*URHO3D_LOGDEBUG("Update: " + value);*/
-
 			mAccessor->Set(mObject, Variant(value));
 		}
 
@@ -246,8 +244,6 @@ namespace Urho3D
 			{
 				return;
 			}
-
-			/*URHO3D_LOGDEBUG("Update: " + String(value));*/
 
 			mAccessor->Set(mObject, Variant(value));
 		}
@@ -259,8 +255,6 @@ namespace Urho3D
 				return;
 			}
 
-			/*URHO3D_LOGDEBUG("Update: " + String(value));*/
-
 			mAccessor->Set(mObject, Variant(value));
 		}
 
@@ -271,14 +265,12 @@ namespace Urho3D
 				return;
 			}
 
-			/*URHO3D_LOGDEBUG("Update: " + String(value));*/
-
 			mAccessor->Set(mObject, Variant(value));
 		}
 	};
 
 	/// Wraps a TurboBadger widget in our Object model
-	class URHO3D_API tbUIWidget : public Object, public tb::TBWidgetListener //, public tb::TBWidgetDelegate
+	class URHO3D_API tbUIWidget : public Object, public tb::TBWidgetDelegate
 	{
 		friend class tbUI;
 
@@ -466,9 +458,9 @@ namespace Urho3D
 		virtual void OnDelete();
 		virtual void OnResized(int old_w, int old_h);
 
-		virtual bool OnWidgetDying(tb::TBWidget *widget);
+		/*virtual bool OnWidgetDying(tb::TBWidget *widget);
 		virtual bool OnWidgetInvokeEvent(tb::TBWidget *widget, const tb::TBWidgetEvent &ev);
-		virtual void OnWidgetFocusChanged(tb::TBWidget *widget, bool focused);
+		virtual void OnWidgetFocusChanged(tb::TBWidget *widget, bool focused);*/
 
 		void UpdateData();
 

@@ -1,5 +1,6 @@
 //
-// Copyright (c) 2014-2015, THUNDERBEAST GAMES LLC All rights reserved
+// Copyright (c) 2014-2017, THUNDERBEAST GAMES LLC All rights reserved
+// Copyright (c) 2008-2016 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,37 +21,44 @@
 // THE SOFTWARE.
 //
 
-#include <TurboBadger/tb_widgets.h>
-#include <TurboBadger/tb_widgets_common.h>
+#pragma once
 
-#include "tbUI.h"
-#include "tbUIEvents.h"
-#include "tbUITextField.h"
-
-using namespace tb;
+#include "Sample.h"
 
 namespace Urho3D
 {
-	tbUITextField::tbUITextField(Context* context, bool createWidget) : tbUIWidget(context, false)
-	{
-		if (createWidget)
-		{
-			widget_ = new TBTextField();
-			widget_->SetDelegate(this);
-			GetSubsystem<tbUI>()->WrapWidget(this, widget_);
-		}
-	}
-
-	void tbUITextField::SetTextAlign(UI_TEXT_ALIGN align)
-	{
-		if (!widget_)
-			return;
-
-		((TBTextField*)widget_)->SetTextAlign((TB_TEXT_ALIGN)align);
-	}
-
-	bool tbUITextField::OnEvent(const tb::TBWidgetEvent &ev)
-	{
-		return false;
-	}
+	class tbUIWindow;
+	class tbUIComponent;
+	class tbUIFinderWindow;
 }
+
+class HelloFinderWindow : public Sample
+{
+	URHO3D_OBJECT(HelloFinderWindow, Sample)
+
+public:
+	/// Construct.
+	HelloFinderWindow(Context* context);
+
+	/// Setup after engine initialization and before running the main loop.
+	virtual void Start();
+
+protected:
+
+	void Cleanup();
+
+private:
+
+	void CreateScene();
+	tbUIView* CreateUI(bool renderToTexture = false);
+
+	/// Set up a viewport for displaying the scene.
+	void SetupViewport();
+	/// Subscribe to application-wide logic update events.
+	void SubscribeToEvents();
+	/// Handle the logic update event.
+	void HandleUpdate(StringHash eventType, VariantMap& eventData);
+
+	WeakPtr<tbUIFinderWindow> window_;
+	WeakPtr<tbUIView> uiView_;
+};

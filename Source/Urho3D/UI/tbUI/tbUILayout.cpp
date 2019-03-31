@@ -44,7 +44,7 @@ namespace Urho3D
 		if (createWidget)
 		{
 			widget_ = new TBLayout();
-			widget_->AddListener(this);
+			widget_->SetDelegate(this);
 			widget_->SetGravity(WIDGET_GRAVITY_ALL);
 			widget_->SetAxis((AXIS)axis);
 			assert(GetSubsystem<tbUI>() != 0);

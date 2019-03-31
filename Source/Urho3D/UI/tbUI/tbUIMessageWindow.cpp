@@ -40,7 +40,7 @@ tbUIMessageWindow::tbUIMessageWindow(Context* context, tbUIWidget* target, const
     if (createWidget)
     {
         widget_ = new TBMessageWindow(target ? target->GetInternalWidget() : 0, TBIDC(id.CString()));
-		widget_->AddListener(this);
+		widget_->SetDelegate(this);
         GetSubsystem<tbUI>()->WrapWidget(this, widget_);
     }
 }

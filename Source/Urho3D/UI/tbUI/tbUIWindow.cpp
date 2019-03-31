@@ -41,7 +41,7 @@ namespace Urho3D
 		{
 			widget_ = new TBWindow();
 			GetSubsystem<tbUI>()->WrapWidget(this, widget_);
-			widget_->AddListener(this);
+			widget_->SetDelegate(this);
 		}
 	}
 	UI_WINDOW_SETTINGS tbUIWindow::GetSettings()
@@ -73,11 +73,6 @@ namespace Urho3D
 	{
 		if (!widget_)
 			return;
-
-		if (widget_->HasListener(this))
-		{
-			widget_->RemoveListener(this);
-		}
 
 		((TBWindow*)widget_)->Close();
 	}

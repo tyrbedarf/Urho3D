@@ -39,7 +39,7 @@ tbUIScrollContainer::tbUIScrollContainer(Context* context, bool createWidget) : 
     if (createWidget)
     {
         widget_ = new TBScrollContainer();
-		widget_->AddListener(this);
+		widget_->SetDelegate(this);
         GetSubsystem<tbUI>()->WrapWidget(this, widget_);
     }
 }

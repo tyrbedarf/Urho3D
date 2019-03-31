@@ -40,7 +40,7 @@ tbUIPulldownMenu::tbUIPulldownMenu(Context* context, bool createWidget) : tbUIBu
     if (createWidget)
     {
         widget_ = new TBPulldownMenu();
-		widget_->AddListener(this);
+		widget_->SetDelegate(this);
         GetSubsystem<tbUI>()->WrapWidget(this, widget_);
     }
 }

@@ -40,7 +40,7 @@ tbUISection::tbUISection(Context* context, bool createWidget) : tbUIWidget(conte
     if (createWidget)
     {
         widget_ = new TBSection();
-		widget_->AddListener(this);
+		widget_->SetDelegate(this);
         GetSubsystem<tbUI>()->WrapWidget(this, widget_);
     }
 }
