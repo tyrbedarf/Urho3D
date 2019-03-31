@@ -90,6 +90,9 @@ namespace Urho3D
 					layout->AddChild(edit);
 				}
 
+				layout->SetLayoutMinWidth(overall);
+				layout->SetSize(overall, 30);
+
 				widget_root_->AddChild(layout);
 				widget_root_->SetLayoutMinWidth(overall);
 			}
