@@ -21,7 +21,6 @@
 #include "../../Graphics/Model.h"
 #include "../../Graphics/Geometry.h"
 
-
 #include "SymetricMatrix.h"
 
 namespace Urho3D
@@ -81,8 +80,7 @@ namespace Urho3D
 			Vector2 uv2,
 			Vector2 uv3);
 
-		/// Create a new Triangle. Only one normal
-		/// since this version of CustomMesh is build for mesh simplification.
+		/// Create a new Triangle.
 		void AddTriangle(
 			Vector3 a,
 			Vector3 b,
@@ -102,9 +100,9 @@ namespace Urho3D
 
 		SharedPtr<Model> GetModel();
 
-		void FromModel(Model* model, unsigned int index, unsigned int lod);
-		void FromGeometry(Geometry* geom, unsigned int index);
-		void FromFile(String ressource, unsigned int index, unsigned int lod);
+		void FromModel(Model* model, unsigned int index, unsigned int lod, bool verbose = true);
+		void FromGeometry(Geometry* geom, unsigned int index, bool verbose = true);
+		void FromFile(String ressource, unsigned int index, unsigned int lod, bool verbose = true);
 
 		/// Main simplification function
 		///

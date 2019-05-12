@@ -28,6 +28,7 @@ namespace Urho3D
 {
 	class tbUIWindow;
 	class tbUIView;
+	class tbUITextView;
 }
 
 class HelloCustomMesh : public Sample
@@ -52,14 +53,11 @@ private:
 
 	/// Handle the logic update event.
 	void HandleUpdate(StringHash eventType, VariantMap& eventData);
-	void HandleWidgetEvent(StringHash eventType, VariantMap& eventData);
 	void HandleWidgetDeleted(StringHash eventType, VariantMap& eventData);
 
 	void SetupViewport();
 	void MoveCamera(float timeStep);
 	void RotateNodes(float timeStep);
-
-	void CreateProceduralMesh();
 
 	void ToggleWireFrame();
 
@@ -67,7 +65,7 @@ private:
 	WeakPtr<tbUIView> uiView_;
 
 	SharedPtr<Material> material;
-	SharedPtr<tbUIButton> button_;
+	SharedPtr<tbUITextField> text_;
 
 	WeakPtr<Node> torus_node;
 	WeakPtr<Node> plane_node;

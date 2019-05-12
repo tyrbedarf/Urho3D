@@ -115,7 +115,7 @@ namespace Urho3D
 		triangles.push_back(t);
 	}
 
-	void ProceduralMesh::FromModel(Model* model, unsigned int index, unsigned int lod)
+	void ProceduralMesh::FromModel(Model* model, unsigned int index, unsigned int lod, bool verbose)
 	{
 		if (!model)
 		{
@@ -123,10 +123,10 @@ namespace Urho3D
 			return;
 		}
 
-		FromGeometry(model->GetGeometry(index, lod), index);
+		FromGeometry(model->GetGeometry(index, lod), index, verbose);
 	}
 
-	void ProceduralMesh::FromGeometry(Geometry* geom, unsigned int index)
+	void ProceduralMesh::FromGeometry(Geometry* geom, unsigned int index, bool verbose)
 	{
 		if (!geom)
 		{
@@ -162,8 +162,11 @@ namespace Urho3D
 		int vertexSize = vertexBuffer->GetVertexSize();
 		int indexSize = indexBuffer->GetIndexSize();
 
-		URHO3D_LOGERROR("Idx Size: " + String(indexSize) + " - " + String(numIndices));
-		URHO3D_LOGERROR("Vtx Size: " + String(vertexSize) + " - " + String(numVertices));
+		if (verbose)
+		{
+			URHO3D_LOGDEBUGF("Idx Size: %d - Indices : %d", indexSize, numIndices);
+			URHO3D_LOGDEBUGF("Vtx Size: %d - Vertices: %d", vertexSize, numVertices);
+		}
 
 		for (int i = 0; i < numIndices; i += 3)
 		{
@@ -178,19 +181,11 @@ namespace Urho3D
 			Vector3 vb = *reinterpret_cast<const Vector3*>(vertexData + (b * vertexSize));
 			Vector3 vc = *reinterpret_cast<const Vector3*>(vertexData + (c * vertexSize));
 
-			/*URHO3D_LOGDEBUG
-			(
-				String(i / 3) + ". " +
-				String(a) + " - " + String(va) + " | " +
-				String(b) + " - " + String(vb) + " | " +
-				String(c) + " - " + String(vc)
-			);*/
-
 			AddTriangle(va, vb, vc);
 		}
 	}
 
-	void ProceduralMesh::FromFile(String ressource, unsigned int index, unsigned int lod)
+	void ProceduralMesh::FromFile(String ressource, unsigned int index, unsigned int lod, bool verbose)
 	{
 		auto* cache = GetSubsystem<ResourceCache>();
 		Model* model = cache->GetResource<Model>(ressource);
@@ -200,7 +195,7 @@ namespace Urho3D
 			return;
 		}
 
-		FromModel(model, index, lod);
+		FromModel(model, index, lod, verbose);
 	}
 
 	int ProceduralMesh::GetIndex(Vector3 v)
@@ -249,14 +244,11 @@ namespace Urho3D
 		PODVector<float> vertexData(vertices.size() * vertexSize);
 		PODVector<unsigned short> indexData;
 
-		URHO3D_LOGDEBUG("Triangles: " + String(triangles.size()));
-		URHO3D_LOGDEBUG("Vertices : " + String(vertexData.Size() / vertexSize));
 		for (int i = 0; i < triangles.size(); i++)
 		{
 			Triangle t = triangles[i];
 			if (t.deleted)
 			{
-				URHO3D_LOGDEBUG("Ignored Triangle");
 				continue;
 			}
 
@@ -502,7 +494,7 @@ namespace Urho3D
 			// target number of triangles reached ? Then break
 			if ((verbose) && (iteration % 5 == 0))
 			{
-				printf("iteration %d - triangles %d threshold %g\n",
+				URHO3D_LOGDEBUGF("iteration %d - triangles %d threshold %g\n",
 					iteration,
 					triangle_count - deleted_triangles,
 					threshold);
@@ -575,7 +567,11 @@ namespace Urho3D
 	void ProceduralMesh::SimplifyMeshLossless(bool verbose, int maxIterations)
 	{
 		// init
-		printf("Before: Vertices %zd Triangles: %zd\n", vertices.size(), triangles.size());
+		if (verbose)
+		{
+			URHO3D_LOGDEBUGF("Before. Vertices: %d Triangles: %d", vertices.size(), triangles.size());
+		}
+
 		loopi(0, triangles.size()) triangles[i].deleted = 0;
 
 		// main iteration loop
@@ -598,7 +594,7 @@ namespace Urho3D
 			double threshold = DBL_EPSILON; //1.0E-3 EPS;
 			if (verbose)
 			{
-				printf("lossless iteration %d\n", iteration);
+				URHO3D_LOGDEBUGF("lossless iteration %d", iteration);
 			}
 
 			// remove vertices & mark deleted triangles
@@ -673,6 +669,11 @@ namespace Urho3D
 
 		// clean up mesh
 		CompactMesh();
+
+		if (verbose)
+		{
+			URHO3D_LOGDEBUGF("After. Vertices: %d Triangles: %d", vertices.size(), triangles.size());
+		}
 	}
 
 	bool ProceduralMesh::Flipped(
