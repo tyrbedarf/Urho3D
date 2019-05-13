@@ -236,12 +236,10 @@ namespace Urho3D
 		elements.Push(VertexElement(TYPE_VECTOR3, SEM_POSITION));
 		elements.Push(VertexElement(TYPE_VECTOR3, SEM_NORMAL));
 		elements.Push(VertexElement(TYPE_VECTOR2, SEM_TEXCOORD));
+		elements.Push(VertexElement(TYPE_VECTOR4, SEM_TANGENT));
 
-		// ToDo: Calculate Tangents
-		// elements.Push(VertexElement(TYPE_VECTOR4, SEM_TANGENT));
-
-		const int vertexSize = 8;
-		PODVector<float> vertexData(vertices.size() * vertexSize);
+		const int vertexSize = 12;
+		PODVector<float> vertexData(vertices.size() * vertexSize, 0.0f);
 		PODVector<unsigned short> indexData;
 
 		for (int i = 0; i < triangles.size(); i++)
@@ -274,17 +272,18 @@ namespace Urho3D
 			vertexData[(t.v[2] * vertexSize) + 2] = c.z_;
 
 			// Normals
-			vertexData[(t.v[0] * vertexSize) + 3] = t.n.x_;
-			vertexData[(t.v[0] * vertexSize) + 4] = t.n.y_;
-			vertexData[(t.v[0] * vertexSize) + 5] = t.n.z_;
+			auto normal = t.n;
+			vertexData[(t.v[0] * vertexSize) + 3] = normal.x_;
+			vertexData[(t.v[0] * vertexSize) + 4] = normal.y_;
+			vertexData[(t.v[0] * vertexSize) + 5] = normal.z_;
 
-			vertexData[(t.v[1] * vertexSize) + 3] = t.n.x_;
-			vertexData[(t.v[1] * vertexSize) + 4] = t.n.y_;
-			vertexData[(t.v[1] * vertexSize) + 5] = t.n.z_;
+			vertexData[(t.v[1] * vertexSize) + 3] = normal.x_;
+			vertexData[(t.v[1] * vertexSize) + 4] = normal.y_;
+			vertexData[(t.v[1] * vertexSize) + 5] = normal.z_;
 
-			vertexData[(t.v[2] * vertexSize) + 3] = t.n.x_;
-			vertexData[(t.v[2] * vertexSize) + 4] = t.n.y_;
-			vertexData[(t.v[2] * vertexSize) + 5] = t.n.z_;
+			vertexData[(t.v[2] * vertexSize) + 3] = normal.x_;
+			vertexData[(t.v[2] * vertexSize) + 4] = normal.y_;
+			vertexData[(t.v[2] * vertexSize) + 5] = normal.z_;
 
 			// UVs
 			vertexData[(t.v[0] * vertexSize) + 6] = t.uvs[0].x_;
@@ -300,6 +299,68 @@ namespace Urho3D
 			indexData.Push(t.v[0]);
 			indexData.Push(t.v[1]);
 			indexData.Push(t.v[2]);
+		}
+
+		/// Calculate Tangents
+		Vector<Vector3> tan1(vertices.size(), Vector3(0.0f, 0.0f, 0.0f));
+		Vector<Vector3> tan2(vertices.size(), Vector3(0.0f, 0.0f, 0.0f));
+		for (int i = 0; i < triangles.size(); i++)
+		{
+			Triangle t = triangles[i];
+			if (t.deleted)
+			{
+				continue;
+			}
+
+			int i1 = t.v[0];
+			int i2 = t.v[1];
+			int i3 = t.v[2];
+
+			Vector3 v1(vertexData[(i1 * vertexSize) + 0], vertexData[(i1 * vertexSize) + 1], vertexData[(i1 * vertexSize) + 2]);
+			Vector3 v2(vertexData[(i2 * vertexSize) + 0], vertexData[(i2 * vertexSize) + 1], vertexData[(i2 * vertexSize) + 2]);
+			Vector3 v3(vertexData[(i3 * vertexSize) + 0], vertexData[(i3 * vertexSize) + 1], vertexData[(i3 * vertexSize) + 2]);
+
+			Vector2 w1(vertexData[(i1 * vertexSize) + 6], vertexData[(i1 * vertexSize) + 7]);
+			Vector2 w2(vertexData[(i2 * vertexSize) + 6], vertexData[(i2 * vertexSize) + 7]);
+			Vector2 w3(vertexData[(i3 * vertexSize) + 6], vertexData[(i3 * vertexSize) + 7]);
+
+			float x1 = v2.x_ - v1.x_;
+			float x2 = v3.x_ - v1.x_;
+			float y1 = v2.y_ - v1.y_;
+			float y2 = v3.y_ - v1.y_;
+			float z1 = v2.z_ - v1.z_;
+			float z2 = v3.z_ - v1.z_;
+			float s1 = w2.x_ - w1.x_;
+			float s2 = w3.x_ - w1.x_;
+			float t1 = w2.y_ - w1.y_;
+			float t2 = w3.y_ - w1.y_;
+			float r = 1.0f / (s1 * t2 - s2 * t1);
+
+			Vector3 sdir((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r, (t2 * z1 - t1 * z2) * r);
+			Vector3 tdir((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r, (s1 * z2 - s2 * z1) * r);
+
+			tan1[i1] += sdir;
+			tan1[i2] += sdir;
+			tan1[i3] += sdir;
+
+			tan2[i1] += tdir;
+			tan2[i2] += tdir;
+			tan2[i3] += tdir;
+		}
+
+		for (long i = 0; i < vertices.size(); i++)
+		{
+			Vector3 n(vertexData[(i * vertexSize) + 3], vertexData[(i * vertexSize) + 4], vertexData[(i * vertexSize) + 5]);
+			Vector3 t(tan1[i].x_, tan1[i].y_, tan1[i].z_);
+
+			// Gram-Schmidt orthogonalize
+			auto ortho = (t - n * n.DotProduct(t)).Normalized();
+			vertexData[(i * vertexSize) +  8] = ortho.x_;
+			vertexData[(i * vertexSize) +  9] = ortho.y_;
+			vertexData[(i * vertexSize) + 10] = ortho.z_;
+
+			// Calculate handedness
+			vertexData[(i * vertexSize) + 11] = (n.CrossProduct(t).DotProduct(tan2[i]) < 0.0F) ? -1.0F : 1.0F;
 		}
 
 		vb->SetSize(vertices.size(), elements);
