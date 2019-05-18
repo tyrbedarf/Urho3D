@@ -25,11 +25,12 @@
 
 namespace Urho3D
 {
-	enum Attributes {
+	enum Attributes
+	{
 		NONE,
-		NORMAL		= 2,
-		TEXCOORD	= 4,
-		COLOR		= 8
+		NORMAL = 2,
+		TEXCOORD = 4,
+		COLOR = 8
 	};
 
 	struct Triangle

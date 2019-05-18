@@ -15,15 +15,18 @@ namespace Urho3D
 		Vector3 v0 = b - a;
 		Vector3 v1 = c - a;
 		Vector3 v2 = p - a;
+
 		double d00 = v0.DotProduct(v0);
 		double d01 = v0.DotProduct(v1);
 		double d11 = v1.DotProduct(v1);
 		double d20 = v2.DotProduct(v0);
 		double d21 = v2.DotProduct(v1);
+
 		double denom = d00 * d11 - d01 * d01;
 		double v = (d11 * d20 - d01 * d21) / denom;
 		double w = (d00 * d21 - d01 * d20) / denom;
 		double u = 1.0 - v - w;
+
 		return Vector3(u, v, w);
 	}
 
@@ -36,9 +39,11 @@ namespace Urho3D
 	{
 		Vector3 bary = Barycentric(p, a, b, c);
 		Vector3 out = Vector3(0, 0, 0);
+
 		out = out + attrs[0] * bary.x_;
 		out = out + attrs[1] * bary.y_;
 		out = out + attrs[2] * bary.z_;
+
 		return out;
 	}
 
@@ -173,6 +178,7 @@ namespace Urho3D
 			int offset_a = 0;
 			int offset_b = indexSize;
 			int offset_c = indexSize + indexSize;
+
 			unsigned short a = *reinterpret_cast<const unsigned short*>(indexData + (i * indexSize) + offset_a);
 			unsigned short b = *reinterpret_cast<const unsigned short*>(indexData + (i * indexSize) + offset_b);
 			unsigned short c = *reinterpret_cast<const unsigned short*>(indexData + (i * indexSize) + offset_c);
@@ -224,10 +230,10 @@ namespace Urho3D
 
 	SharedPtr<Model> ProceduralMesh::GetModel()
 	{
-		SharedPtr<Model> model = SharedPtr<Model>(new Model(context_));
-		SharedPtr<VertexBuffer> vb = SharedPtr<VertexBuffer>(new VertexBuffer(context_));
-		SharedPtr<IndexBuffer> ib = SharedPtr<IndexBuffer>(new IndexBuffer(context_));
-		SharedPtr<Geometry> geom = SharedPtr<Geometry>(new Geometry(context_));
+		SharedPtr<Model> model		= SharedPtr<Model>(new Model(context_));
+		SharedPtr<VertexBuffer> vb	= SharedPtr<VertexBuffer>(new VertexBuffer(context_));
+		SharedPtr<IndexBuffer> ib	= SharedPtr<IndexBuffer>(new IndexBuffer(context_));
+		SharedPtr<Geometry> geom	= SharedPtr<Geometry>(new Geometry(context_));
 		BoundingBox boundingBox;
 
 		vb->SetShadowed(true);
@@ -766,7 +772,7 @@ namespace Urho3D
 			if (fabs(d1.DotProduct(d2)) > 0.999) return true;
 
 			Vector3 n;
-			// n.cross(d1, d2);
+
 			n = d1.CrossProduct(d2);
 			n.Normalize();
 			deleted[k] = 0;
@@ -806,13 +812,16 @@ namespace Urho3D
 		{
 			VTRef &r = refs[v.tstart + k];
 			Triangle &t = triangles[r.tid];
+
 			if (t.deleted)continue;
+
 			if (deleted[k])
 			{
 				t.deleted = 1;
 				deleted_triangles++;
 				continue;
 			}
+
 			t.v[r.tvertex] = i0;
 			t.dirty = 1;
 			t.err[0] = CalculateError(t.v[0], t.v[1], p);
@@ -986,7 +995,8 @@ namespace Urho3D
 
 	double ProceduralMesh::VertexError(SymetricMatrix q, double x, double y, double z)
 	{
-		return   q[0] * x*x + 2 * q[1] * x*y + 2 * q[2] * x*z + 2 * q[3] * x + q[4] * y*y
+		return
+			q[0] * x*x + 2 * q[1] * x*y + 2 * q[2] * x*z + 2 * q[3] * x + q[4] * y*y
 			+ 2 * q[5] * y*z + 2 * q[6] * y + q[7] * z*z + 2 * q[8] * z + q[9];
 	}
 
@@ -1012,6 +1022,7 @@ namespace Urho3D
 			Vector3 p1 = vertices[id_v1].p;
 			Vector3 p2 = vertices[id_v2].p;
 			Vector3 p3 = (p1 + p2) / 2;
+
 			double error1 = VertexError(q, p1.x_, p1.y_, p1.z_);
 			double error2 = VertexError(q, p2.x_, p2.y_, p2.z_);
 			double error3 = VertexError(q, p3.x_, p3.y_, p3.z_);
