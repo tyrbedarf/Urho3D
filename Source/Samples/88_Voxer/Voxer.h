@@ -65,4 +65,7 @@ private:
 
 	SharedPtr<Material> material;
 	SharedPtr<tbUITextField> text_;
+
+	std::atomic<int> batch_1;
+	std::atomic<int> batch_2;
 };

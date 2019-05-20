@@ -1,8 +1,12 @@
 #pragma once
 
 #include <atomic>
+#include <functional>
 
-namespace Voxer
+#include "../Core/Timer.h"
+#include "../IO/Log.h"
+
+namespace Urho3D
 {
 	struct Task
 	{
@@ -16,10 +20,6 @@ namespace Voxer
 		/// True, if the task has finished
 		std::atomic<bool> mFinished;
 
-		void NoOp(void*)
-		{
-
-		}
 
 	public:
 		/// Code to execute
@@ -29,7 +29,7 @@ namespace Voxer
 		Task(std::atomic<int>* counter, std::atomic<int>* dependency)
 		{
 			mCounter = counter;
-			if(mCounter != nullptr) mCounter++;
+			if(mCounter != nullptr) ++mCounter;
 
 			mDependency = dependency;
 			mFinished.store(false);
@@ -39,8 +39,18 @@ namespace Voxer
 
 		bool CanExecute()
 		{
+			if (mDependency != nullptr)
+			{
+				int tasks = mDependency->load();
+				URHO3D_LOGDEBUGF("Dependencies: %d", tasks);
+			}
+			if (mCounter != nullptr)
+			{
+				int count = mCounter->load();
+				URHO3D_LOGDEBUGF("Bulk Count: %d", count);
+			}
 			return
-				mDependency != nullptr &&
+				mDependency == nullptr ||
 				mDependency->load() < 1;
 		}
 
@@ -49,7 +59,7 @@ namespace Voxer
 			Function(Data);
 			if (mCounter != nullptr)
 			{
-				mCounter--;
+				--mCounter;
 			}
 
 			mFinished.store(true);
@@ -60,7 +70,7 @@ namespace Voxer
 		{
 			while (!mFinished.load())
 			{
-				std::this_thread::yield();
+				Time::Sleep(0);
 			}
 		}
 	};

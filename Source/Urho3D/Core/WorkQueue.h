@@ -26,8 +26,8 @@
 #include "../Core/Mutex.h"
 #include "../Core/Object.h"
 
-//#include "../Toolbox/VoxelTerrain/Task.h"
-//#include "../Container/ConcurentQueue.h"
+#include "../Toolbox/VoxelTerrain/Task.h"
+#include "../Container/ConcurentQueue.h"
 
 namespace Urho3D
 {
@@ -129,14 +129,14 @@ namespace Urho3D
 		}
 
 		/// Get the next task to work on
-		//Task* GetNextTask();
+		Task* GetNextTask();
 
-		///// Add a task
-		//void AddTask(
-		//	std::function<void(void*)> func,
-		//	void* userData,
-		//	std::atomic<int>* batch,
-		//	std::atomic<int>* dependencies);
+		/// Add a task
+		void AddTask(
+			std::function<void(void*)> func,
+			void* userData,
+			std::atomic<int>* batch,
+			std::atomic<int>* dependencies);
 
 	private:
 		/// Process work items until shut down. Called by the worker threads.
@@ -193,8 +193,8 @@ namespace Urho3D
 		/// Tasksystem
 		/// Task are being run on the main thread only if there are no
 		/// worker threads and are meant to handle more complex code.
-		//moodycamel::ConcurrentQueue<Task*> mTasks;
-		//std::atomic<int> mTaskCount;
+		moodycamel::ConcurrentQueue<Task*> mTasks;
+		std::atomic<int> mTaskCount;
 	};
 
 }

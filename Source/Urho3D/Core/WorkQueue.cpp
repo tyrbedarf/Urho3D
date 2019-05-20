@@ -73,6 +73,7 @@ namespace Urho3D
 		maxNonThreadedWorkMs_(5)
 	{
 		SubscribeToEvent(E_BEGINFRAME, URHO3D_HANDLER(WorkQueue, HandleBeginFrame));
+		mTaskCount.store(0);
 	}
 
 	WorkQueue::~WorkQueue()
@@ -319,12 +320,12 @@ namespace Urho3D
 				Time::Sleep(0);
 			else
 			{
-				//Task* t = GetNextTask();
-				//if (t != nullptr)
-				//{
-				//	t->Execute();
-				//	delete t;
-				//}
+				Task* t = GetNextTask();
+				if (t != nullptr)
+				{
+					t->Execute();
+					delete t;
+				}
 
 				queueMutex_.Acquire();
 				if (!queue_.Empty())
@@ -428,54 +429,57 @@ namespace Urho3D
 		/// Work tasks on main thread if there
 		/// are no worker threads.
 		/// Run only one task per Frame (?)
-		//if (threads_.Empty())
-		//{
-		//	Task* t = GetNextTask();
-		//	if (t != nullptr)
-		//	{
-		//		t->Execute();
-		//		delete t;
-		//		/*t = GetNextTask();*/
-		//	}
-		//}
+		if (threads_.Empty())
+		{
+			Task* t = GetNextTask();
+			if (t != nullptr)
+			{
+				t->Execute();
+				delete t;
+				/*t = GetNextTask();*/
+			}
+		}
 
 		// Complete and signal items down to the lowest priority
 		PurgeCompleted(0);
 		PurgePool();
 	}
 
-	//Task* WorkQueue::GetNextTask()
-	//{
-	//	Task* t = nullptr;
-	//	int maxCount = mTaskCount.load();
-	//	int count = 0;
+	Task* WorkQueue::GetNextTask()
+	{
+		Task* t = nullptr;
+		int maxCount = mTaskCount.load();
+		int count = 0;
 
-	//	while (mTasks.try_dequeue(t) && (count < maxCount))
-	//	{
-	//		if (t->CanExecute())
-	//		{
-	//			mTaskCount--;
-	//			return t;
-	//		}
+		if(maxCount > 0)
+			URHO3D_LOGDEBUGF("Tasks: %d", maxCount);
 
-	//		mTasks.enqueue(t);
-	//		count++;
-	//	}
+		while (mTasks.try_dequeue(t) && (count < maxCount))
+		{
+			if (t->CanExecute())
+			{
+				--mTaskCount;
+				return t;
+			}
 
-	//	return nullptr;
-	//}
+			mTasks.enqueue(t);
+			count++;
+		}
 
-	//void WorkQueue::AddTask(
-	//	std::function<void(void*)> func,
-	//	void* userData,
-	//	std::atomic<int>* batch,
-	//	std::atomic<int>* dependencies)
-	//{
-	//	Task* t = new Task(batch, dependencies);
-	//	t->Function = func;
-	//	t->Data = userData;
+		return nullptr;
+	}
 
-	//	mTasks.enqueue(t);
-	//	mTaskCount++;
-	//}
+	void WorkQueue::AddTask(
+		std::function<void(void*)> func,
+		void* userData,
+		std::atomic<int>* batch,
+		std::atomic<int>* dependencies)
+	{
+		Task* t = new Task(batch, dependencies);
+		t->Function = func;
+		t->Data = userData;
+
+		++mTaskCount;
+		mTasks.enqueue(t);
+	}
 }

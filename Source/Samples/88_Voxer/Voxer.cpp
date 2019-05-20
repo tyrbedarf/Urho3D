@@ -43,6 +43,7 @@
 #include <Urho3D/Toolbox/Mesh/ProceduralMesh.h>
 #include <Urho3D/Graphics/Zone.h>
 #include <Urho3D/UI/tbUI/tbUITextField.h>
+#include <Urho3D/Core/WorkQueue.h>
 
 #include "Voxer.h"
 
@@ -51,7 +52,9 @@
 URHO3D_DEFINE_APPLICATION_MAIN(VoxerSample)
 
 VoxerSample::VoxerSample(Context* context) :
-	Sample(context)
+	Sample(context),
+	batch_1(0),
+	batch_2(0)
 {
 }
 
@@ -64,6 +67,37 @@ void VoxerSample::Start()
 	SetupViewport();
 
 	SubscribeToEvents();
+
+	auto workqueue = GetSubsystem<WorkQueue>();
+	int task = 0;
+	for (int i = 0; i < 100; i++)
+	{
+		task++;
+		workqueue->AddTask(
+			[](void* data) {
+				for (int i = 0; i < 1000000; i++)
+				{
+					Time::Sleep(0);
+				}
+			},
+			&i,
+			&batch_1,
+			nullptr);
+	}
+
+	for (int i = 0; i < 50; i++)
+	{
+		workqueue->AddTask(
+			[](void* data) {
+				for (int i = 0; i < 100000; i++)
+				{
+					Time::Sleep(0);
+				}
+			},
+			&i,
+			&batch_2,
+			&batch_1);
+	}
 
 	Sample::InitMouseMode(MM_FREE);
 }
