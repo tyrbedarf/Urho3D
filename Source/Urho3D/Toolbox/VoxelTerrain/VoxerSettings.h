@@ -1,9 +1,9 @@
 #pragma once
 
-#include "IO/Log.h"
-#include "Math/Vector3i.h"
-#include "Math/Vector3d.h"
-#include "Core/Object.h"
+#include "../IO/Log.h"
+#include "../Math/Vector3i.h"
+#include "../Math/Vector3d.h"
+#include "../Core/Object.h"
 
 namespace Urho3D
 {
@@ -23,9 +23,9 @@ namespace Urho3D
 		return r;
 	}
 
-	class VoxerSettings : public Object
+	class VoxerSettings : public Urho3D::Object
 	{
-		URHO3D_OBJECT(VoxerSettings, Object)
+		URHO3D_OBJECT(VoxerSettings, Urho3D::Object)
 
 	protected:
 		float mVoxelSize;

@@ -1,7 +1,8 @@
 #include "Chunk.h"
 
-#include "Helper/Vector3Helper.h"
-#include "Math/Vector3i.h"
+#include "../Helper/Vector3Helper.h"
+#include "../Math/Vector3d.h"
+#include "VoxerSystem.h"
 
 #include <tuple>
 
@@ -87,7 +88,7 @@ namespace Urho3D
 		mNeighborhood.clear();
 	}
 
-	void Chunk::SetNeighbor(int x, int y, int z, IChunk* c)
+	void Chunk::SetNeighbor(int x, int y, int z, Chunk* c)
 	{
 		auto hash = GetNeighborHash(x, y, z);
 		if (hash == 0)
@@ -198,7 +199,7 @@ namespace Urho3D
 			}
 		}
 
-		IVoxerSystem::Instance()->SpawnChunk(this);
+		VoxerSystem::Get()->SpawnChunk(this);
 
 		if (mMeshed.exchange(1) != 0)
 		{

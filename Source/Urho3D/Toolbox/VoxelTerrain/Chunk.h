@@ -1,26 +1,22 @@
 #pragma once
 
-#include "API/IChunk.h"
 #include "VoxerStatistics.h"
-#include "Helper/Vector3Helper.h"
-#include "Math/SimplexNoise.h"
+#include "../Helper/Vector3Helper.h"
+#include "../Math/SimplexNoise.h"
 #include "Voxel.h"
-#include "Math/Vector3i.h"
-#include "VoxerStatistics.h"
-#include "Core/Object.h"
+#include "../Math/Vector3i.h"
+#include "../Core/Object.h"
 
 #include <tuple>
 #include <atomic>
 #include <chrono>
 #include <ctime>
 
-#include "API/IVoxerSystem.h"
-
 namespace Urho3D
 {
-	class Chunk : public IChunk
+	class Chunk : public Object
 	{
-		URHO3D_OBJECT(Chunk, IChunk);
+		URHO3D_OBJECT(Chunk, Object);
 
 	public:
 		static VoxerStatistics* mStats;
@@ -44,7 +40,7 @@ namespace Urho3D
 		float mVoxelSize;
 		Vector3d mWorldPosition;
 
-		std::unordered_map<int, IChunk*> mNeighborhood;
+		std::unordered_map<int, Chunk*> mNeighborhood;
 
 		Voxel* mData;
 		Vector3i mVoxelLayout;
@@ -67,7 +63,7 @@ namespace Urho3D
 
 	public:
 		Chunk(Context* ctx, const Vector3i voxelLayout, float voxelSize) :
-			IChunk(ctx),
+			Object(ctx),
 			mInitMarker(0),
 			mWorldPosition(0),
 			mVoxelSize(voxelSize),
@@ -137,7 +133,7 @@ namespace Urho3D
 
 		virtual void Reset(Vector3d pos);
 
-		virtual void SetNeighbor(int x, int y, int z, IChunk* c);
+		virtual void SetNeighbor(int x, int y, int z, Chunk* c);
 
 		virtual void Initialize();
 

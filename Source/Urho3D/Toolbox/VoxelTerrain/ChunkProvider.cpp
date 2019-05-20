@@ -5,21 +5,22 @@
 #include "TaskSystem.h"
 #include "Core/Context.h"
 #include "Core/Object.h"
+#include "VoxerSettings.h"
 
 #include <unordered_map>
 
 namespace Urho3D
 {
-	bool chunkOrder(const IChunk* lhs, const IChunk* rhs)
+	bool chunkOrder(const Chunk* lhs, const Chunk* rhs)
 	{
 		return lhs->GetInitializationMarker() < rhs->GetInitializationMarker();
 	}
 
-	ChunkProvider::ChunkProvider(Context* ctx, IVoxerSettings* settings) :
-		IChunkProvider(ctx)
+	ChunkProvider::ChunkProvider(Context* ctx, SharedPtr<VoxerSettings> settings) :
+		Object(ctx)
 	{
 		mSettings = settings;
-		mTaskSystem = GetSubsystem<TaskSystem>();
+		mTaskSystem = GetSubsystem<WorkQueue>();
 
 		mInitialing = nullptr;
 		mMeshing = nullptr;
@@ -38,7 +39,7 @@ namespace Urho3D
 
 		/// Remove all Chunks
 		URHO3D_LOGDEBUG("Destroying active chunks");
-		for (std::unordered_map<Vector3d, IChunk*>::iterator it = mActiveChunks.begin();
+		for (std::unordered_map<Vector3d, Chunk*>::iterator it = mActiveChunks.begin();
 			it != mActiveChunks.end();
 			++it)
 		{
@@ -77,7 +78,7 @@ namespace Urho3D
 		int positions = mSettings->IsServer() ? playerPositions.size() : 1;
 		auto cd = mSettings->GetChunkDimension();
 		auto vr = mSettings->GetViewRange();
-		std::vector<IChunk*> Workload;
+		std::vector<Chunk*> Workload;
 
 		for (int i = 0; i < positions; i++)
 		{
@@ -117,7 +118,7 @@ namespace Urho3D
 		}
 
 		std::sort(Workload.begin(), Workload.end(), chunkOrder);
-		std::vector<IChunk*> init_tasks;
+		std::vector<Chunk*> init_tasks;
 		for (int i = 0; i < Workload.size(); i++)
 		{
 			/// Setup neighborhood for each chunk
@@ -145,52 +146,52 @@ namespace Urho3D
 			}
 
 			/// Add initializer task
-			mTaskSystem->AddTask(
-				[](void* data)
-				{
-					auto chunk = reinterpret_cast<IChunk*>(data);
-					chunk->Initialize();
-				},
-				c,
-				mInitialing,
-				nullptr);
+			//mTaskSystem->AddTask(
+			//	[](void* data)
+			//	{
+			//		auto chunk = reinterpret_cast<Chunk*>(data);
+			//		chunk->Initialize();
+			//	},
+			//	c,
+			//	mInitialing,
+			//	nullptr);
 
-			init_tasks.push_back(c);
+			//init_tasks.push_back(c);
 		}
 
 
 		///extract the surface.
 		/// Use task dependencies to make sure all chunks have been initialized
 		/// before we try to extract the surface.
-		for (int i = 0; i < init_tasks.size(); i++)
-		{
-			auto c = init_tasks[i];
-			if (c->Meshing())
-			{
-				continue;
-			}
+		//for (int i = 0; i < init_tasks.size(); i++)
+		//{
+		//	auto c = init_tasks[i];
+		//	if (c->Meshing())
+		//	{
+		//		continue;
+		//	}
 
-			mTaskSystem->AddTask(
-				[](void* data)
-				{
-					auto chunk = reinterpret_cast<IChunk*>(data);
-					chunk->CreateMesh();
-				},
-				c,
-				mMeshing,
-				mInitialing);
-		}
+		//	mTaskSystem->AddTask(
+		//		[](void* data)
+		//		{
+		//			auto chunk = reinterpret_cast<Chunk*>(data);
+		//			chunk->CreateMesh();
+		//		},
+		//		c,
+		//		mMeshing,
+		//		mInitialing);
+		//}
 
-		/// Finally clean up, otherwise this metho runs only once
-		mTaskSystem->AddTask(
-			[](void* data)
-			{
-				auto cp = reinterpret_cast<IChunkProvider*>(data);
-				cp->FinishUpdateCycle();
-			},
-			this,
-			nullptr,
-			mMeshing);
+		///// Finally clean up, otherwise this metho runs only once
+		//mTaskSystem->AddTask(
+		//	[](void* data)
+		//	{
+		//		auto cp = reinterpret_cast<ChunkProvider*>(data);
+		//		cp->FinishUpdateCycle();
+		//	},
+		//	this,
+		//	nullptr,
+		//	mMeshing);
 
 	}
 
@@ -210,7 +211,7 @@ namespace Urho3D
 		double maxDist = mSettings->GetDistToDestroy();
 
 		std::vector<Vector3d> keys;
-		for (std::unordered_map<Vector3d, IChunk*>::iterator it = mActiveChunks.begin();
+		for (std::unordered_map<Vector3d, Chunk*>::iterator it = mActiveChunks.begin();
 			it != mActiveChunks.end();
 			++it)
 		{
@@ -266,9 +267,9 @@ namespace Urho3D
 		return Vector3d(x, y, z);
 	}
 
-	IChunk* ChunkProvider::CreateChunk(Vector3d pos)
+	Chunk* ChunkProvider::CreateChunk(Vector3d pos)
 	{
-		IChunk* r = nullptr;
+		Chunk* r = nullptr;
 		auto it = mActiveChunks.find(pos);
 		if (it != mActiveChunks.end())
 		{
@@ -287,12 +288,12 @@ namespace Urho3D
 
 		r = NewChunk();
 		r->Reset(pos);
-		mActiveChunks.insert(std::pair<Vector3d, IChunk*>(pos, r));
+		mActiveChunks.insert(std::pair<Vector3d, Chunk*>(pos, r));
 
 		return r;
 	}
 
-	IChunk* ChunkProvider::GetChunk(Vector3d pos)
+	Chunk* ChunkProvider::GetChunk(Vector3d pos)
 	{
 		auto it = mActiveChunks.find(pos);
 		if (it != mActiveChunks.end())
@@ -303,7 +304,7 @@ namespace Urho3D
 		return nullptr;
 	}
 
-	IChunk* ChunkProvider::NewChunk()
+	Chunk* ChunkProvider::NewChunk()
 	{
 		if (mObjectPool.empty())
 		{

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <atomic>
-#include "IO/Log.h"
+#include "../IO/Log.h"
 
 namespace Urho3D
 {

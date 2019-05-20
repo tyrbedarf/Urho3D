@@ -1,10 +1,10 @@
 #pragma once
 
 #include <thread>
-#include "Container/ConcurentQueue.h"
+#include "../Container/ConcurentQueue.h"
 #include <vector>
 
-#include "Core/Object.h"
+#include "../Core/Object.h"
 #include "Task.h"
 
 namespace Urho3D

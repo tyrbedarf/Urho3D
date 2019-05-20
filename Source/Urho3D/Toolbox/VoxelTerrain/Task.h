@@ -32,9 +32,9 @@ namespace Urho3D
 		std::function<void(void*)> Function;
 		void* Data;
 
-		Task(std::atomic<int>* counter, std::atomic<int>* dependency)
+		Task(std::atomic<int>* batch, std::atomic<int>* dependency)
 		{
-			mBatch = counter;
+			mBatch = batch;
 			if(mBatch != nullptr) mBatch++;
 
 			mDependency = dependency;

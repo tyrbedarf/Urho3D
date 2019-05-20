@@ -319,6 +319,13 @@ namespace Urho3D
 				Time::Sleep(0);
 			else
 			{
+				//Task* t = GetNextTask();
+				//if (t != nullptr)
+				//{
+				//	t->Execute();
+				//	delete t;
+				//}
+
 				queueMutex_.Acquire();
 				if (!queue_.Empty())
 				{
@@ -418,9 +425,57 @@ namespace Urho3D
 			}
 		}
 
+		/// Work tasks on main thread if there
+		/// are no worker threads.
+		/// Run only one task per Frame (?)
+		//if (threads_.Empty())
+		//{
+		//	Task* t = GetNextTask();
+		//	if (t != nullptr)
+		//	{
+		//		t->Execute();
+		//		delete t;
+		//		/*t = GetNextTask();*/
+		//	}
+		//}
+
 		// Complete and signal items down to the lowest priority
 		PurgeCompleted(0);
 		PurgePool();
 	}
 
+	//Task* WorkQueue::GetNextTask()
+	//{
+	//	Task* t = nullptr;
+	//	int maxCount = mTaskCount.load();
+	//	int count = 0;
+
+	//	while (mTasks.try_dequeue(t) && (count < maxCount))
+	//	{
+	//		if (t->CanExecute())
+	//		{
+	//			mTaskCount--;
+	//			return t;
+	//		}
+
+	//		mTasks.enqueue(t);
+	//		count++;
+	//	}
+
+	//	return nullptr;
+	//}
+
+	//void WorkQueue::AddTask(
+	//	std::function<void(void*)> func,
+	//	void* userData,
+	//	std::atomic<int>* batch,
+	//	std::atomic<int>* dependencies)
+	//{
+	//	Task* t = new Task(batch, dependencies);
+	//	t->Function = func;
+	//	t->Data = userData;
+
+	//	mTasks.enqueue(t);
+	//	mTaskCount++;
+	//}
 }

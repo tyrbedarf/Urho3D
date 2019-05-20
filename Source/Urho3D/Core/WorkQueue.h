@@ -26,6 +26,9 @@
 #include "../Core/Mutex.h"
 #include "../Core/Object.h"
 
+//#include "../Toolbox/VoxelTerrain/Task.h"
+//#include "../Container/ConcurentQueue.h"
+
 namespace Urho3D
 {
 
@@ -120,46 +123,78 @@ namespace Urho3D
 		}
 
 		/// Return how many milliseconds maximum to spend on non-threaded low-priority work.
-		int GetNonThreadedWorkMs() const {
+		int GetNonThreadedWorkMs() const
+		{
 			return maxNonThreadedWorkMs_;
 		}
+
+		/// Get the next task to work on
+		//Task* GetNextTask();
+
+		///// Add a task
+		//void AddTask(
+		//	std::function<void(void*)> func,
+		//	void* userData,
+		//	std::atomic<int>* batch,
+		//	std::atomic<int>* dependencies);
 
 	private:
 		/// Process work items until shut down. Called by the worker threads.
 		void ProcessItems(unsigned threadIndex);
+
 		/// Purge completed work items which have at least the specified priority, and send completion events as necessary.
 		void PurgeCompleted(unsigned priority);
+
 		/// Purge the pool to reduce allocation where its unneeded.
 		void PurgePool();
+
 		/// Return a work item to the pool.
 		void ReturnToPool(SharedPtr<WorkItem>& item);
+
 		/// Handle frame start event. Purge completed work from the main thread queue, and perform work if no threads at all.
 		void HandleBeginFrame(StringHash eventType, VariantMap& eventData);
 
 		/// Worker threads.
 		Vector<SharedPtr<WorkerThread> > threads_;
+
 		/// Work item pool for reuse to cut down on allocation. The bool is a flag for item pooling and whether it is available or not.
 		List<SharedPtr<WorkItem> > poolItems_;
+
 		/// Work item collection. Accessed only by the main thread.
 		List<SharedPtr<WorkItem> > workItems_;
+
 		/// Work item prioritized queue for worker threads. Pointers are guaranteed to be valid (point to workItems.)
 		List<WorkItem*> queue_;
+
 		/// Worker queue mutex.
 		Mutex queueMutex_;
+
 		/// Shutting down flag.
 		volatile bool shutDown_;
+
 		/// Pausing flag. Indicates the worker threads should not contend for the queue mutex.
 		volatile bool pausing_;
+
 		/// Paused flag. Indicates the queue mutex being locked to prevent worker threads using up CPU time.
 		bool paused_;
+
 		/// Completing work in the main thread flag.
 		bool completing_;
+
 		/// Tolerance for the shared pool before it begins to deallocate.
 		int tolerance_;
+
 		/// Last size of the shared pool.
 		unsigned lastSize_;
+
 		/// Maximum milliseconds per frame to spend on low-priority work, when there are no worker threads.
 		int maxNonThreadedWorkMs_;
+
+		/// Tasksystem
+		/// Task are being run on the main thread only if there are no
+		/// worker threads and are meant to handle more complex code.
+		//moodycamel::ConcurrentQueue<Task*> mTasks;
+		//std::atomic<int> mTaskCount;
 	};
 
 }

@@ -44,18 +44,21 @@
 #include <Urho3D/Graphics/Zone.h>
 #include <Urho3D/UI/tbUI/tbUITextField.h>
 
-#include "CustomMesh.h"
+#include <Urho3D/Toolbox/VoxelTerrain/ChunkProvider.h>
+#include <Urho3D/Toolbox/VoxelTerrain/VoxerSettings.h>
+
+#include "Voxer.h"
 
 #include <Urho3D/DebugNew.h>
 
-URHO3D_DEFINE_APPLICATION_MAIN(HelloCustomMesh)
+URHO3D_DEFINE_APPLICATION_MAIN(VoxerSample)
 
-HelloCustomMesh::HelloCustomMesh(Context* context) :
+VoxerSample::VoxerSample(Context* context) :
 	Sample(context)
 {
 }
 
-void HelloCustomMesh::Start()
+void VoxerSample::Start()
 {
 	Sample::Start();
 
@@ -68,7 +71,7 @@ void HelloCustomMesh::Start()
 	Sample::InitMouseMode(MM_FREE);
 }
 
-void HelloCustomMesh::CreateScene()
+void VoxerSample::CreateScene()
 {
 	auto* cache = GetSubsystem<ResourceCache>();
 	scene_ = new Scene(context_);
@@ -82,6 +85,13 @@ void HelloCustomMesh::CreateScene()
 	zone->SetFogStart(200.0f);
 	zone->SetFogEnd(300.0f);
 
+	// Create a scene node for the camera, which we will move around
+	// The camera will use default settings (1000 far clip distance, 45 degrees FOV, set aspect ratio automatically)
+	cameraNode_ = new Node(context_);
+	cameraNode_->SetPosition(Vector3(0.0f, 0.0f, 0.0f));
+	auto* camera = cameraNode_->CreateComponent<Camera>();
+	camera->SetFarClip(300.0f);
+
 	// Create a directional light
 	Node* lightNode = scene_->CreateChild("DirectionalLight");
 	lightNode->SetDirection(Vector3(-0.6f, -1.0f, -0.8f)); // The direction vector does not need to be normalized
@@ -90,51 +100,21 @@ void HelloCustomMesh::CreateScene()
 	light->SetColor(Color(0.4f, 1.0f, 0.4f));
 	light->SetSpecularIntensity(2.5f);
 
-	ProceduralMesh mesh(context_);
-	ProceduralMesh mesh2(context_);
-	mesh2.FromModel(cache->GetResource<Model>("Models/Plane.mdl"), 0, 0);
-	mesh.FromModel(cache->GetResource<Model>("Models/Torus.mdl"), 0, 0);
-
-	torus_node = WeakPtr<Node>(scene_->CreateChild("Torus"));
-	torus_node->SetScale(Vector3(10.0f, 10.0f, 10.0f));
-	torus_node->SetPosition(Vector3(-10.0f, 0.0f, 50.0f));
-	torus_node->Rotate(Quaternion(90.0f, 0.0f, 0.0f), TS_WORLD);
 	material = cache->GetResource<Material>("Materials/StoneTiled.xml");
-	auto* object = torus_node->CreateComponent<StaticModel>();
 
-	plane_node = WeakPtr<Node>(scene_->CreateChild("Plane"));
-	plane_node->SetScale(Vector3(10.0f, 10.0f, 10.0f));
-	plane_node->SetPosition(Vector3(10.0f, 0.0f, 50.0f));
-	plane_node->Rotate(Quaternion(90.0f, 120.0f, 0.0f), TS_WORLD);
-	auto* object2 = plane_node->CreateComponent<StaticModel>();
+	mVoxerSettings = new VoxerSettings(context_);
+	mChunkProvider = new ChunkProvider(context_, mVoxerSettings);
 
-	mesh.SimplifyMesh(0.9f, 7.0f, true);
-	mesh2.SimplifyMeshLossless(true);
-	auto model = mesh.GetModel();
-	auto model2 = mesh2.GetModel();
-
-	object->SetModel(model);
-	object->SetMaterial(material);
-
-	object2->SetModel(model2);
-	object2->SetMaterial(material);
-
-	// Create a scene node for the camera, which we will move around
-	// The camera will use default settings (1000 far clip distance, 45 degrees FOV, set aspect ratio automatically)
-	cameraNode_ = new Node(context_);
-	cameraNode_->SetPosition(Vector3(0.0f, 0.0f, 0.0f));
-	auto* camera = cameraNode_->CreateComponent<Camera>();
-	camera->SetFarClip(300.0f);
 }
 
-void HelloCustomMesh::SetupViewport()
+void VoxerSample::SetupViewport()
 {
 	auto* renderer = GetSubsystem<Renderer>();
 	SharedPtr<Viewport> viewport(new Viewport(context_, scene_, cameraNode_->GetComponent<Camera>()));
 	renderer->SetViewport(0, viewport);
 }
 
-void HelloCustomMesh::CreateUI()
+void VoxerSample::CreateUI()
 {
 	tbUI* ui = GetSubsystem<tbUI>();
 	ui->Initialize("TB/resources/language/lng_en.tb.txt");
@@ -163,32 +143,31 @@ void HelloCustomMesh::CreateUI()
 	uiView_->AddChild(window_);
 }
 
-void HelloCustomMesh::SubscribeToEvents()
+void VoxerSample::SubscribeToEvents()
 {
-	SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(HelloCustomMesh, HandleUpdate));
-	SubscribeToEvent(E_WIDGETDELETED, URHO3D_HANDLER(HelloCustomMesh, HandleWidgetDeleted));
+	SubscribeToEvent(E_UPDATE, URHO3D_HANDLER(VoxerSample, HandleUpdate));
+	SubscribeToEvent(E_WIDGETDELETED, URHO3D_HANDLER(VoxerSample, HandleWidgetDeleted));
 }
 
-void HelloCustomMesh::ToggleWireFrame()
+void VoxerSample::ToggleWireFrame()
 {
 	FillMode mode = material->GetFillMode() == FillMode::FILL_WIREFRAME ? FillMode::FILL_SOLID : FillMode::FILL_WIREFRAME;
 	material->SetFillMode(mode);
 }
 
-void HelloCustomMesh::HandleWidgetDeleted(StringHash eventType, VariantMap& eventData)
+void VoxerSample::HandleWidgetDeleted(StringHash eventType, VariantMap& eventData)
 {
 	GetSubsystem<Engine>()->Exit();
 }
 
-void HelloCustomMesh::HandleUpdate(StringHash eventType, VariantMap& eventData)
+void VoxerSample::HandleUpdate(StringHash eventType, VariantMap& eventData)
 {
 	using namespace Update;
 	float timeStep = eventData[P_TIMESTEP].GetFloat();
 	MoveCamera(timeStep);
-	RotateNodes(timeStep);
 }
 
-void HelloCustomMesh::MoveCamera(float timeStep)
+void VoxerSample::MoveCamera(float timeStep)
 {
 	if (GetSubsystem<UI>()->GetFocusElement())
 		return;
@@ -228,19 +207,4 @@ void HelloCustomMesh::MoveCamera(float timeStep)
 			"Position: " + String(cameraNode_->GetPosition()) +
 			" Rotation: " + String(cameraNode_->GetRotation()));
 	}
-}
-
-void HelloCustomMesh::RotateNodes(float timeStep)
-{
-	torus_node->Rotate
-	(
-		Quaternion(0.0f, 20.0f * timeStep, 0.0f),
-		TS_WORLD
-	);
-
-	plane_node->Rotate
-	(
-		Quaternion(0.0f, 20.0f * timeStep, 0.0f),
-		TS_WORLD
-	);
 }

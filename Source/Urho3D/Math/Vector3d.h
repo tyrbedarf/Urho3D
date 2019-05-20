@@ -110,13 +110,14 @@ namespace Urho3D
 			return Vector3(x, y, z);
 		}
 
-		std::string ToString()
+		String ToString()
 		{
-			using namespace std;
-			stringstream ss;
-			ss << x << ", " << y << ", " << z;
-
-			return ss.str();
+			return
+				"(" +
+				String(x) + ", " +
+				String(y) + ", " +
+				String(z) +
+				")";
 		}
 	};
 }

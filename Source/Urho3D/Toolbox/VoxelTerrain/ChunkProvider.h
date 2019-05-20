@@ -3,42 +3,37 @@
 #include <unordered_map>
 #include <queue>
 
-#include "API/IVoxerSettings.h"
-#include "API/IChunk.h"
-#include "API/IChunkProvider.h"
-#include "API/IVoxerSystem.h"
-
-#include "Core/Object.h"
-#include "Core/WorkQueue.h"
-#include "TaskSystem.h"
+#include "../Core/Object.h"
+#include "../Core/WorkQueue.h"
 
 #include "Chunk.h"
+#include "VoxerSettings.h"
 
 namespace Urho3D
 {
-	bool chunkOrder(const IChunk* lhs, const IChunk* rhs);
+	bool chunkOrder(const Chunk* lhs, const Chunk* rhs);
 
-	class ChunkProvider : public IChunkProvider
+	class ChunkProvider : public Object
 	{
-		URHO3D_OBJECT(ChunkProvider, IChunkProvider)
+		URHO3D_OBJECT(ChunkProvider, Object)
 
 	private:
-		IVoxerSettings* mSettings;
+		SharedPtr<VoxerSettings> mSettings;
 
-		std::unordered_map<Vector3d, IChunk*> mActiveChunks;
-		std::queue<IChunk*> mObjectPool;
+		std::unordered_map<Vector3d, Chunk*> mActiveChunks;
+		std::queue<Chunk*> mObjectPool;
 
 		std::atomic<int>* mInitialing;
 		std::atomic<int>* mMeshing;
 
-		SharedPtr<TaskSystem> mTaskSystem;
+		SharedPtr<WorkQueue> mTaskSystem;
 
 	public:
-		ChunkProvider(Context* ctx, IVoxerSettings* settings);
+		ChunkProvider(Context* ctx, SharedPtr<VoxerSettings> settings);
 
-		virtual void Update(const std::vector<Vector3d>& playerPositions);
-		virtual void FinishUpdateCycle();
-		virtual void Shutdown();
+		void Update(const std::vector<Vector3d>& playerPositions);
+		void FinishUpdateCycle();
+		void Shutdown();
 
 		void SpawnChunks(const std::vector<Vector3d>& playerPositions);
 
@@ -59,16 +54,16 @@ namespace Urho3D
 		/// </summary>
 		/// <param name="pos"></param>
 		/// <returns></returns>
-		IChunk* CreateChunk(Vector3d pos);
+		Chunk* CreateChunk(Vector3d pos);
 
 		/// <summary>
 		/// Just return a chunk, do not create new ones.
 		/// </summary>
 		/// <param name="pos"></param>
 		/// <returns></returns>
-		IChunk* GetChunk(Vector3d pos);
+		Chunk* GetChunk(Vector3d pos);
 
-		IChunk* NewChunk();
+		Chunk* NewChunk();
 
 		void DestroyChunk(const Vector3d pos)
 		{

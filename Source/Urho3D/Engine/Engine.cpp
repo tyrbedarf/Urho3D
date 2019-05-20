@@ -230,11 +230,11 @@ bool Engine::Initialize(const VariantMap& parameters)
     }
 
 	/// Register the task subsystem.
-	context_->RegisterSubsystem(new TaskSystem(context_));
-	unsigned numTaskThreads = GetParameter(parameters, EP_TASK_SYSTEM_THREADS, true).GetBool() ? GetNumPhysicalCPUs() - 1 : 1;
-	GetSubsystem<TaskSystem>()->Start(numTaskThreads);
+	//context_->RegisterSubsystem(new TaskSystem(context_));
+	//unsigned numTaskThreads = GetParameter(parameters, EP_TASK_SYSTEM_THREADS, true).GetBool() ? GetNumPhysicalCPUs() - 1 : 1;
+	//GetSubsystem<TaskSystem>()->Start(numTaskThreads);
 
-	URHO3D_LOGINFOF("Created %u worker thread%s for the task system.", numTaskThreads, numTaskThreads > 1 ? "s" : "");
+	//URHO3D_LOGINFOF("Created %u worker thread%s for the task system.", numTaskThreads, numTaskThreads > 1 ? "s" : "");
 #endif
 
     // Add resource paths
