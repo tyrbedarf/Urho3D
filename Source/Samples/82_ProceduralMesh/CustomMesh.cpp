@@ -160,6 +160,7 @@ void HelloCustomMesh::CreateUI()
 	text_->SetText("Press F8 to toggle Wireframe mode.");
 	layout->AddChild(text_);
 
+
 	uiView_->AddChild(window_);
 }
 
