@@ -44,9 +44,6 @@
 #include <Urho3D/Graphics/Zone.h>
 #include <Urho3D/UI/tbUI/tbUITextField.h>
 
-#include <Urho3D/Toolbox/VoxelTerrain/ChunkProvider.h>
-#include <Urho3D/Toolbox/VoxelTerrain/VoxerSettings.h>
-
 #include "Voxer.h"
 
 #include <Urho3D/DebugNew.h>
@@ -101,10 +98,6 @@ void VoxerSample::CreateScene()
 	light->SetSpecularIntensity(2.5f);
 
 	material = cache->GetResource<Material>("Materials/StoneTiled.xml");
-
-	mVoxerSettings = new VoxerSettings(context_);
-	mChunkProvider = new ChunkProvider(context_, mVoxerSettings);
-
 }
 
 void VoxerSample::SetupViewport()

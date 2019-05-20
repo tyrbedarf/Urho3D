@@ -1,19 +1,14 @@
 #pragma once
 
 #include <atomic>
-#include <functional>
-#include <thread>
 
-namespace Urho3D
+namespace Voxer
 {
 	struct Task
 	{
 	protected:
-		/// The batch of work this task belongs to.
-		/// Task depending on this task will start after
-		/// all tasks of this batch have been execute and are
-		/// finished.
-		std::atomic<int>* mBatch;
+		/// Counter this task should update
+		std::atomic<int>* mCounter;
 
 		/// This should only start if the counter is zero.
 		std::atomic<int>* mDependency;
@@ -21,7 +16,6 @@ namespace Urho3D
 		/// True, if the task has finished
 		std::atomic<bool> mFinished;
 
-		/// Default function assign on creating a new task.
 		void NoOp(void*)
 		{
 
@@ -32,35 +26,30 @@ namespace Urho3D
 		std::function<void(void*)> Function;
 		void* Data;
 
-		Task(std::atomic<int>* batch, std::atomic<int>* dependency)
+		Task(std::atomic<int>* counter, std::atomic<int>* dependency)
 		{
-			mBatch = batch;
-			if(mBatch != nullptr) mBatch++;
+			mCounter = counter;
+			if(mCounter != nullptr) mCounter++;
 
 			mDependency = dependency;
 			mFinished.store(false);
-
 			Function = nullptr;
-
 			Data = nullptr;
 		}
 
-		/// True, if the task can be executed. In other words:
-		/// true if all dependencies finished.
 		bool CanExecute()
 		{
 			return
-				mDependency == nullptr ||
+				mDependency != nullptr &&
 				mDependency->load() < 1;
 		}
 
-		/// Execute this task.
 		void Execute()
 		{
 			Function(Data);
-			if (mBatch != nullptr)
+			if (mCounter != nullptr)
 			{
-				mBatch--;
+				mCounter--;
 			}
 
 			mFinished.store(true);

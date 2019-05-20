@@ -29,8 +29,6 @@ namespace Urho3D
 	class tbUIWindow;
 	class tbUIView;
 	class tbUITextView;
-	class ChunkProvider;
-	class VoxerSettings;
 }
 
 class VoxerSample : public Sample
@@ -67,7 +65,4 @@ private:
 
 	SharedPtr<Material> material;
 	SharedPtr<tbUITextField> text_;
-
-	SharedPtr<ChunkProvider> mChunkProvider;
-	SharedPtr<VoxerSettings> mVoxerSettings;
 };

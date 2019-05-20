@@ -71,11 +71,6 @@
 #include <emscripten/emscripten.h>
 #endif
 
-#ifdef URHO3D_THREADING
-#include "Toolbox/VoxelTerrain/TaskSystem.h"
-#endif // URHO3D_THREADING
-
-
 #include "../DebugNew.h"
 
 
@@ -1010,8 +1005,6 @@ void Engine::HandleExitRequested(StringHash eventType, VariantMap& eventData)
 
 void Engine::DoExit()
 {
-	GetSubsystem<TaskSystem>()->Shutdown();
-
     auto* graphics = GetSubsystem<Graphics>();
     if (graphics)
         graphics->Close();

@@ -5,7 +5,7 @@
 #include <string>
 #include <sstream>
 
-#include "Math/Vector3.h"
+#include "Vector3.h"
 
 namespace Urho3D
 {
