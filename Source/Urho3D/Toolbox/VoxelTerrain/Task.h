@@ -20,7 +20,6 @@ namespace Urho3D
 		/// True, if the task has finished
 		std::atomic<bool> mFinished;
 
-
 	public:
 		/// Code to execute
 		std::function<void(void*)> Function;

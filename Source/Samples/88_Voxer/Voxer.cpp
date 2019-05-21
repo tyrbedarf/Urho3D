@@ -74,8 +74,9 @@ void VoxerSample::Start()
 	{
 		task++;
 		workqueue->AddTask(
-			[](void* data) {
-				for (int i = 0; i < 1000000; i++)
+			[](void* data)
+			{
+				for (int i = 0; i < 100000; i++)
 				{
 					Time::Sleep(0);
 				}
@@ -88,7 +89,8 @@ void VoxerSample::Start()
 	for (int i = 0; i < 50; i++)
 	{
 		workqueue->AddTask(
-			[](void* data) {
+			[](void* data)
+			{
 				for (int i = 0; i < 100000; i++)
 				{
 					Time::Sleep(0);
