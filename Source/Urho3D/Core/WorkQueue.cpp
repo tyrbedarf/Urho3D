@@ -451,8 +451,8 @@ namespace Urho3D
 		int maxCount = mTaskCount.load();
 		int count = 0;
 
-		if(maxCount > 0)
-			URHO3D_LOGDEBUGF("Tasks: %d", maxCount);
+		//if(maxCount > 0)
+		//	URHO3D_LOGDEBUGF("Tasks: %d", maxCount);
 
 		while (mTasks.try_dequeue(t) && (count < maxCount))
 		{

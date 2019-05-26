@@ -44,6 +44,8 @@
 #include <Urho3D/Graphics/Zone.h>
 #include <Urho3D/UI/tbUI/tbUITextField.h>
 #include <Urho3D/Core/WorkQueue.h>
+#include <Urho3D/Toolbox/VoxelTerrain/VoxerSystem.h>
+#include <Urho3D/Graphics/Material.h>
 
 #include "Voxer.h"
 
@@ -61,6 +63,8 @@ VoxerSample::VoxerSample(Context* context) :
 void VoxerSample::Start()
 {
 	Sample::Start();
+	voxer_ = new VoxerSystem(context_);
+	scene_ = voxer_->GetScene();
 
 	CreateUI();
 	CreateScene();
@@ -68,7 +72,8 @@ void VoxerSample::Start()
 
 	SubscribeToEvents();
 
-	auto workqueue = GetSubsystem<WorkQueue>();
+	/// Test the job system first.
+	/*auto workqueue = GetSubsystem<WorkQueue>();
 	int task = 0;
 	for (int i = 0; i < 100; i++)
 	{
@@ -99,7 +104,7 @@ void VoxerSample::Start()
 			&i,
 			&batch_2,
 			&batch_1);
-	}
+	}*/
 
 	Sample::InitMouseMode(MM_FREE);
 }
@@ -107,8 +112,6 @@ void VoxerSample::Start()
 void VoxerSample::CreateScene()
 {
 	auto* cache = GetSubsystem<ResourceCache>();
-	scene_ = new Scene(context_);
-	scene_->CreateComponent<Octree>();
 
 	// Create a Zone for ambient light & fog control
 	Node* zoneNode = scene_->CreateChild("Zone");
@@ -119,7 +122,8 @@ void VoxerSample::CreateScene()
 	zone->SetFogEnd(300.0f);
 
 	// Create a scene node for the camera, which we will move around
-	// The camera will use default settings (1000 far clip distance, 45 degrees FOV, set aspect ratio automatically)
+	// The camera will use default settings (1000 far clip distance, 45 degrees FOV,
+	// set aspect ratio automatically)
 	cameraNode_ = new Node(context_);
 	cameraNode_->SetPosition(Vector3(0.0f, 0.0f, 0.0f));
 	auto* camera = cameraNode_->CreateComponent<Camera>();
@@ -159,14 +163,14 @@ void VoxerSample::CreateUI()
 		UI_WINDOW_SETTINGS_TITLEBAR |
 		UI_WINDOW_SETTINGS_CLOSE_BUTTON));
 
-	window_->SetText("Hello Custom Mesh!");
+	window_->SetText("Hello Voxer System!");
 	window_->AddChild(layout);
 	window_->ResizeToFitContent();
 	window_->SetPosition(20, 20);
-	window_->SetSize(450, 100);
+	window_->SetSize(550, 100);
 
 	text_ = new tbUITextField(context_);
-	text_->SetText("Press F8 to toggle Wireframe mode.");
+	text_->SetText("Press F8 to toggle Wireframe mode. And F10 to capture mouse.");
 	layout->AddChild(text_);
 
 	uiView_->AddChild(window_);
@@ -194,6 +198,7 @@ void VoxerSample::HandleUpdate(StringHash eventType, VariantMap& eventData)
 	using namespace Update;
 	float timeStep = eventData[P_TIMESTEP].GetFloat();
 	MoveCamera(timeStep);
+	UpdateVoxerSystem(timeStep);
 }
 
 void VoxerSample::MoveCamera(float timeStep)
@@ -236,4 +241,17 @@ void VoxerSample::MoveCamera(float timeStep)
 			"Position: " + String(cameraNode_->GetPosition()) +
 			" Rotation: " + String(cameraNode_->GetRotation()));
 	}
+
+	if (input->GetKeyPress(KEY_F10))
+	{
+		GetSubsystem<Input>()->SetMouseMode(MM_RELATIVE);
+	}
+}
+
+void VoxerSample::UpdateVoxerSystem(float timeStep)
+{
+	Vector<Vector3d> positions;
+	auto pos = cameraNode_->GetPosition();
+	positions.Push(Vector3(pos.x_, pos.y_, pos.z_));
+	voxer_->Update(positions);
 }

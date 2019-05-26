@@ -42,7 +42,7 @@ namespace Urho3D
 
 		std::unordered_map<int, Chunk*> mNeighborhood;
 
-		Voxel* mData;
+		Vector<Voxel> mData;
 		Vector3i mVoxelLayout;
 
 		std::atomic<int> mInitialized;
@@ -68,19 +68,13 @@ namespace Urho3D
 			mWorldPosition(0),
 			mVoxelSize(voxelSize)
 		{
-			mData = nullptr;
 			mVoxelLayout = voxelLayout;
 			mStats = new VoxerStatistics();
+			mData.Resize(mVoxelLayout.GetArrayCount(), Voxel::GetAir());
 		}
 
 		~Chunk()
 		{
-			if (mData)
-			{
-				delete[] mData;
-			}
-
-			delete mStats;
 		}
 
 		const Vector3d& GetWorldPosition() const
@@ -88,24 +82,24 @@ namespace Urho3D
 			return mWorldPosition;
 		}
 
-		bool GetInitialized() const
+		bool Initialized() const
 		{
-			return false;
+			return mInitialized.load() > 0;
 		}
 
 		bool Initializing() const
 		{
-			return false;
+			return mInitializing.load() > 0;
 		}
 
 		bool Meshed() const
 		{
-			return false;
+			return mMeshed.load() > 0;
 		}
 
 		bool Meshing() const
 		{
-			return false;
+			return mMeshing.load() > 0;
 		}
 
 		bool IsMeshInGame() const
@@ -136,25 +130,20 @@ namespace Urho3D
 		void Reset(Vector3d pos);
 
 		void SetNeighbor(int x, int y, int z, Chunk* c);
-
 		void Initialize();
-
 		void CreateMesh();
 
 		/// First one is cube index
 		/// second indicates whether to move a vertex or not.
 		std::tuple<int, int> GetCubeIndexSafe(int x, int y, int z);
 
-		virtual void Despawn()
-		{
+		void Despawn();
 
-		}
+		void Set(const Voxel& data, int x, int y, int z);
 
-		virtual void Set(const Voxel& data, int x, int y, int z);
+		Voxel& Get(int x, int y, int z, bool& found);
 
-		virtual Voxel& Get(int x, int y, int z, bool& found);
-
-		virtual bool CanExtractSurface() const
+		bool CanExtractSurface() const
 		{
 			return false;
 		}

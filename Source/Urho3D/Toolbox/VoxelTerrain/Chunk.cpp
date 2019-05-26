@@ -101,7 +101,7 @@ namespace Urho3D
 
 		/// Did our status change from border to internal chunk?
 		/// Than make sure we can remesh.
-		if (IsBorderChunk() && mNeighborhood.size() >= 26 && GetInitialized())
+		if (IsBorderChunk() && mNeighborhood.size() >= 26 && Initialized())
 		{
 			mMeshing.store(0);
 			mMeshed.store(0);
@@ -145,7 +145,7 @@ namespace Urho3D
 			}
 		}
 
-		if (mInitialized.exchange(1) != 0 != 0)
+		if (mInitialized.exchange(1) != 0)
 		{
 			URHO3D_LOGERROR("Found a chunk that has been initialized twice.");
 		}
@@ -181,8 +181,8 @@ namespace Urho3D
 					auto node_position = Vector3(x, y, z) * mVoxelSize;
 
 					/// Than calculate the actual position and update the node position;
-					//node_position += PointTable[cube_index];
-					//mMesh.SetVertex(node_index, node_position);
+					// node_position += PointTable[cube_index];
+					// mMesh.SetVertex(node_index, node_position);
 
 					/// Tells us, which edges are being cut by the surface.
 					/// This controlls which planes are being created.
@@ -206,6 +206,11 @@ namespace Urho3D
 		auto t_end = std::chrono::high_resolution_clock::now();
 		auto time = 1000.0 * (c_end - c_start) / CLOCKS_PER_SEC;
 		mStats->AddMeshTime(time);
+	}
+
+	void Chunk::Despawn()
+	{
+		VoxerSystem::Get()->DestroyChunk(this);
 	}
 
 	/// First one is cube index
@@ -299,12 +304,6 @@ namespace Urho3D
 
 			found = true;
 			return it->second->Get(pos.x, pos.y, pos.z, found);
-		}
-
-		if (mData == nullptr)
-		{
-			found = false;
-			return Voxel::GetAir();
 		}
 
 		found = true;

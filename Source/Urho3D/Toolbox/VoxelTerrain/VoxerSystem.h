@@ -4,6 +4,9 @@
 #include "../../Math/Vector3d.h"
 #include "../../Scene/Node.h"
 #include "../../Core/WorkQueue.h"
+#include "../../Graphics/Octree.h"
+#include "../../Resource/ResourceCache.h"
+#include "../../Container/Vector.h"
 
 #include "VoxerSettings.h"
 #include "ChunkProvider.h"
@@ -15,6 +18,8 @@ namespace Urho3D
 {
 	class VoxerSystem : public Object
 	{
+		URHO3D_OBJECT(VoxerSystem, Object)
+
 	private:
 		static VoxerSystem* mInstance;
 
@@ -25,8 +30,13 @@ namespace Urho3D
 		moodycamel::ConcurrentQueue<Vector3d> mChunksToDespawn;
 
 		SharedPtr<Scene> mScene;
+		SharedPtr<Node> mRootNode;
+		SharedPtr<Octree> mOctree;
+		SharedPtr<ResourceCache> mResourceCache;
 
 		std::unordered_map<Vector3d, Node*> mSpawnedChunks;
+
+		void CreateCamera();
 
 	public:
 		VoxerSystem(Context* ctx);
@@ -42,17 +52,20 @@ namespace Urho3D
 			return mSettings;
 		}
 
-		void Update(std::vector< Vector3d>& playerPositions);
+		void Update(const Vector<Vector3d>& playerPositions);
 
 		ChunkProvider* GetChunkProvider();
-
 		void Shutdown();
-
 		void DestroyChunk(Chunk* c);
 
 		void SpawnChunk(Chunk* c)
 		{
 			mChunksToSpawn.enqueue(c);
+		}
+
+		Scene* GetScene()
+		{
+			return mScene;
 		}
 	};
 }

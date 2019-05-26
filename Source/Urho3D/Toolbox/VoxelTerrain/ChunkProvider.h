@@ -7,6 +7,7 @@
 #include "../../Math/Vector3i.h"
 #include "../../Core/Object.h"
 #include "../../Core/WorkQueue.h"
+#include "../../Container/Vector.h"
 
 #include "VoxerSettings.h"
 #include "Chunk.h"
@@ -14,8 +15,6 @@
 
 namespace Urho3D
 {
-	class VoxerSystem;
-
 	class ChunkProvider : public Object
 	{
 		URHO3D_OBJECT(ChunkProvider, Object)
@@ -34,18 +33,18 @@ namespace Urho3D
 	public:
 		ChunkProvider(Context* ctx, VoxerSettings* settings);
 
-		void Update(const std::vector<Vector3d>& playerPositions);
+		void Update(const Vector<Vector3d>& playerPositions);
 		void FinishUpdateCycle();
 		void Shutdown();
 
-		void SpawnChunks(const std::vector<Vector3d>& playerPositions);
+		void SpawnChunks(const Vector<Vector3d>& playerPositions);
 
 		/// <summary>
 		/// A server must maintain chunks for more than one player. On the client side the list
 		/// contains only one element.
 		/// </summary>
 		/// <param name="playerPositions"></param>
-		void DespawnChunks(const std::vector<Vector3d>& playerPositions);
+		void DespawnChunks(const Vector<Vector3d>& playerPositions);
 
 		Vector3d NormalizeChunkPosition(const Vector3d& position) const;
 		Vector3d NormalizeVoxelPosition(const Vector3d& position) const;
@@ -67,11 +66,6 @@ namespace Urho3D
 
 		Chunk* NewChunk();
 
-		void DestroyChunk(const Vector3d pos)
-		{
-			auto it = mActiveChunks.find(pos);
-			mObjectPool.push(it->second);
-			mActiveChunks.erase(it);
-		}
+		void DestroyChunk(const Vector3d pos);
 	};
 }

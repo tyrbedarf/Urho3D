@@ -5,24 +5,11 @@
 #include "../../Math/Vector3i.h"
 #include "../../Core/Object.h"
 #include "../../Container/Str.h"
+#include "../../Math/Vector3d.h"
 
 namespace Urho3D
 {
-	double Max(double a, double b, double c)
-	{
-		double r = a;
-		if (r < b)
-		{
-			r = b;
-		}
-
-		if (r < c)
-		{
-			r = c;
-		}
-
-		return r;
-	}
+	double GetMax(double a, double b, double c);
 
 	class VoxerSettings : public Object
 	{
@@ -125,7 +112,7 @@ namespace Urho3D
 			/// max distance squared as well. Plus a little to avoid
 			/// flickering on the margins.
 
-			mDistToDestroy = Max
+			mDistToDestroy = GetMax
 			(
 				std::pow((mViewRange.x * mChunkDimension.x), 2.5f),
 				std::pow((mViewRange.y * mChunkDimension.y), 2.5f),

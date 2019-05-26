@@ -38,7 +38,7 @@ namespace Urho3D
 
 		bool CanExecute()
 		{
-			if (mDependency != nullptr)
+			/*if (mDependency != nullptr)
 			{
 				int tasks = mDependency->load();
 				URHO3D_LOGDEBUGF("Dependencies: %d", tasks);
@@ -47,7 +47,7 @@ namespace Urho3D
 			{
 				int count = mCounter->load();
 				URHO3D_LOGDEBUGF("Bulk Count: %d", count);
-			}
+			}*/
 			return
 				mDependency == nullptr ||
 				mDependency->load() < 1;

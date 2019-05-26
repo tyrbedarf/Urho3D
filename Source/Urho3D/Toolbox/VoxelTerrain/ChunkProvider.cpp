@@ -19,7 +19,7 @@ namespace Urho3D
 		mMeshing = nullptr;
 	}
 
-	void ChunkProvider::Update(const std::vector<Vector3d>& playerPositions)
+	void ChunkProvider::Update(const Vector<Vector3d>& playerPositions)
 	{
 		SpawnChunks(playerPositions);
 		DespawnChunks(playerPositions);
@@ -53,9 +53,9 @@ namespace Urho3D
 		URHO3D_LOGDEBUG("Chunk provider out!");
 	}
 
-	void ChunkProvider::SpawnChunks(const std::vector<Vector3d>& playerPositions)
+	void ChunkProvider::SpawnChunks(const Vector<Vector3d>& playerPositions)
 	{
-		if (playerPositions.size() < 1)
+		if (playerPositions.Size() < 1)
 		{
 			return;
 		}
@@ -68,7 +68,7 @@ namespace Urho3D
 		mInitialing = new std::atomic<int>();
 		mMeshing = new std::atomic<int>();
 
-		int positions = mSettings->IsServer() ? playerPositions.size() : 1;
+		int positions = mSettings->IsServer() ? playerPositions.Size() : 1;
 		Vector3d cd = mSettings->GetChunkDimension();
 		Vector3i vr = mSettings->GetViewRange();
 		std::vector<Chunk*> Workload;
@@ -81,9 +81,9 @@ namespace Urho3D
 			double starty = np.y - (cd.y * vr.y);
 			double startz = np.z - (cd.z * vr.z);
 
-			double stopx = np.x + (cd.x * (float)vr.x);
-			double stopy = np.y + (cd.y * (float)vr.y);
-			double stopz = np.z + (cd.z * (float)vr.z);
+			double stopx = np.x + (cd.x * (float) vr.x);
+			double stopy = np.y + (cd.y * (float) vr.y);
+			double stopz = np.z + (cd.z * (float) vr.z);
 
 			for (double x2 = startx; x2 < stopx; x2 += cd.x)
 			{
@@ -197,7 +197,7 @@ namespace Urho3D
 		mMeshing = nullptr;
 	}
 
-	void ChunkProvider::DespawnChunks(const std::vector<Vector3d>& playerPositions)
+	void ChunkProvider::DespawnChunks(const Vector<Vector3d>& playerPositions)
 	{
 		/// Placed inside Settings since it depends on voxel size, voxel count and
 		/// the view range.
@@ -215,15 +215,15 @@ namespace Urho3D
 		{
 			bool destroy = true;
 			auto c = mActiveChunks[keys[j]];
-			for (int i = 0; i < playerPositions.size(); i++)
+			for (int i = 0; i < playerPositions.Size(); i++)
 			{
-				if (!c->GetInitialized() || !c->Meshed() || !c->IsMeshInGame())
+				if (!c->Initialized() || !c->Meshed() || !c->IsMeshInGame())
 				{
 					destroy = false;
 					break;
 				}
 
-				/// Remove everything that further away than max distance.
+				/// Remove everything that is further away than max distance.
 				auto dist = (keys[j] - playerPositions[i]).SqrMagnitude();
 				if (dist < maxDist)
 				{
@@ -310,29 +310,12 @@ namespace Urho3D
 		return r;
 	}
 
-	/*void ChunkProvider::InitChunkTask(ftl::TaskScheduler *taskScheduler, void *arg)
+	void ChunkProvider::DestroyChunk(const Vector3d pos)
 	{
-		auto chunk = reinterpret_cast<IChunk *>(arg);
-		chunk->Initialize();
+		auto it = mActiveChunks.find(pos);
+		auto c = it->second;
+		c->Despawn();
+		mObjectPool.push(c);
+		mActiveChunks.erase(it);
 	}
-
-	void ChunkProvider::CreateMeshTask(ftl::TaskScheduler *taskScheduler, void *arg)
-	{
-		auto chunk = reinterpret_cast<IChunk *>(arg);
-		taskScheduler->WaitForCounter(chunk->GetFiberBarier(), 0);
-
-		chunk->CreateMesh();
-	}
-
-	void ChunkProvider::ResetCounterTask(ftl::TaskScheduler *taskScheduler, void *arg)
-	{
-		auto cp = reinterpret_cast<ChunkProvider*>(arg);
-		taskScheduler->WaitForCounter(cp->mInitTaskCounter, 0);
-		taskScheduler->WaitForCounter(cp->mMeshTaskCounter, 0);
-
-		delete cp->mInitTaskCounter;
-		delete cp->mMeshTaskCounter;
-		cp->mInitTaskCounter = nullptr;
-		cp->mMeshTaskCounter = nullptr;
-	}*/
 }

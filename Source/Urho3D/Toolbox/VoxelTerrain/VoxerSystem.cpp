@@ -2,6 +2,9 @@
 
 #include "VoxerSystem.h"
 #include "../../Scene/Scene.h"
+#include "../../Graphics/Model.h"
+#include "../../Graphics/StaticModel.h"
+#include "../../Graphics/Material.h"
 
 namespace Urho3D
 {
@@ -14,67 +17,67 @@ namespace Urho3D
 		mSettings = new VoxerSettings(ctx);
 		mTaskSystem = GetSubsystem<WorkQueue>();
 		mChunkProvider = new ChunkProvider(ctx, mSettings);
+
+		CreateCamera();
+		mResourceCache = GetSubsystem<ResourceCache>();
 	}
 
 	VoxerSystem::~VoxerSystem()
 	{
-		delete mSettings;
-		delete mChunkProvider;
+
 	}
 
-	void VoxerSystem::Update(std::vector< Vector3d>& playerPositions)
+	void VoxerSystem::CreateCamera()
 	{
-		/*mChunkProvider->Update(playerPositions);
+		mScene = new Scene(context_);
+		mRootNode = mScene->CreateChild();
+		mRootNode->SetName("Chunks");
+
+		mOctree = mScene->CreateComponent<Octree>();
+	}
+
+	void VoxerSystem::Update(const Vector<Vector3d>& playerPositions)
+	{
+		mChunkProvider->Update(playerPositions);
 		Chunk* chunk;
 		auto dim = mSettings->GetChunkDimension();
 		while (mChunksToSpawn.try_dequeue(chunk))
 		{
-			Plane plane(Vector3::UNIT_Y, 0);
-
 			auto pos = chunk->GetWorldPosition();
 			auto name = pos.ToString();
 
-			MeshManager::getSingleton().createPlane(
-				name,
-				RGN_DEFAULT,
-				plane,
-				dim.x,
-				dim.z,
-				20,
-				20,
-				true,
-				1,
-				5,
-				5,
-				Vector3::UNIT_Z);
+			auto planeNode = mScene->CreateChild();
+			planeNode->SetName(name);
 
-			Entity* groundEntity = mSceneManager->createEntity(name);
-			auto node = mSceneManager->getRootSceneNode()->createChildSceneNode();
-			node->attachObject(groundEntity);
-			node->setPosition(pos.x, pos.y, pos.z);
+			auto* planeObject = planeNode->CreateComponent<StaticModel>();
+			planeObject->SetModel(mResourceCache->GetResource<Model>("Models/Plane.mdl"));
+			planeObject->SetMaterial(mResourceCache->GetResource<Material>("Materials/StoneTiled.xml"));
 
-			groundEntity->setCastShadows(false);
-			groundEntity->setMaterialName("Examples/Rockwall");
+			planeNode->SetPosition(Vector3(pos.x, pos.y, pos.z));
+			planeNode->SetRotation(Quaternion::IDENTITY);
 
 			/// Already spawned?
 			auto it = mSpawnedChunks.find(pos);
 			if (it != mSpawnedChunks.end())
 			{
-				auto parent = it->second->getParentSceneNode();
-				parent->detachObject(it->second);
-				mSceneManager->destroyEntity(it->second);
+				mScene->RemoveChild(it->second);
 				mSpawnedChunks.erase(it);
 			}
 
-			mSpawnedChunks[pos] = groundEntity;
-			chunk->SetMeshInGame(true);*/
-		/*}
+			mSpawnedChunks[pos] = planeNode;
+			chunk->SetMeshInGame(true);
+		}
 
-		Vector3d v(0);
+		Vector3d v(0.0, 0.0, 0.0);
 		while (mChunksToDespawn.try_dequeue(v))
 		{
-
-		}*/
+			auto it = mSpawnedChunks.find(v);
+			if (it != mSpawnedChunks.end())
+			{
+				mScene->RemoveChild(it->second);
+				mSpawnedChunks.erase(it);
+			}
+		}
 	}
 
 	ChunkProvider* VoxerSystem::GetChunkProvider()

@@ -29,6 +29,7 @@ namespace Urho3D
 	class tbUIWindow;
 	class tbUIView;
 	class tbUITextView;
+	class VoxerSystem;
 }
 
 class VoxerSample : public Sample
@@ -57,6 +58,7 @@ private:
 
 	void SetupViewport();
 	void MoveCamera(float timeStep);
+	void UpdateVoxerSystem(float timeStep);
 
 	void ToggleWireFrame();
 
@@ -65,6 +67,8 @@ private:
 
 	SharedPtr<Material> material;
 	SharedPtr<tbUITextField> text_;
+
+	SharedPtr<VoxerSystem> voxer_;
 
 	std::atomic<int> batch_1;
 	std::atomic<int> batch_2;
