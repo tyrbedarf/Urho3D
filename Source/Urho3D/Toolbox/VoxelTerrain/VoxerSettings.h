@@ -20,7 +20,7 @@ namespace Urho3D
 			Object(ctx),
 			mVoxelSize(0.5f),
 			mVoxelCount(16, 16, 16),
-			mViewRange(2, 2, 2),
+			mViewRange(5, 3, 5),
 			mServer(false),
 			mChunkDimension(0.0f)
 		{

@@ -58,6 +58,11 @@ namespace Urho3D
             return Vector3i(x + rhs.x, y + rhs.y, z + rhs.z);
         }
 
+		Vector3i operator*(int i) const
+		{
+			return Vector3i(x * i, y * i, z * i);
+		}
+
         /// <summary>
         /// Subtracts two vectors.
         /// </summary>

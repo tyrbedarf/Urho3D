@@ -1,6 +1,8 @@
 #include "Chunk.h"
 
 #include "VoxerSystem.h"
+#include <unordered_set>
+#include <sstream>
 
 namespace Urho3D
 {
@@ -82,6 +84,7 @@ namespace Urho3D
 		mMeshInGame.store(0);
 
 		mNeighborhood.clear();
+		mMesh->Clear();
 	}
 
 	void Chunk::SetNeighbor(int x, int y, int z, Chunk* c)
@@ -124,15 +127,16 @@ namespace Urho3D
 
 		auto voxelSize = mVoxelSize;
 		const float size = 0.05f;
+		const Vector3i tmp(2, 2, 2);
 		for (int x = 0; x < mVoxelLayout.x; x++)
 		{
 			for (int y = 0; y < mVoxelLayout.y; y++)
 			{
 				for (int z = 0; z < mVoxelLayout.z; z++)
 				{
-					auto voxel_pos = (Vector3d(x, y, z) * voxelSize) + mWorldPosition;
-					auto height = SimplexNoise::noise((float)voxel_pos.x * size, (float)voxel_pos.z * size) * -4.0f;
 					int index = GetIndexFromVector(mVoxelLayout, x, y, z);
+					auto voxel_pos = (Vector3d(x, y, z) * voxelSize) + mWorldPosition;
+					auto height = SimplexNoise::noise((float)voxel_pos.x * size, (float)voxel_pos.z * size) * -2.5f;
 					if (voxel_pos.y > height)
 					{
 						mData[index] = Voxel::GetAir();
@@ -141,6 +145,15 @@ namespace Urho3D
 					{
 						mData[index] = Voxel::GetStone();
 					}
+
+					/*if (tmp.x == x && tmp.y == y && tmp.z == z)
+					{
+						mData[index] = Voxel::GetStone();
+					}
+					else
+					{
+						mData[index] = Voxel::GetAir();
+					}*/
 				}
 			}
 		}
@@ -167,8 +180,14 @@ namespace Urho3D
 		mStats->AddMeshed();
 		std::clock_t c_start = std::clock();
 		auto t_start = std::chrono::high_resolution_clock::now();
+		mMesh->Clear();
 
+		int indices[6];
 		int cube_index, move_vertex;
+
+		/// By default every vertex is right in the middle of the voxel cube.
+		Vector3 vertexOffset(mVoxelSize * 0.5f, mVoxelSize * 0.5f, mVoxelSize * 0.5f);
+
 		for (int x = 0; x < mVoxelLayout.x; x++)
 		{
 			for (int y = 0; y < mVoxelLayout.y; y++)
@@ -177,12 +196,15 @@ namespace Urho3D
 				{
 					std::tie(cube_index, move_vertex) = GetCubeIndexSafe(x, y, z);
 
-					/// Use the position inside the chunk as key for a node
-					auto node_position = Vector3(x, y, z) * mVoxelSize;
+					/// Key of the vertex. Essentially the position inside the chunk.
+					Vector3i pos(x, y, z);
+
+					/// Make sure the vertex is generated.
+					Vector3 actual_pos = (Vector3(x, y, z) * mVoxelSize) + vertexOffset;
 
 					/// Than calculate the actual position and update the node position;
-					// node_position += PointTable[cube_index];
-					// mMesh.SetVertex(node_index, node_position);
+					/// node_position += PointTable[cube_index];
+					mMesh->GetIndex(actual_pos);
 
 					/// Tells us, which edges are being cut by the surface.
 					/// This controlls which planes are being created.
@@ -191,11 +213,42 @@ namespace Urho3D
 					{
 						continue;
 					}
+
+					/// For each side we need two triangles, plus one material.
+					for (int i = 0;
+						mSurfaceData->CubeIndexToFaceLookup.Get(plane_index, i) != mSurfaceData->STOP;
+						i += 7)
+					{
+						/*
+						int material = material_ids[d.CubeIndexToFaceLookup.get(plane_index, 6)];
+						auto submesh = mesh.GetSubmesh(material);
+						auto collider = mesh.Collider;
+						*/
+
+						/// For each vertex of a quad.
+						for (int j = 0; j < 6; j++)
+						{
+							auto item_0 = mSurfaceData->Vertices[mSurfaceData->CubeIndexToFaceLookup.Get(plane_index, i + j)] + pos;
+							indices[j] = mMesh->GetIndex
+							(
+								(Vector3(item_0.x, item_0.y, item_0.z) * mVoxelSize) +
+								vertexOffset
+							);
+						}
+
+						mMesh->AddTriangleFromIndices(indices[1], indices[0], indices[2], true, true);
+						mMesh->AddTriangleFromIndices(indices[4], indices[3], indices[5], true, true);
+					}
 				}
 			}
 		}
 
-		VoxerSystem::Get()->SpawnChunk(this);
+		mMesh->SimplifyMeshLossless(false, 100);
+
+		if (mMesh->GetVertexCount() > 0)
+		{
+			VoxerSystem::Get()->SpawnChunk(this);
+		}
 
 		if (mMeshed.exchange(1) != 0)
 		{
@@ -231,7 +284,7 @@ namespace Urho3D
 				return std::tuple<int, int>(0, 0);
 			}
 
-			cube_index |= voxel.IsTransparent() || voxel.IsAir() || voxel.IsModel() ? 1 << i : 0;
+			cube_index |= voxel.IsTransparent() || voxel.IsAir() || voxel.IsModel() ? 0 << i : 1 << i;
 
 			/// If any of the voxel is a block do not move
 			/// any of the neighboring nodes. This way we can combine

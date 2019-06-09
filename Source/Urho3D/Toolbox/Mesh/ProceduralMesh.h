@@ -20,6 +20,7 @@
 #include "../../Graphics/IndexBuffer.h"
 #include "../../Graphics/Model.h"
 #include "../../Graphics/Geometry.h"
+#include "../../IO/Log.h"
 
 #include "SymetricMatrix.h"
 
@@ -142,6 +143,11 @@ namespace Urho3D
 			vertices.clear();
 			refs.clear();
 			VertexIndices.clear();
+		}
+
+		size_t GetVertexCount() const
+		{
+			return vertices.size();
 		}
 
 	private:

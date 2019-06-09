@@ -125,7 +125,7 @@ void VoxerSample::CreateScene()
 	// The camera will use default settings (1000 far clip distance, 45 degrees FOV,
 	// set aspect ratio automatically)
 	cameraNode_ = new Node(context_);
-	cameraNode_->SetPosition(Vector3(0.0f, 0.0f, 0.0f));
+	cameraNode_->SetPosition(Vector3(0.0f, 10.0f, 0.0f));
 	auto* camera = cameraNode_->CreateComponent<Camera>();
 	camera->SetFarClip(300.0f);
 
@@ -166,12 +166,16 @@ void VoxerSample::CreateUI()
 	window_->SetText("Hello Voxer System!");
 	window_->AddChild(layout);
 	window_->ResizeToFitContent();
-	window_->SetPosition(20, 20);
+	window_->SetPosition(150, 50);
 	window_->SetSize(550, 100);
 
 	text_ = new tbUITextField(context_);
 	text_->SetText("Press F8 to toggle Wireframe mode. And F10 to capture mouse.");
 	layout->AddChild(text_);
+
+	direction_ = new tbUITextField(context_);
+	direction_->SetText("Direction: -unkown-");
+	layout->AddChild(direction_);
 
 	uiView_->AddChild(window_);
 }
@@ -190,7 +194,7 @@ void VoxerSample::ToggleWireFrame()
 
 void VoxerSample::HandleWidgetDeleted(StringHash eventType, VariantMap& eventData)
 {
-	GetSubsystem<Engine>()->Exit();
+	//GetSubsystem<Engine>()->Exit();
 }
 
 void VoxerSample::HandleUpdate(StringHash eventType, VariantMap& eventData)
@@ -244,7 +248,60 @@ void VoxerSample::MoveCamera(float timeStep)
 
 	if (input->GetKeyPress(KEY_F10))
 	{
-		GetSubsystem<Input>()->SetMouseMode(MM_RELATIVE);
+		auto input = GetSubsystem<Input>();
+		if (input->GetMouseMode() == MM_RELATIVE)
+		{
+			GetSubsystem<Input>()->SetMouseMode(MM_FREE);
+		}
+		else
+		{
+			GetSubsystem<Input>()->SetMouseMode(MM_RELATIVE);
+		}
+	}
+
+	/// Figure out the direction the camera is pointing
+	auto forward = cameraNode_->GetDirection();
+	const int count = 6;
+	const Vector3 dirs[] =
+	{
+		Vector3( 0,  1,  0),
+		Vector3( 0, -1,  0),
+		Vector3( 1,  0,  0),
+		Vector3(-1,  0,  0),
+		Vector3( 0,  0,  1),
+		Vector3( 0,  0, -1)
+	};
+
+	const String names[]
+	{
+		"up",
+		"down",
+		"right",
+		"left",
+		"forward",
+		"back"
+	};
+
+	String name;
+	float maximum = -10.0f;
+	int direction = -1;
+	for (int i = 0; i < count; i++)
+	{
+		float dot = forward.DotProduct(dirs[i]);
+		if (dot > maximum)
+		{
+			direction = i;
+			maximum = dot;
+		}
+	}
+
+	if (direction >= 0 && direction < count)
+	{
+		direction_->SetText("Camera is facing " + names[direction]);
+	}
+	else
+	{
+		direction_->SetText("Camera is facing an unknown direction");
 	}
 }
 

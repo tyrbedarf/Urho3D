@@ -12,7 +12,6 @@
 #include "VoxerSettings.h"
 #include "Chunk.h"
 
-
 namespace Urho3D
 {
 	class ChunkProvider : public Object
@@ -21,6 +20,7 @@ namespace Urho3D
 
 	private:
 		SharedPtr<VoxerSettings> mSettings;
+		SharedPtr<SurfaceData> mSurfaceData;
 
 		std::unordered_map<Vector3d, Chunk*> mActiveChunks;
 		std::queue<Chunk*> mObjectPool;

@@ -1,6 +1,7 @@
 #include "ChunkProvider.h"
 
 #include <array>
+#include "../../Core/Timer.h"
 
 namespace Urho3D
 {
@@ -17,6 +18,8 @@ namespace Urho3D
 
 		mInitialing = nullptr;
 		mMeshing = nullptr;
+
+		mSurfaceData = new SurfaceData(context_, mSettings->GetVoxelSize());
 	}
 
 	void ChunkProvider::Update(const Vector<Vector3d>& playerPositions)
@@ -29,6 +32,15 @@ namespace Urho3D
 	{
 		/// Wait for all tasks to finish
 		URHO3D_LOGDEBUG("Waiting for all pending tasks to finish.");
+		while (mInitialing != nullptr)
+		{
+			Time::Sleep(0);
+		}
+
+		while (mMeshing != nullptr)
+		{
+			Time::Sleep(0);
+		}
 
 		/// Remove all Chunks
 		URHO3D_LOGDEBUG("Destroying active chunks");
@@ -122,9 +134,9 @@ namespace Urho3D
 				{
 					for (int z = -1; z <= 1; z++)
 					{
-						auto px = (double)x * cd.x;
-						auto py = (double)y * cd.y;
-						auto pz = (double)z * cd.z;
+						auto px = (double) x * cd.x;
+						auto py = (double) y * cd.y;
+						auto pz = (double) z * cd.z;
 						auto pos = Vector3d(px, py, pz) + c->GetWorldPosition();
 						auto neighbor = GetChunk(pos);
 
@@ -301,7 +313,11 @@ namespace Urho3D
 	{
 		if (mObjectPool.empty())
 		{
-			return new Chunk(context_, mSettings->GetVoxelCount(), mSettings->GetVoxelSize());
+			return new Chunk(
+				context_,
+				mSettings->GetVoxelCount(),
+				mSettings->GetVoxelSize(),
+				mSurfaceData);
 		}
 
 		auto r = mObjectPool.front();

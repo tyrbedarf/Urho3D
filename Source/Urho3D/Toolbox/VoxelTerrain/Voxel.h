@@ -32,7 +32,6 @@ namespace Urho3D
 		int GetHitpoints()
 		{
 			return mHitpoints;
-
 		}
 
 		void SetHitpoints(int value)
@@ -88,7 +87,7 @@ namespace Urho3D
 
 		bool IsAir()
 		{
-			return mId == 0;
+			return mId == 1;
 		}
 
 		static Voxel GetAir()
@@ -97,6 +96,14 @@ namespace Urho3D
 			r.mId = 1;
 			r.SetTransparent(true);
 			r.SetBlock(false);
+			r.SetModel(false);
+			r.SetHitpoints(0);
+
+			assert(r.IsTransparent());
+			assert(!r.IsBlock());
+			assert(r.IsAir());
+			assert(!r.IsModel());
+			assert(r.GetId() == 1);
 
 			return r;
 		}
@@ -107,6 +114,14 @@ namespace Urho3D
 			r.mId = 2;
 			r.SetTransparent(false);
 			r.SetBlock(false);
+			r.SetModel(false);
+			r.SetHitpoints(100);
+
+			assert(!r.IsTransparent());
+			assert(!r.IsBlock());
+			assert(!r.IsAir());
+			assert(!r.IsModel());
+			assert(r.GetId() == 2);
 
 			return r;
 		}

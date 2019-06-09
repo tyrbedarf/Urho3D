@@ -43,14 +43,23 @@ namespace Urho3D
 		auto dim = mSettings->GetChunkDimension();
 		while (mChunksToSpawn.try_dequeue(chunk))
 		{
+			auto model = chunk->GetModel();
+			if (model == nullptr)
+			{
+				continue;
+			}
+
 			auto pos = chunk->GetWorldPosition();
 			auto name = pos.ToString();
+
+			/*URHO3D_LOGDEBUG("Spawning chunk: " + name);*/
 
 			auto planeNode = mScene->CreateChild();
 			planeNode->SetName(name);
 
 			auto* planeObject = planeNode->CreateComponent<StaticModel>();
-			planeObject->SetModel(mResourceCache->GetResource<Model>("Models/Plane.mdl"));
+
+			planeObject->SetModel(model);
 			planeObject->SetMaterial(mResourceCache->GetResource<Material>("Materials/StoneTiled.xml"));
 
 			planeNode->SetPosition(Vector3(pos.x, pos.y, pos.z));
@@ -74,6 +83,7 @@ namespace Urho3D
 			auto it = mSpawnedChunks.find(v);
 			if (it != mSpawnedChunks.end())
 			{
+				/*URHO3D_LOGDEBUG("Despawning chunk: " + it->second->GetName());*/
 				mScene->RemoveChild(it->second);
 				mSpawnedChunks.erase(it);
 			}
@@ -88,6 +98,7 @@ namespace Urho3D
 	void VoxerSystem::Shutdown()
 	{
 		mChunkProvider->Shutdown();
+
 	}
 
 	void VoxerSystem::DestroyChunk(Chunk* c)

@@ -4,6 +4,8 @@
 #include "../../Helper/Vector3Helper.h"
 #include "../../Math/SimplexNoise.h"
 #include "../../Core/Object.h"
+#include "../../Toolbox/Mesh/ProceduralMesh.h"
+#include "SurfaceData.h"
 
 #include <tuple>
 #include <atomic>
@@ -45,12 +47,17 @@ namespace Urho3D
 		Vector<Voxel> mData;
 		Vector3i mVoxelLayout;
 
+		/// READONLY!
+		const SurfaceData* mSurfaceData;
+
 		std::atomic<int> mInitialized;
 		std::atomic<int> mInitializing;
 		std::atomic<int> mMeshed;
 		std::atomic<int> mMeshing;
 		std::atomic<int> mBorderChunk;
 		std::atomic<int> mMeshInGame;
+
+		SharedPtr<ProceduralMesh> mMesh;
 
 		int GetNeighborHash(int x, int y, int z) const;
 
@@ -62,15 +69,21 @@ namespace Urho3D
 		}
 
 	public:
-		Chunk(Context* ctx, const Vector3i voxelLayout, float voxelSize) :
+		Chunk(
+			Context* ctx,
+			const Vector3i voxelLayout,
+			float voxelSize,
+			const SurfaceData* surfData) :
 			Object(ctx),
 			mInitMarker(0),
 			mWorldPosition(0),
-			mVoxelSize(voxelSize)
+			mVoxelSize(voxelSize),
+			mSurfaceData(surfData)
 		{
 			mVoxelLayout = voxelLayout;
 			mStats = new VoxerStatistics();
 			mData.Resize(mVoxelLayout.GetArrayCount(), Voxel::GetAir());
+			mMesh = new ProceduralMesh(context_);
 		}
 
 		~Chunk()
@@ -146,6 +159,11 @@ namespace Urho3D
 		bool CanExtractSurface() const
 		{
 			return false;
+		}
+
+		SharedPtr<Model> GetModel()
+		{
+			return mMesh->GetModel();
 		}
 	};
 }

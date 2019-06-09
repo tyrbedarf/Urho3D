@@ -96,7 +96,7 @@ namespace Urho3D
 
 		bool operator ==(const Vector3d& rhs)
 		{
-			return *this == rhs;
+			return x == rhs.x && y == rhs.y && z == rhs.z;
 		}
 
 		bool operator !=(Vector3d rhs)

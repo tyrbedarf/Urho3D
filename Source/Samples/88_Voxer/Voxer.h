@@ -67,6 +67,7 @@ private:
 
 	SharedPtr<Material> material;
 	SharedPtr<tbUITextField> text_;
+	SharedPtr<tbUITextField> direction_;
 
 	SharedPtr<VoxerSystem> voxer_;
 
