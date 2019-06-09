@@ -51,7 +51,8 @@ namespace Urho3D
 	{
 		auto dir1 = b - a;
 		auto dir2 = c - a;
-		return dir2.Cross(dir1).Normalized();
+
+		return dir1.Cross(dir2).Normalized();
 	}
 
 	ProceduralMesh::ProceduralMesh(Context* context_) : Object(context_)
@@ -90,9 +91,9 @@ namespace Urho3D
 			a,
 			b,
 			c,
-			Vector3(uv1.x_, uv1.y_, 0.0f),
-			Vector3(uv2.x_, uv2.y_, 0.0f),
-			Vector3(uv3.x_, uv3.y_, 0.0f),
+			uv1,
+			uv2,
+			uv3,
 			normal);
 	}
 
@@ -100,9 +101,9 @@ namespace Urho3D
 		Vector3 a,
 		Vector3 b,
 		Vector3 c,
-		Vector3 uv1,
-		Vector3 uv2,
-		Vector3 uv3,
+		Vector2 uv1,
+		Vector2 uv2,
+		Vector2 uv3,
 		Vector3 normal)
 	{
 		Triangle t;
@@ -113,9 +114,9 @@ namespace Urho3D
 
 		t.n = normal;
 
-		t.uvs[0] = uv1;
-		t.uvs[1] = uv2;
-		t.uvs[2] = uv3;
+		t.uvs[0] = Vector3(uv1.x_, uv1.y_);
+		t.uvs[1] = Vector3(uv2.x_, uv2.y_);
+		t.uvs[2] = Vector3(uv3.x_, uv3.y_);
 
 		triangles.push_back(t);
 	}
@@ -237,8 +238,6 @@ namespace Urho3D
 		SharedPtr<Geometry> geom	= SharedPtr<Geometry>(new Geometry(context_));
 		BoundingBox boundingBox;
 
-		vb->SetShadowed(true);
-
 		PODVector<VertexElement> elements;
 		elements.Push(VertexElement(TYPE_VECTOR3, SEM_POSITION));
 		elements.Push(VertexElement(TYPE_VECTOR3, SEM_NORMAL));
@@ -246,7 +245,7 @@ namespace Urho3D
 		elements.Push(VertexElement(TYPE_VECTOR4, SEM_TANGENT));
 
 		const int vertexSize = 12;
-		PODVector<float> vertexData(vertices.size() * vertexSize);
+		PODVector<float> vertexData; // (vertices.size() * vertexSize);
 		PODVector<unsigned short> indexData;
 
 		for (int i = 0; i < triangles.size(); i++)
@@ -261,50 +260,73 @@ namespace Urho3D
 			Vector3 b = vertices[t.v[1]].p;
 			Vector3 c = vertices[t.v[2]].p;
 
+			auto normal = calcNormal(a, b, c);
+			auto uv1 = ProjectVertex(a, normal);
+			auto uv2 = ProjectVertex(b, normal);
+			auto uv3 = ProjectVertex(c, normal);
+
 			boundingBox.Merge(a);
 			boundingBox.Merge(b);
 			boundingBox.Merge(c);
 
-			// Vertices
-			vertexData[(t.v[0] * vertexSize) + 0] = a.x_;
-			vertexData[(t.v[0] * vertexSize) + 1] = a.y_;
-			vertexData[(t.v[0] * vertexSize) + 2] = a.z_;
+			int ia = (vertexData.Size() / vertexSize) + 0;
+			int ib = (vertexData.Size() / vertexSize) + 1;
+			int ic = (vertexData.Size() / vertexSize) + 2;
 
-			vertexData[(t.v[1] * vertexSize) + 0] = b.x_;
-			vertexData[(t.v[1] * vertexSize) + 1] = b.y_;
-			vertexData[(t.v[1] * vertexSize) + 2] = b.z_;
+			indexData.Push(ia);
+			indexData.Push(ib);
+			indexData.Push(ic);
 
-			vertexData[(t.v[2] * vertexSize) + 0] = c.x_;
-			vertexData[(t.v[2] * vertexSize) + 1] = c.y_;
-			vertexData[(t.v[2] * vertexSize) + 2] = c.z_;
+			/// Vertex 1
+			vertexData.Push(a.x_);
+			vertexData.Push(a.y_);
+			vertexData.Push(a.z_);
 
-			// Normals
-			vertexData[(t.v[0] * vertexSize) + 3] = t.n.x_;
-			vertexData[(t.v[0] * vertexSize) + 4] = t.n.y_;
-			vertexData[(t.v[0] * vertexSize) + 5] = t.n.z_;
+			vertexData.Push(normal.x_);
+			vertexData.Push(normal.y_);
+			vertexData.Push(normal.z_);
 
-			vertexData[(t.v[1] * vertexSize) + 3] = t.n.x_;
-			vertexData[(t.v[1] * vertexSize) + 4] = t.n.y_;
-			vertexData[(t.v[1] * vertexSize) + 5] = t.n.z_;
+			vertexData.Push(uv1.x_);
+			vertexData.Push(uv1.y_);
 
-			vertexData[(t.v[2] * vertexSize) + 3] = t.n.x_;
-			vertexData[(t.v[2] * vertexSize) + 4] = t.n.y_;
-			vertexData[(t.v[2] * vertexSize) + 5] = t.n.z_;
+			vertexData.Push(0.0f);
+			vertexData.Push(0.0f);
+			vertexData.Push(0.0f);
+			vertexData.Push(0.0f);
 
-			// UVs
-			vertexData[(t.v[0] * vertexSize) + 6] = t.uvs[0].x_;
-			vertexData[(t.v[0] * vertexSize) + 7] = t.uvs[0].y_;
+			/// Vertex 2
+			vertexData.Push(b.x_);
+			vertexData.Push(b.y_);
+			vertexData.Push(b.z_);
 
-			vertexData[(t.v[1] * vertexSize) + 6] = t.uvs[1].x_;
-			vertexData[(t.v[1] * vertexSize) + 7] = t.uvs[1].y_;
+			vertexData.Push(normal.x_);
+			vertexData.Push(normal.y_);
+			vertexData.Push(normal.z_);
 
-			vertexData[(t.v[2] * vertexSize) + 6] = t.uvs[2].x_;
-			vertexData[(t.v[2] * vertexSize) + 7] = t.uvs[2].y_;
+			vertexData.Push(uv2.x_);
+			vertexData.Push(uv2.y_);
 
-			// Indices
-			indexData.Push(t.v[0]);
-			indexData.Push(t.v[1]);
-			indexData.Push(t.v[2]);
+			vertexData.Push(0.0f);
+			vertexData.Push(0.0f);
+			vertexData.Push(0.0f);
+			vertexData.Push(0.0f);
+
+			/// Vertex 3
+			vertexData.Push(c.x_);
+			vertexData.Push(c.y_);
+			vertexData.Push(c.z_);
+
+			vertexData.Push(normal.x_);
+			vertexData.Push(normal.y_);
+			vertexData.Push(normal.z_);
+
+			vertexData.Push(uv3.x_);
+			vertexData.Push(uv3.y_);
+
+			vertexData.Push(0.0f);
+			vertexData.Push(0.0f);
+			vertexData.Push(0.0f);
+			vertexData.Push(0.0f);
 		}
 
 		if (vertices.size() < 1 || indexData.Size() < 1)
@@ -313,19 +335,13 @@ namespace Urho3D
 		}
 
 		/// Calculate Tangents
-		Vector<Vector3> tan1(vertices.size(), Vector3(0.0f, 0.0f, 0.0f));
-		Vector<Vector3> tan2(vertices.size(), Vector3(0.0f, 0.0f, 0.0f));
-		for (int i = 0; i < triangles.size(); i++)
+		Vector<Vector3> tan1(indexData.Size(), Vector3(0.0f, 0.0f, 0.0f));
+		Vector<Vector3> tan2(indexData.Size(), Vector3(0.0f, 0.0f, 0.0f));
+		for (int i = 0; i < indexData.Size(); i += 3)
 		{
-			Triangle t = triangles[i];
-			if (t.deleted)
-			{
-				continue;
-			}
-
-			int i1 = t.v[0];
-			int i2 = t.v[1];
-			int i3 = t.v[2];
+			int i1 = indexData[i + 0];
+			int i2 = indexData[i + 1];
+			int i3 = indexData[i + 2];
 
 			Vector3 v1(vertexData[(i1 * vertexSize) + 0], vertexData[(i1 * vertexSize) + 1], vertexData[(i1 * vertexSize) + 2]);
 			Vector3 v2(vertexData[(i2 * vertexSize) + 0], vertexData[(i2 * vertexSize) + 1], vertexData[(i2 * vertexSize) + 2]);
@@ -359,28 +375,29 @@ namespace Urho3D
 			tan2[i3] += tdir;
 		}
 
-		for (long i = 0; i < vertices.size(); i++)
+		for (long i = 0; i < vertexData.Size(); i += vertexSize)
 		{
-			Vector3 n(vertexData[(i * vertexSize) + 3], vertexData[(i * vertexSize) + 4], vertexData[(i * vertexSize) + 5]);
-			Vector3 t(tan1[i].x_, tan1[i].y_, tan1[i].z_);
+			Vector3 n(vertexData[i + 3], vertexData[i + 4], vertexData[i + 5]);
+			Vector3 t(tan1[i / vertexSize].x_, tan1[i / vertexSize].y_, tan1[i / vertexSize].z_);
 
 			// Gram-Schmidt orthogonalize
 			auto ortho = (t - n * n.DotProduct(t)).Normalized();
-			vertexData[(i * vertexSize) + 8] = ortho.x_;
-			vertexData[(i * vertexSize) + 9] = ortho.y_;
-			vertexData[(i * vertexSize) + 10] = ortho.z_;
+			vertexData[i + 8] = ortho.x_;
+			vertexData[i + 9] = ortho.y_;
+			vertexData[i + 10] = ortho.z_;
 
 			// Calculate handedness
-			vertexData[(i * vertexSize) + 11] = (n.CrossProduct(t).DotProduct(tan2[i]) < 0.0F) ? -1.0F : 1.0F;
+			vertexData[i + 11] = (n.CrossProduct(t).DotProduct(tan2[i / vertexSize]) < 0.0F) ? -1.0F : 1.0F;
 		}
 
-		vb->SetSize(vertices.size(), elements);
+		vb->SetSize(vertexData.Size() / vertexSize, elements);
 		vb->SetData(vertexData.Buffer());
 
 		ib->SetSize(indexData.Size(), false);
 		ib->SetData(indexData.Buffer());
 
 		ib->SetShadowed(true);
+		vb->SetShadowed(true);
 
 		geom->SetNumVertexBuffers(1);
 		geom->SetVertexBuffer(0, vb);
@@ -407,7 +424,7 @@ namespace Urho3D
 		return model;
 	}
 
-	Vector3 ProceduralMesh::ProjectVertex(Vector3 point, Vector3 normal)
+	Vector2 ProceduralMesh::ProjectVertex(Vector3 point, Vector3 normal)
 	{
 		int plane = 0;
 		float max = std::numeric_limits<float>::lowest();
@@ -429,7 +446,7 @@ namespace Urho3D
 			}
 		}
 
-		Vector3 result = Vector3::ZERO;
+		Vector2 result = Vector2::ZERO;
 		switch (plane)
 		{
 		case 0:
@@ -450,7 +467,7 @@ namespace Urho3D
 
 		case 2:
 		{
-			result.x_ = point.x_;
+			result.x_ = point.z_;
 			result.y_ = point.y_;
 
 			break;
@@ -459,7 +476,7 @@ namespace Urho3D
 		case 3:
 		{
 			result.x_ = point.y_;
-			result.y_ = point.x_;
+			result.y_ = point.z_;
 
 			break;
 		}
@@ -510,12 +527,12 @@ namespace Urho3D
 			t.n = calcNormal(vertices[a].p, vertices[b].p, vertices[c].p);
 		}
 
-		if (create_uvs)
+		/*if (create_uvs)
 		{
 			t.uvs[0] = ProjectVertex(vertices[a].p, t.n);
 			t.uvs[1] = ProjectVertex(vertices[b].p, t.n);
 			t.uvs[2] = ProjectVertex(vertices[c].p, t.n);
-		}
+		}*/
 
 		t.attr = Attributes::NORMAL | Attributes::TEXCOORD;
 

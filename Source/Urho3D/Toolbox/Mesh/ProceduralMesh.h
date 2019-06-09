@@ -87,9 +87,9 @@ namespace Urho3D
 			Vector3 a,
 			Vector3 b,
 			Vector3 c,
-			Vector3 uv1,
-			Vector3 uv2,
-			Vector3 uv3,
+			Vector2 uv1,
+			Vector2 uv2,
+			Vector2 uv3,
 			Vector3 normal);
 
 		/// Create a triangle using the given indices into the vertex array.
@@ -184,7 +184,7 @@ namespace Urho3D
 		double CalculateError(int id_v1, int id_v2, Vector3 &p_result);
 
 		/// Pick components of the point depending where the normal is pointing.
-		Vector3 ProjectVertex(Vector3 point, Vector3 normal);
+		Vector2 ProjectVertex(Vector3 point, Vector3 normal);
 	};
 }
 #endif

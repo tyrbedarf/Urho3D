@@ -236,8 +236,8 @@ namespace Urho3D
 							);
 						}
 
-						mMesh->AddTriangleFromIndices(indices[1], indices[0], indices[2], true, true);
-						mMesh->AddTriangleFromIndices(indices[4], indices[3], indices[5], true, true);
+						mMesh->AddTriangleFromIndices(indices[1], indices[0], indices[2], true);
+						mMesh->AddTriangleFromIndices(indices[4], indices[3], indices[5], true);
 					}
 				}
 			}

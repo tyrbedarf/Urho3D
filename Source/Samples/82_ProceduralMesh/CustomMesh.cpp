@@ -108,7 +108,7 @@ void HelloCustomMesh::CreateScene()
 	plane_node->Rotate(Quaternion(90.0f, 120.0f, 0.0f), TS_WORLD);
 	auto* object2 = plane_node->CreateComponent<StaticModel>();
 
-	mesh.SimplifyMesh(0.9f, 7.0f, true);
+	mesh.SimplifyMesh(0.8f, 7.0f, true);
 	mesh2.SimplifyMeshLossless(true);
 	auto model = mesh.GetModel();
 	auto model2 = mesh2.GetModel();
