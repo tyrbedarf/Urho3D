@@ -5,6 +5,7 @@
 #include "../../Graphics/Model.h"
 #include "../../Graphics/StaticModel.h"
 #include "../../Graphics/Material.h"
+#include "../../Core/Profiler.h"
 
 namespace Urho3D
 {
@@ -39,6 +40,9 @@ namespace Urho3D
 	void VoxerSystem::Update(const Vector<Vector3d>& playerPositions)
 	{
 		mChunkProvider->Update(playerPositions);
+
+		URHO3D_PROFILE(UpdateVoxerSystem);
+
 		Chunk* chunk;
 		auto dim = mSettings->GetChunkDimension();
 		while (mChunksToSpawn.try_dequeue(chunk))
@@ -98,7 +102,6 @@ namespace Urho3D
 	void VoxerSystem::Shutdown()
 	{
 		mChunkProvider->Shutdown();
-
 	}
 
 	void VoxerSystem::DestroyChunk(Chunk* c)

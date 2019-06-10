@@ -3,6 +3,8 @@
 #include <array>
 #include "../../Core/Timer.h"
 
+#include "../../Core/Profiler.h"
+
 namespace Urho3D
 {
 	bool chunkOrder(const Chunk* lhs, const Chunk* rhs)
@@ -67,12 +69,13 @@ namespace Urho3D
 
 	void ChunkProvider::SpawnChunks(const Vector<Vector3d>& playerPositions)
 	{
+		URHO3D_PROFILE(SpawnChunks);
 		if (playerPositions.Size() < 1)
 		{
 			return;
 		}
 
-		if (mInitialing != nullptr)
+		if (mInitialing != nullptr || mMeshing != nullptr)
 		{
 			return;
 		}
@@ -211,6 +214,8 @@ namespace Urho3D
 
 	void ChunkProvider::DespawnChunks(const Vector<Vector3d>& playerPositions)
 	{
+		URHO3D_PROFILE(DespawnChunks);
+
 		/// Placed inside Settings since it depends on voxel size, voxel count and
 		/// the view range.
 		double maxDist = mSettings->GetDistToDestroy();

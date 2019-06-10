@@ -70,16 +70,9 @@ if (URHO3D_LIB_TYPE STREQUAL SHARED AND NOT WIN32 AND NOT ANDROID AND NOT IOS AN
 endif ()
 
 # Add targets
-foreach (TARGET FreeType LZ4 PugiXml rapidjson SDL StanHull STB)
+foreach (TARGET FreeType LZ4 PugiXml rapidjson SDL StanHull STB EASTL)
     add_subdirectory (ThirdParty/${TARGET})
 endforeach ()
-
-#if (URHO3D_ANGELSCRIPT)
-#    add_subdirectory (ThirdParty/AngelScript)
-#    if (WEB OR (ARM AND URHO3D_64BIT))
-#        add_subdirectory (ThirdParty/boost)
-#    endif ()
-#endif ()
 
 if (URHO3D_LUA)
     add_subdirectory (ThirdParty/Lua${JIT})

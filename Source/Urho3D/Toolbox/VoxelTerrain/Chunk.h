@@ -47,6 +47,10 @@ namespace Urho3D
 		Vector<Voxel> mData;
 		Vector3i mVoxelLayout;
 
+		Voxel mLastVoxel;
+		bool isAir;
+		bool isSolid;
+
 		/// READONLY!
 		const SurfaceData* mSurfaceData;
 
@@ -152,9 +156,11 @@ namespace Urho3D
 
 		void Despawn();
 
-		void Set(const Voxel& data, int x, int y, int z);
+		void Set(const Voxel& data, int x, int y, int z, bool safe = false);
 
 		Voxel& Get(int x, int y, int z, bool& found);
+
+		void HandleVoxelUpdate(Voxel v);
 
 		bool CanExtractSurface() const
 		{

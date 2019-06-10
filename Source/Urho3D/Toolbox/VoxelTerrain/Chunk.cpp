@@ -85,6 +85,10 @@ namespace Urho3D
 
 		mNeighborhood.clear();
 		mMesh->Clear();
+
+		Voxel mLastVoxel = Voxel::GetAir();
+		isAir = true;
+		isSolid = false;
 	}
 
 	void Chunk::SetNeighbor(int x, int y, int z, Chunk* c)
@@ -134,26 +138,16 @@ namespace Urho3D
 			{
 				for (int z = 0; z < mVoxelLayout.z; z++)
 				{
-					int index = GetIndexFromVector(mVoxelLayout, x, y, z);
 					auto voxel_pos = (Vector3d(x, y, z) * voxelSize) + mWorldPosition;
 					auto height = SimplexNoise::noise((float)voxel_pos.x * size, (float)voxel_pos.z * size) * -2.5f;
 					if (voxel_pos.y > height)
 					{
-						mData[index] = Voxel::GetAir();
+						Set(Voxel::GetAir(), x, y, z, true);
 					}
 					else
 					{
-						mData[index] = Voxel::GetStone();
+						Set(Voxel::GetStone(), x, y, z, true);
 					}
-
-					/*if (tmp.x == x && tmp.y == y && tmp.z == z)
-					{
-						mData[index] = Voxel::GetStone();
-					}
-					else
-					{
-						mData[index] = Voxel::GetAir();
-					}*/
 				}
 			}
 		}
@@ -181,6 +175,53 @@ namespace Urho3D
 		std::clock_t c_start = std::clock();
 		auto t_start = std::chrono::high_resolution_clock::now();
 		mMesh->Clear();
+
+		/// If the entire neighborhood is air as well dont bother to create a mesh.
+		bool createMesh = true;
+		if (isAir)
+		{
+			for (auto it = mNeighborhood.begin(); it != mNeighborhood.end(); it++)
+			{
+				if (!it->second->isAir)
+				{
+					createMesh = false;
+					break;
+				}
+			}
+		}
+		if (!createMesh)
+		{
+			if (mMeshed.exchange(1) != 0)
+			{
+				URHO3D_LOGERROR("Found a chunk that has been meshed twice.");
+			}
+
+			URHO3D_LOGDEBUG("Empty chunk surrounded by empty chunks.");
+
+			return;
+		}
+
+		/// If all surrounding chunks are solid, dont bother creating a mesh.
+		/*createMesh = true;
+		for (auto it = mNeighborhood.begin(); it != mNeighborhood.end(); it++)
+		{
+			if (!it->second->isSolid)
+			{
+				createMesh = false;
+				break;
+			}
+		}
+		if (!createMesh)
+		{
+			if (mMeshed.exchange(1) != 0)
+			{
+				URHO3D_LOGERROR("Found a chunk that has been meshed twice.");
+			}
+
+			URHO3D_LOGDEBUG("Surrounded by solid chunks only");
+
+			return;
+		}*/
 
 		int indices[6];
 		int cube_index, move_vertex;
@@ -295,35 +336,61 @@ namespace Urho3D
 		return std::tuple<int, int>(cube_index, move_vertex);
 	}
 
-	void Chunk::Set(const Voxel& data, int x, int y, int z)
+	void Chunk::Set(const Voxel& data, int x, int y, int z, bool safe)
 	{
-		Vector3i neighborPos;
-		auto index = GetIndex(x, y, z, neighborPos);
-		if (index < 0)
+		if (safe)
 		{
-			auto x1 = x < 0 ? -1 : 0;
-			x1 = x >= mVoxelLayout.x ? 1 : x1;
-
-			auto y1 = y < 0 ? -1 : 0;
-			y1 = y >= mVoxelLayout.y ? 1 : y1;
-
-			auto z1 = z < 0 ? -1 : 0;
-			z1 = z >= mVoxelLayout.z ? 1 : z1;
-
-			auto hash = GetNeighborHash(x1, y1, z1);
-			auto it = mNeighborhood.find(hash);
-
-			if (it == mNeighborhood.end())
+			Vector3i neighborPos;
+			auto index = GetIndex(x, y, z, neighborPos);
+			if (index < 0)
 			{
-				URHO3D_LOGERROR("Could not find a neighboring chunk.");
+				auto x1 = x < 0 ? -1 : 0;
+				x1 = x >= mVoxelLayout.x ? 1 : x1;
+
+				auto y1 = y < 0 ? -1 : 0;
+				y1 = y >= mVoxelLayout.y ? 1 : y1;
+
+				auto z1 = z < 0 ? -1 : 0;
+				z1 = z >= mVoxelLayout.z ? 1 : z1;
+
+				auto hash = GetNeighborHash(x1, y1, z1);
+				auto it = mNeighborhood.find(hash);
+
+				if (it == mNeighborhood.end())
+				{
+					URHO3D_LOGERROR("Could not find a neighboring chunk.");
+					return;
+				}
+
+				it->second->Set(data, neighborPos.x, neighborPos.y, neighborPos.z);
 				return;
 			}
 
-			it->second->Set(data, neighborPos.x, neighborPos.y, neighborPos.z);
-			return;
+			mData[index] = data;
+			HandleVoxelUpdate(data);
+		}
+		else
+		{
+			auto index = mVoxelLayout.GetIndex(x, y, z);
+			mData[index] = data;
+			HandleVoxelUpdate(data);
+		}
+	}
+
+	void Chunk::HandleVoxelUpdate(Voxel v)
+	{
+		if (v.GetId() != mLastVoxel.GetId() && !isAir)
+		{
+			isSolid = false;
 		}
 
-		mData[index] = data;
+		if (!v.IsAir())
+		{
+			isAir = false;
+			isSolid = true;
+		}
+
+		mLastVoxel = v;
 	}
 
 	Voxel& Chunk::Get(int x, int y, int z, bool& found)

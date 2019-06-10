@@ -166,7 +166,7 @@ void VoxerSample::CreateUI()
 	window_->SetText("Hello Voxer System!");
 	window_->AddChild(layout);
 	window_->ResizeToFitContent();
-	window_->SetPosition(150, 50);
+	window_->SetPosition(50, 350);
 	window_->SetSize(550, 100);
 
 	text_ = new tbUITextField(context_);
