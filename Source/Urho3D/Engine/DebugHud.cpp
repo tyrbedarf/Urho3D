@@ -36,6 +36,9 @@
 #include "../UI/Text.h"
 #include "../UI/UI.h"
 
+#include "../Toolbox/VoxelTerrain/VoxerStatistics.h"
+#include "../Toolbox/VoxelTerrain/Chunk.h"
+
 #include "../DebugNew.h"
 
 namespace Urho3D
@@ -158,6 +161,8 @@ void DebugHud::Update()
                 stats.AppendWithFormat("\n%s %s", i->first_.CString(), i->second_.CString());
         }
 
+		stats.Append(Chunk::Stats->GetStats());
+
         statsText_->SetText(stats);
     }
 
@@ -203,6 +208,7 @@ void DebugHud::Update()
 
     if (memoryText_->IsVisible())
         memoryText_->SetText(GetSubsystem<ResourceCache>()->PrintMemoryUsage());
+
 }
 
 void DebugHud::SetDefaultStyle(XMLFile* style)
@@ -229,7 +235,6 @@ void DebugHud::SetMode(unsigned mode)
     profilerText_->SetVisible((mode & DEBUGHUD_SHOW_PROFILER) != 0);
     memoryText_->SetVisible((mode & DEBUGHUD_SHOW_MEMORY) != 0);
     eventProfilerText_->SetVisible((mode & DEBUGHUD_SHOW_EVENTPROFILER) != 0);
-
     memoryText_->SetPosition(0, modeText_->IsVisible() ? modeText_->GetHeight() * -2 : 0);
 
 #ifdef URHO3D_PROFILING

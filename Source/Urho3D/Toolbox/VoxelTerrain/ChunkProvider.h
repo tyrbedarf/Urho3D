@@ -1,13 +1,14 @@
 #pragma once
 
-#include <unordered_map>
 #include <queue>
+
 
 #include "../../Math/Vector3d.h"
 #include "../../Math/Vector3i.h"
 #include "../../Core/Object.h"
 #include "../../Core/WorkQueue.h"
 #include "../../Container/Vector.h"
+#include "../../Container/HashMap.h"
 
 #include "VoxerSettings.h"
 #include "Chunk.h"
@@ -22,7 +23,7 @@ namespace Urho3D
 		SharedPtr<VoxerSettings> mSettings;
 		SharedPtr<SurfaceData> mSurfaceData;
 
-		std::unordered_map<Vector3d, Chunk*> mActiveChunks;
+		HashMap<Vector3d, Chunk*> mActiveChunks;
 		std::queue<Chunk*> mObjectPool;
 
 		std::atomic<int>* mInitialing;

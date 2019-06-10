@@ -211,6 +211,7 @@ Urho3D uses the following third-party libraries:
 - stb_vorbis 1.13b (https://nothings.org)
 - tolua++ 1.0.93 (defunct - http://www.codenix.com/~tolua)
 - WebP (https://chromium.googlesource.com/webm/libwebp)
+- EASTL (https://github.com/electronicarts/EASTL/)
 
 DXT / ETC1 / PVRTC decompression code based on the Squish library and the Oolong
 Engine.

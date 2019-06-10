@@ -4,6 +4,7 @@
 #include "../../Math/Vector3.h"
 #include "FlatArray2D.h"
 #include "../../Core/Object.h"
+#include "../../Helper/Vector3Helper.h"
 #include <sstream>
 
 /*
@@ -332,29 +333,92 @@ namespace Urho3D
 		// Will be calculated during startup.
 		Vector3 PointTable[256];
 
+		// Size of a voxel
 		float mVoxelSize;
 
-		SurfaceData(Context* ctx, float voxel_size) :
+		/// Layout of voxels inside a chunk
+		Vector3i VoxelLayout;
+
+		/// Size and position of each cube that form a voxel.
+		const int VoxelCubeSize = 8;
+		const Vector3i VoxelCube[8] =
+		{
+			Vector3i(0, 0, 0),
+			Vector3i(1, 0, 0),
+			Vector3i(0, 1, 0),
+			Vector3i(0, 0, 1),
+
+			Vector3i(1, 0, 1),
+			Vector3i(1, 1, 0),
+			Vector3i(0, 1, 1),
+			Vector3i(1, 1, 1),
+		};
+
+		/// Map each position inside a chunk to a index to avoid doing that calculation during
+		/// chunk iteration, while building the mesh.
+		/// Each cube consists of 8 voxel, each voxel consists of x, y and z position plus the index
+		Vector<int> CubeIndices;
+
+		/// Remember which voxel cube has members that are outside the chunk.
+		/// If this is the case we have to access neighboring chunk, which requires extra work.
+		Vector<bool> CubeOutsideChunk;
+
+
+		SurfaceData(Context* ctx, float voxel_size, Vector3i voxel_layout) :
 			Object(ctx),
 			Faces(6, 7, -1),
 			CubeIndexToFaceLookup(16, 22, STOP),
 			Edges(8, 3, 0),
-			mVoxelSize(voxel_size)
+			mVoxelSize(voxel_size),
+			VoxelLayout(voxel_layout)
 		{
-			//Faces = new FlatArray2D<int>(6, 7, -1);
-			//CubeIndexToFaceLookup = new FlatArray2D<int>(16, 22, -1);
-			//// CubeIndexToUvsLookup = new FlatArray2D<Vector2>(16, 12, new Vector2());
-			//Edges = new FlatArray2D<int>(8, 3, 0);
-
 			InitCube();
 			InitFaces();
 			InitCubeToFaceLookup();
 			InitEdges();
 
-			for (int i = 0; i < 8; i++)
+			/// Prepare chunk iteration data.
+			/*CubeIndices.Resize(GetArrayCount(VoxelLayout) * 32);
+			CubeOutsideChunk.Resize(GetArrayCount(VoxelLayout));
+			int no_cubes = 0;
+			for (int x = 0; x < VoxelLayout.x; x++)
 			{
+				for (int y = 0; y < VoxelLayout.y; y++)
+				{
+					for (int z = 0; z < VoxelLayout.z; z++)
+					{
+						int index = no_cubes * 32;
+						Vector3i chunk_pos(x, y, z);
 
-			}
+						bool outside = false;
+						for (int i = 0; i < VoxelCubeSize; i++)
+						{
+							auto pos = chunk_pos + VoxelCube[i];
+							int start_index = (i * 4) + index;
+
+							CubeIndices[start_index + 0] = pos.x;
+							CubeIndices[start_index + 1] = pos.y;
+							CubeIndices[start_index + 2] = pos.z;
+
+							CubeIndices[start_index + 3] = GetIndexFromVector(VoxelLayout, pos);
+
+							if (pos.x >= VoxelLayout.x || pos.y >= VoxelLayout.y || pos.z >= VoxelLayout.z)
+							{
+								outside = true;
+							}
+
+							if (pos.x < 0|| pos.y < 0 || pos.z < 0)
+							{
+								outside = true;
+							}
+						}
+
+						CubeOutsideChunk[no_cubes] = outside;
+
+						no_cubes++;
+					}
+				}
+			}*/
 		}
 	};
 }

@@ -119,6 +119,7 @@ private:
     SharedPtr<Text> eventProfilerText_;
     /// Memory stats text.
     SharedPtr<Text> memoryText_;
+
     /// Hashmap containing application specific stats.
     HashMap<String, String> appStats_;
     /// Profiler timer.

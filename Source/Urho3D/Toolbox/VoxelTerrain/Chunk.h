@@ -5,6 +5,7 @@
 #include "../../Math/SimplexNoise.h"
 #include "../../Core/Object.h"
 #include "../../Toolbox/Mesh/ProceduralMesh.h"
+#include "../../Container/HashMap.h"
 #include "SurfaceData.h"
 
 #include <tuple>
@@ -21,10 +22,10 @@ namespace Urho3D
 		URHO3D_OBJECT(Chunk, Object)
 
 	public:
-		static VoxerStatistics* mStats;
+		static VoxerStatistics* Stats;
 
 	protected:
-		const int VoxelCubeSize = 8;
+		/*const int VoxelCubeSize = 8;
 		const Vector3i VoxelCube[8] =
 		{
 			Vector3i(0, 0, 0),
@@ -36,13 +37,13 @@ namespace Urho3D
 			Vector3i(1, 1, 0),
 			Vector3i(0, 1, 1),
 			Vector3i(1, 1, 1),
-		};
+		};*/
 
 		double mInitMarker;
 		float mVoxelSize;
 		Vector3d mWorldPosition;
 
-		std::unordered_map<int, Chunk*> mNeighborhood;
+		HashMap<int, Chunk*> mNeighborhood;
 
 		Vector<Voxel> mData;
 		Vector3i mVoxelLayout;
@@ -85,7 +86,6 @@ namespace Urho3D
 			mSurfaceData(surfData)
 		{
 			mVoxelLayout = voxelLayout;
-			mStats = new VoxerStatistics();
 			mData.Resize(mVoxelLayout.GetArrayCount(), Voxel::GetAir());
 			mMesh = new ProceduralMesh(context_);
 		}
@@ -152,13 +152,13 @@ namespace Urho3D
 
 		/// First one is cube index
 		/// second indicates whether to move a vertex or not.
-		std::tuple<int, int> GetCubeIndexSafe(int x, int y, int z);
+		std::tuple<int, int> GetCube(int x, int y, int z, bool safe = true);
 
 		void Despawn();
 
 		void Set(const Voxel& data, int x, int y, int z, bool safe = false);
 
-		Voxel& Get(int x, int y, int z, bool& found);
+		std::tuple<Voxel&, bool> Get(int x, int y, int z, bool safe = true);
 
 		void HandleVoxelUpdate(Voxel v);
 

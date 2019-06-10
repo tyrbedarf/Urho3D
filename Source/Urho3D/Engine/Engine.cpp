@@ -71,6 +71,8 @@
 #include <emscripten/emscripten.h>
 #endif
 
+#include "../Engine/EngineEvents.h"
+
 #include "../DebugNew.h"
 
 
@@ -1005,6 +1007,15 @@ void Engine::HandleExitRequested(StringHash eventType, VariantMap& eventData)
 
 void Engine::DoExit()
 {
+	VariantMap& eventData = GetEventDataMap();
+	using namespace EngineQuit;
+	eventData[P_WAIT] = false;
+	SendEvent(E_ENGINE_QUIT, eventData);
+	if (eventData[P_WAIT].GetBool())
+	{
+		URHO3D_LOGDEBUG("I should wait");
+	}
+
     auto* graphics = GetSubsystem<Graphics>();
     if (graphics)
         graphics->Close();

@@ -7,10 +7,8 @@
 #ifndef CUSTOM_MESH_H
 #define CUSTOM_MESH_H
 
-#include <unordered_map>
 #include <math.h>
-#include <vector>
-#include <map>
+
 
 #include "../../Math/Vector3.h"
 #include "../../Core/Object.h"
@@ -21,6 +19,8 @@
 #include "../../Graphics/Model.h"
 #include "../../Graphics/Geometry.h"
 #include "../../IO/Log.h"
+#include "../../Container/HashMap.h"
+#include <vector>
 
 #include "SymetricMatrix.h"
 
@@ -139,29 +139,29 @@ namespace Urho3D
 		/// Clear mesh data.
 		void Clear()
 		{
-			triangles.clear();
-			vertices.clear();
-			refs.clear();
-			VertexIndices.clear();
+			triangles.Clear();
+			vertices.Clear();
+			refs.Clear();
+			VertexIndices.Clear();
 		}
 
 		size_t GetVertexCount() const
 		{
-			return vertices.size();
+			return vertices.Size();
 		}
 
 	private:
 		// Todo: Change to pointers?
-		std::vector<Triangle> triangles;
-		std::vector<Vertex> vertices;
-		std::vector<VTRef> refs;
+		Vector<Triangle> triangles;
+		Vector<Vertex> vertices;
+		Vector<VTRef> refs;
 
-		std::vector<Vector3> planes;
+		Vector<Vector3> planes;
 
 		/// Note: The key is the position a vertex had, when it
 		/// was first inserted. The actual position might change.
 		/// (using get_index and set_vertex for example)
-		std::map<Vector3, size_t> VertexIndices;
+		HashMap<Vector3, size_t> VertexIndices;
 
 		/// Check if a triangle flips when this edge is removed
 		bool Flipped(Vector3 p, int i0, int i1, Vertex &v0, Vertex &v1, std::vector<int> &deleted);

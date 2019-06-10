@@ -12,6 +12,7 @@ namespace Urho3D
 		std::atomic<int> mMeshedChunks;
 		std::atomic<long> mInitTime;
 		std::atomic<long> mMeshTime;
+		std::atomic<long> mSimplifyMeshTime;
 
 	public:
 		VoxerStatistics();
@@ -24,6 +25,8 @@ namespace Urho3D
 
 		void AddMeshTime(double time);
 
+		void AddSimplifyMeshTime(double time);
+
 		int GetInitialized() const;
 
 		int GetMeshed() const;
@@ -32,6 +35,10 @@ namespace Urho3D
 
 		long GetMeshTime() const;
 
+		long GetSimplifyMeshTime() const;
+
 		void Log();
+
+		String GetStats() const;
 	};
 }

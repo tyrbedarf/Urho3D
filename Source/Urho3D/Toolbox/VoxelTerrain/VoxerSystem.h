@@ -7,12 +7,12 @@
 #include "../../Graphics/Octree.h"
 #include "../../Resource/ResourceCache.h"
 #include "../../Container/Vector.h"
+#include "../../Container/HashMap.h"
 
 #include "VoxerSettings.h"
 #include "ChunkProvider.h"
 #include "Chunk.h"
 
-#include <unordered_map>
 
 namespace Urho3D
 {
@@ -34,7 +34,7 @@ namespace Urho3D
 		SharedPtr<Octree> mOctree;
 		SharedPtr<ResourceCache> mResourceCache;
 
-		std::unordered_map<Vector3d, Node*> mSpawnedChunks;
+		HashMap<Vector3d, Node*> mSpawnedChunks;
 
 		void CreateCamera();
 
@@ -55,7 +55,7 @@ namespace Urho3D
 		void Update(const Vector<Vector3d>& playerPositions);
 
 		ChunkProvider* GetChunkProvider();
-		void Shutdown();
+		void Shutdown(StringHash eventType, VariantMap& eventData);
 		void DestroyChunk(Chunk* c);
 
 		void SpawnChunk(Chunk* c)

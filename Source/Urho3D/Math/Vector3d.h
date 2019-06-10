@@ -1,6 +1,5 @@
 #pragma once
 
-#include <unordered_map>
 #include <math.h>
 #include "../Container/Str.h"
 
@@ -86,7 +85,7 @@ namespace Urho3D
 				return Zero();
 		}
 
-		size_t GetHashCode() const
+		size_t ToHash() const
 		{
 			return
 				(std::hash<double>()(x) << 20) ^
@@ -119,6 +118,8 @@ namespace Urho3D
 				")";
 		}
 	};
+
+	bool operator ==(const Urho3D::Vector3d& lhs, const Urho3D::Vector3d& rhs);
 }
 
 namespace std
@@ -128,9 +129,9 @@ namespace std
 	{
 		size_t operator()(const Urho3D::Vector3d& k) const
 		{
-			return k.GetHashCode();
+			return k.ToHash();
 		}
 	};
 
-	bool operator ==(const Urho3D::Vector3d& lhs, const Urho3D::Vector3d& rhs);
+	/*bool operator ==(const Urho3D::Vector3d& lhs, const Urho3D::Vector3d& rhs);*/
 }

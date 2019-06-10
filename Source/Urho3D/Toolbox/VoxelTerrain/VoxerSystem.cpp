@@ -6,6 +6,7 @@
 #include "../../Graphics/StaticModel.h"
 #include "../../Graphics/Material.h"
 #include "../../Core/Profiler.h"
+#include "../../Engine/EngineEvents.h"
 
 namespace Urho3D
 {
@@ -21,6 +22,8 @@ namespace Urho3D
 
 		CreateCamera();
 		mResourceCache = GetSubsystem<ResourceCache>();
+
+		SubscribeToEvent(E_ENGINE_QUIT, URHO3D_HANDLER(VoxerSystem, Shutdown));
 	}
 
 	VoxerSystem::~VoxerSystem()
@@ -70,11 +73,11 @@ namespace Urho3D
 			planeNode->SetRotation(Quaternion::IDENTITY);
 
 			/// Already spawned?
-			auto it = mSpawnedChunks.find(pos);
-			if (it != mSpawnedChunks.end())
+			auto it = mSpawnedChunks.Find(pos);
+			if (it != mSpawnedChunks.End())
 			{
-				mScene->RemoveChild(it->second);
-				mSpawnedChunks.erase(it);
+				mScene->RemoveChild(it->second_);
+				mSpawnedChunks.Erase(it);
 			}
 
 			mSpawnedChunks[pos] = planeNode;
@@ -84,12 +87,12 @@ namespace Urho3D
 		Vector3d v(0.0, 0.0, 0.0);
 		while (mChunksToDespawn.try_dequeue(v))
 		{
-			auto it = mSpawnedChunks.find(v);
-			if (it != mSpawnedChunks.end())
+			auto it = mSpawnedChunks.Find(v);
+			if (it != mSpawnedChunks.End())
 			{
 				/*URHO3D_LOGDEBUG("Despawning chunk: " + it->second->GetName());*/
-				mScene->RemoveChild(it->second);
-				mSpawnedChunks.erase(it);
+				mScene->RemoveChild(it->second_);
+				mSpawnedChunks.Erase(it);
 			}
 		}
 	}
@@ -99,9 +102,11 @@ namespace Urho3D
 		return mChunkProvider;
 	}
 
-	void VoxerSystem::Shutdown()
+	void VoxerSystem::Shutdown(StringHash eventType, VariantMap& eventData)
 	{
-		mChunkProvider->Shutdown();
+		/*mChunkProvider->Shutdown();*/
+		using namespace EngineQuit;
+		eventData[P_WAIT] = true;
 	}
 
 	void VoxerSystem::DestroyChunk(Chunk* c)

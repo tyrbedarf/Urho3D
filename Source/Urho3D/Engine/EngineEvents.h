@@ -34,4 +34,11 @@ URHO3D_EVENT(E_CONSOLECOMMAND, ConsoleCommand)
     URHO3D_PARAM(P_ID, Id);                        // String
 }
 
+/// The engine is about to quit.
+URHO3D_EVENT(E_ENGINE_QUIT, EngineQuit)
+{
+	/// Set to true if a subsystem needs more update cycles.
+	URHO3D_PARAM(P_WAIT, Wait);              // bool
+}
+
 }

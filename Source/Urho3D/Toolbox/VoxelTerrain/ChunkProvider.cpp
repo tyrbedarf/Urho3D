@@ -21,7 +21,9 @@ namespace Urho3D
 		mInitialing = nullptr;
 		mMeshing = nullptr;
 
-		mSurfaceData = new SurfaceData(context_, mSettings->GetVoxelSize());
+		mSurfaceData = new SurfaceData(context_, mSettings->GetVoxelSize(), settings->GetVoxelCount());
+
+		Chunk::Stats = new VoxerStatistics();
 	}
 
 	void ChunkProvider::Update(const Vector<Vector3d>& playerPositions)
@@ -46,15 +48,15 @@ namespace Urho3D
 
 		/// Remove all Chunks
 		URHO3D_LOGDEBUG("Destroying active chunks");
-		for (std::unordered_map<Vector3d, Chunk*>::iterator it = mActiveChunks.begin();
-			it != mActiveChunks.end();
+		for (HashMap<Vector3d, Chunk*>::Iterator it = mActiveChunks.Begin();
+			it != mActiveChunks.End();
 			++it)
 		{
-			auto c = it->second;
+			auto c = it->second_;
 			delete c;
 		}
 
-		mActiveChunks.clear();
+		mActiveChunks.Clear();
 
 		URHO3D_LOGDEBUG("Cleaning up object pool");
 		while (mObjectPool.size() > 0)
@@ -63,6 +65,10 @@ namespace Urho3D
 			delete c;
 			mObjectPool.pop();
 		}
+
+		URHO3D_LOGDEBUG("Removing voxer statistics");
+		delete Chunk::Stats;
+		Chunk::Stats = nullptr;
 
 		URHO3D_LOGDEBUG("Chunk provider out!");
 	}
@@ -86,7 +92,7 @@ namespace Urho3D
 		int positions = mSettings->IsServer() ? playerPositions.Size() : 1;
 		Vector3d cd = mSettings->GetChunkDimension();
 		Vector3i vr = mSettings->GetViewRange();
-		std::vector<Chunk*> Workload;
+		Vector<Chunk*> Workload;
 
 		for (int i = 0; i < positions; i++)
 		{
@@ -119,15 +125,15 @@ namespace Urho3D
 
 						auto dir = position - np;
 						auto key = dir.SqrMagnitude();
-						Workload.push_back(ch);
+						Workload.Push(ch);
 					}
 				}
 			}
 		}
 
-		std::sort(Workload.begin(), Workload.end(), chunkOrder);
+		Sort(Workload.Begin(), Workload.End(), chunkOrder);
 		std::vector<Chunk*> init_tasks;
-		for (int i = 0; i < Workload.size(); i++)
+		for (int i = 0; i < Workload.Size(); i++)
 		{
 			/// Setup neighborhood for each chunk
 			auto c = Workload[i];
@@ -221,11 +227,11 @@ namespace Urho3D
 		double maxDist = mSettings->GetDistToDestroy();
 
 		std::vector<Vector3d> keys;
-		for (std::unordered_map<Vector3d, Chunk*>::iterator it = mActiveChunks.begin();
-			it != mActiveChunks.end();
+		for (HashMap<Vector3d, Chunk*>::Iterator it = mActiveChunks.Begin();
+			it != mActiveChunks.End();
 			++it)
 		{
-			keys.push_back(it->first);
+			keys.push_back(it->first_);
 		}
 
 		for (int j = 0; j < keys.size(); j++)
@@ -280,14 +286,14 @@ namespace Urho3D
 	Chunk* ChunkProvider::CreateChunk(Vector3d pos)
 	{
 		Chunk* r = nullptr;
-		auto it = mActiveChunks.find(pos);
-		if (it != mActiveChunks.end())
+		auto it = mActiveChunks.Find(pos);
+		if (it != mActiveChunks.End())
 		{
 			/// Is it a former border chunk?
 			/// We will know after all chunks of this batch have been collected
 			/// and the neighbors have been set up. So return all border chunks here
 			/// to make sure meshing can take place again
-			r = it->second;
+			r = it->second_;
 			if (r->IsBorderChunk())
 			{
 				return r;
@@ -298,17 +304,17 @@ namespace Urho3D
 
 		r = NewChunk();
 		r->Reset(pos);
-		mActiveChunks.insert(std::pair<Vector3d, Chunk*>(pos, r));
+		mActiveChunks.Insert(Pair<Vector3d, Chunk*>(pos, r));
 
 		return r;
 	}
 
 	Chunk* ChunkProvider::GetChunk(Vector3d pos)
 	{
-		auto it = mActiveChunks.find(pos);
-		if (it != mActiveChunks.end())
+		auto it = mActiveChunks.Find(pos);
+		if (it != mActiveChunks.End())
 		{
-			return it->second;
+			return it->second_;
 		}
 
 		return nullptr;
@@ -333,10 +339,10 @@ namespace Urho3D
 
 	void ChunkProvider::DestroyChunk(const Vector3d pos)
 	{
-		auto it = mActiveChunks.find(pos);
-		auto c = it->second;
+		auto it = mActiveChunks.Find(pos);
+		auto c = it->second_;
 		c->Despawn();
 		mObjectPool.push(c);
-		mActiveChunks.erase(it);
+		mActiveChunks.Erase(it);
 	}
 }

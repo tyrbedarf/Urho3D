@@ -6,7 +6,7 @@
 
 namespace Urho3D
 {
-	VoxerStatistics* Chunk::mStats = nullptr;
+	VoxerStatistics* Chunk::Stats = nullptr;
 
 	int Chunk::GetNeighborHash(int x, int y, int z) const
 	{
@@ -83,7 +83,7 @@ namespace Urho3D
 
 		mMeshInGame.store(0);
 
-		mNeighborhood.clear();
+		mNeighborhood.Clear();
 		mMesh->Clear();
 
 		Voxel mLastVoxel = Voxel::GetAir();
@@ -100,21 +100,21 @@ namespace Urho3D
 			return;
 		}
 
-		auto it = mNeighborhood.find(hash);
-		if (it == mNeighborhood.end());
+		auto it = mNeighborhood.Find(hash);
+		if (it == mNeighborhood.End());
 		{
 			mNeighborhood[hash] = c;
 		}
 
 		/// Did our status change from border to internal chunk?
 		/// Than make sure we can remesh.
-		if (IsBorderChunk() && mNeighborhood.size() >= 26 && Initialized())
+		if (IsBorderChunk() && mNeighborhood.Size() >= 26 && Initialized())
 		{
 			mMeshing.store(0);
 			mMeshed.store(0);
 		}
 
-		SetIsBorderChunk(mNeighborhood.size() < 26);
+		SetIsBorderChunk(mNeighborhood.Size() < 26);
 	}
 
 	void Chunk::Initialize()
@@ -125,7 +125,7 @@ namespace Urho3D
 			return;
 		}
 
-		mStats->AddInitialized();
+		Stats->AddInitialized();
 		std::clock_t c_start = std::clock();
 		auto t_start = std::chrono::high_resolution_clock::now();
 
@@ -160,7 +160,7 @@ namespace Urho3D
 		std::clock_t c_end = std::clock();
 		auto t_end = std::chrono::high_resolution_clock::now();
 		auto time = 1000.0 * (c_end - c_start) / CLOCKS_PER_SEC;
-		mStats->AddInitTime(time);
+		Stats->AddInitTime(time);
 	}
 
 	void Chunk::CreateMesh()
@@ -171,7 +171,7 @@ namespace Urho3D
 			return;
 		}
 
-		mStats->AddMeshed();
+		Stats->AddMeshed();
 		std::clock_t c_start = std::clock();
 		auto t_start = std::chrono::high_resolution_clock::now();
 		mMesh->Clear();
@@ -180,9 +180,9 @@ namespace Urho3D
 		bool createMesh = true;
 		if (isAir)
 		{
-			for (auto it = mNeighborhood.begin(); it != mNeighborhood.end(); it++)
+			for (auto it = mNeighborhood.Begin(); it != mNeighborhood.End(); it++)
 			{
-				if (!it->second->isAir)
+				if (!it->second_->isAir)
 				{
 					createMesh = false;
 					break;
@@ -200,6 +200,9 @@ namespace Urho3D
 
 			return;
 		}
+
+		String st = (isSolid ? "yes" : "no");
+		URHO3D_LOGDEBUG(String("Is solid? ") + st);
 
 		/// If all surrounding chunks are solid, dont bother creating a mesh.
 		/*createMesh = true;
@@ -235,7 +238,7 @@ namespace Urho3D
 			{
 				for (int z = 0; z < mVoxelLayout.z; z++)
 				{
-					std::tie(cube_index, move_vertex) = GetCubeIndexSafe(x, y, z);
+					std::tie(cube_index, move_vertex) = GetCube(x, y, z, false);
 
 					/// Key of the vertex. Essentially the position inside the chunk.
 					Vector3i pos(x, y, z);
@@ -260,12 +263,6 @@ namespace Urho3D
 						mSurfaceData->CubeIndexToFaceLookup.Get(plane_index, i) != mSurfaceData->STOP;
 						i += 7)
 					{
-						/*
-						int material = material_ids[d.CubeIndexToFaceLookup.get(plane_index, 6)];
-						auto submesh = mesh.GetSubmesh(material);
-						auto collider = mesh.Collider;
-						*/
-
 						/// For each vertex of a quad.
 						for (int j = 0; j < 6; j++)
 						{
@@ -284,7 +281,20 @@ namespace Urho3D
 			}
 		}
 
+		std::clock_t c_end = std::clock();
+		auto t_end = std::chrono::high_resolution_clock::now();
+		auto time = 1000.0 * (c_end - c_start) / CLOCKS_PER_SEC;
+		Stats->AddMeshTime(time);
+
+		c_start = std::clock();
+		t_start = std::chrono::high_resolution_clock::now();
+
 		mMesh->SimplifyMeshLossless(false, 100);
+
+		c_end = std::clock();
+		t_end = std::chrono::high_resolution_clock::now();
+		time = 1000.0 * (c_end - c_start) / CLOCKS_PER_SEC;
+		Stats->AddSimplifyMeshTime(time);
 
 		if (mMesh->GetVertexCount() > 0)
 		{
@@ -295,11 +305,6 @@ namespace Urho3D
 		{
 			URHO3D_LOGERROR("Found a chunk that has been meshed twice.");
 		}
-
-		std::clock_t c_end = std::clock();
-		auto t_end = std::chrono::high_resolution_clock::now();
-		auto time = 1000.0 * (c_end - c_start) / CLOCKS_PER_SEC;
-		mStats->AddMeshTime(time);
 	}
 
 	void Chunk::Despawn()
@@ -309,17 +314,18 @@ namespace Urho3D
 
 	/// First one is cube index
 	/// second indicates whether to move a vertex or not.
-	std::tuple<int, int> Chunk::GetCubeIndexSafe(int x, int y, int z)
+	std::tuple<int, int> Chunk::GetCube(int x, int y, int z, bool safe)
 	{
 		int cube_index = 0;
 		int move_vertex = 1;
 		Vector3i chun_pos(x, y, z);
 
-		for (int i = 0; i < VoxelCubeSize; i++)
+		for (int i = 0; i < mSurfaceData->VoxelCubeSize; i++)
 		{
-			auto pos = VoxelCube[i] + chun_pos;
+			auto pos = mSurfaceData->VoxelCube[i] + chun_pos;
 			bool found = false;
-			auto voxel = Get(pos.x, pos.y, pos.z, found);
+			Voxel voxel;
+			std::tie(voxel, found) = Get(pos.x, pos.y, pos.z, safe);
 			if (!found)
 			{
 				return std::tuple<int, int>(0, 0);
@@ -354,15 +360,15 @@ namespace Urho3D
 				z1 = z >= mVoxelLayout.z ? 1 : z1;
 
 				auto hash = GetNeighborHash(x1, y1, z1);
-				auto it = mNeighborhood.find(hash);
+				auto it = mNeighborhood.Find(hash);
 
-				if (it == mNeighborhood.end())
+				if (it == mNeighborhood.End())
 				{
 					URHO3D_LOGERROR("Could not find a neighboring chunk.");
 					return;
 				}
 
-				it->second->Set(data, neighborPos.x, neighborPos.y, neighborPos.z);
+				it->second_->Set(data, neighborPos.x, neighborPos.y, neighborPos.z);
 				return;
 			}
 
@@ -393,10 +399,16 @@ namespace Urho3D
 		mLastVoxel = v;
 	}
 
-	Voxel& Chunk::Get(int x, int y, int z, bool& found)
+	std::tuple<Voxel&, bool> Chunk::Get(int x, int y, int z, bool safe)
 	{
 		Vector3i pos;
 		auto index = GetIndex(x, y, z, pos);
+
+		if (safe)
+		{
+			return std::tuple<Voxel&, bool>(mData[index], true);
+		}
+
 		if (index < 0)
 		{
 			auto x1 = x < 0 ? -1 : 0;
@@ -409,24 +421,20 @@ namespace Urho3D
 			z1 = z >= mVoxelLayout.z ? 1 : z1;
 
 			auto hash = GetNeighborHash(x1, y1, z1);
-			auto it = mNeighborhood.find(hash);
-			if (it == mNeighborhood.end())
+			auto it = mNeighborhood.Find(hash);
+			if (it == mNeighborhood.End())
 			{
-				found = false;
-				return Voxel::GetAir();
+				return std::tuple<Voxel&, bool>(Voxel::GetAir(), false);
 			}
 
-			if (it->second == nullptr)
+			if (it->second_ == nullptr)
 			{
-				found = false;
-				return Voxel::GetAir();
+				return std::tuple<Voxel&, bool>(Voxel::GetAir(), false);
 			}
 
-			found = true;
-			return it->second->Get(pos.x, pos.y, pos.z, found);
+			return it->second_->Get(pos.x, pos.y, pos.z, safe);
 		}
 
-		found = true;
-		return mData[index];
+		return std::tuple<Voxel&, bool>(mData[index], true);
 	}
 }
