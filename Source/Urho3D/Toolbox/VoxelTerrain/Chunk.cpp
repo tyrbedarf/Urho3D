@@ -1,7 +1,6 @@
 #include "Chunk.h"
 
 #include "VoxerSystem.h"
-#include <unordered_set>
 #include <sstream>
 
 namespace Urho3D
@@ -189,6 +188,7 @@ namespace Urho3D
 				}
 			}
 		}
+
 		if (!createMesh)
 		{
 			if (mMeshed.exchange(1) != 0)
@@ -196,21 +196,22 @@ namespace Urho3D
 				URHO3D_LOGERROR("Found a chunk that has been meshed twice.");
 			}
 
+			Stats->AddEmptyChunksSkipped();
 			URHO3D_LOGDEBUG("Empty chunk surrounded by empty chunks.");
 
 			return;
 		}
 
-		String st = (isSolid ? "yes" : "no");
-		URHO3D_LOGDEBUG(String("Is solid? ") + st);
+		/*String st = (isSolid ? "yes" : "no");
+		URHO3D_LOGDEBUG(String("Is solid? ") + st);*/
 
 		/// If all surrounding chunks are solid, dont bother creating a mesh.
-		/*createMesh = true;
-		for (auto it = mNeighborhood.begin(); it != mNeighborhood.end(); it++)
+		createMesh = false;
+		for (auto it = mNeighborhood.Begin(); it != mNeighborhood.End(); it++)
 		{
-			if (!it->second->isSolid)
+			if (!it->second_->isSolid)
 			{
-				createMesh = false;
+				createMesh = true;
 				break;
 			}
 		}
@@ -221,10 +222,11 @@ namespace Urho3D
 				URHO3D_LOGERROR("Found a chunk that has been meshed twice.");
 			}
 
+			Stats->AddSolidChunksSkipped();
 			URHO3D_LOGDEBUG("Surrounded by solid chunks only");
 
 			return;
-		}*/
+		}
 
 		int indices[6];
 		int cube_index, move_vertex;

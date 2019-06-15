@@ -48,15 +48,15 @@ namespace Urho3D
 
 		/// Remove all Chunks
 		URHO3D_LOGDEBUG("Destroying active chunks");
-		for (HashMap<Vector3d, Chunk*>::Iterator it = mActiveChunks.Begin();
-			it != mActiveChunks.End();
+		for (auto it = mActiveChunks.begin();
+			it != mActiveChunks.end();
 			++it)
 		{
-			auto c = it->second_;
+			auto c = it->second;
 			delete c;
 		}
 
-		mActiveChunks.Clear();
+		mActiveChunks.clear();
 
 		URHO3D_LOGDEBUG("Cleaning up object pool");
 		while (mObjectPool.size() > 0)
@@ -227,11 +227,11 @@ namespace Urho3D
 		double maxDist = mSettings->GetDistToDestroy();
 
 		std::vector<Vector3d> keys;
-		for (HashMap<Vector3d, Chunk*>::Iterator it = mActiveChunks.Begin();
-			it != mActiveChunks.End();
+		for (auto it = mActiveChunks.begin();
+			it != mActiveChunks.end();
 			++it)
 		{
-			keys.push_back(it->first_);
+			keys.push_back(it->first);
 		}
 
 		for (int j = 0; j < keys.size(); j++)
@@ -286,14 +286,14 @@ namespace Urho3D
 	Chunk* ChunkProvider::CreateChunk(Vector3d pos)
 	{
 		Chunk* r = nullptr;
-		auto it = mActiveChunks.Find(pos);
-		if (it != mActiveChunks.End())
+		auto it = mActiveChunks.find(pos);
+		if (it != mActiveChunks.end())
 		{
 			/// Is it a former border chunk?
 			/// We will know after all chunks of this batch have been collected
 			/// and the neighbors have been set up. So return all border chunks here
 			/// to make sure meshing can take place again
-			r = it->second_;
+			r = it->second;
 			if (r->IsBorderChunk())
 			{
 				return r;
@@ -304,17 +304,17 @@ namespace Urho3D
 
 		r = NewChunk();
 		r->Reset(pos);
-		mActiveChunks.Insert(Pair<Vector3d, Chunk*>(pos, r));
+		mActiveChunks.insert(eastl::pair<Vector3d, Chunk*>(pos, r));
 
 		return r;
 	}
 
 	Chunk* ChunkProvider::GetChunk(Vector3d pos)
 	{
-		auto it = mActiveChunks.Find(pos);
-		if (it != mActiveChunks.End())
+		auto it = mActiveChunks.find(pos);
+		if (it != mActiveChunks.end())
 		{
-			return it->second_;
+			return it->second;
 		}
 
 		return nullptr;
@@ -339,10 +339,10 @@ namespace Urho3D
 
 	void ChunkProvider::DestroyChunk(const Vector3d pos)
 	{
-		auto it = mActiveChunks.Find(pos);
-		auto c = it->second_;
+		auto it = mActiveChunks.find(pos);
+		auto c = it->second;
 		c->Despawn();
 		mObjectPool.push(c);
-		mActiveChunks.Erase(it);
+		mActiveChunks.erase(it);
 	}
 }

@@ -2,6 +2,7 @@
 
 #include <queue>
 
+#include <EASTL/unordered_map.h>
 
 #include "../../Math/Vector3d.h"
 #include "../../Math/Vector3i.h"
@@ -23,7 +24,9 @@ namespace Urho3D
 		SharedPtr<VoxerSettings> mSettings;
 		SharedPtr<SurfaceData> mSurfaceData;
 
-		HashMap<Vector3d, Chunk*> mActiveChunks;
+		// HashMap<Vector3d, Chunk*> mActiveChunks;
+
+		eastl::unordered_map<Vector3d, Chunk*> mActiveChunks;
 		std::queue<Chunk*> mObjectPool;
 
 		std::atomic<int>* mInitialing;

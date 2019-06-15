@@ -1,11 +1,15 @@
 #pragma once
 
+#include "../../Container/EaStlAllocator.h"
+#include <EASTL/vector.h>
+
 #include "VoxerStatistics.h"
 #include "../../Helper/Vector3Helper.h"
 #include "../../Math/SimplexNoise.h"
 #include "../../Core/Object.h"
 #include "../../Toolbox/Mesh/ProceduralMesh.h"
 #include "../../Container/HashMap.h"
+
 #include "SurfaceData.h"
 
 #include <tuple>
@@ -45,7 +49,8 @@ namespace Urho3D
 
 		HashMap<int, Chunk*> mNeighborhood;
 
-		Vector<Voxel> mData;
+		//Vector<Voxel> mData;
+		eastl::vector<Voxel> mData;
 		Vector3i mVoxelLayout;
 
 		Voxel mLastVoxel;
@@ -86,7 +91,7 @@ namespace Urho3D
 			mSurfaceData(surfData)
 		{
 			mVoxelLayout = voxelLayout;
-			mData.Resize(mVoxelLayout.GetArrayCount(), Voxel::GetAir());
+			mData.resize(mVoxelLayout.GetArrayCount(), Voxel::GetAir());
 			mMesh = new ProceduralMesh(context_);
 		}
 

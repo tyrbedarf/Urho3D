@@ -1,6 +1,8 @@
 #pragma once
 
 #include <math.h>
+#include <EASTL/functional.h>
+
 #include "../Container/Str.h"
 
 #include "Vector3.h"
@@ -122,16 +124,26 @@ namespace Urho3D
 	bool operator ==(const Urho3D::Vector3d& lhs, const Urho3D::Vector3d& rhs);
 }
 
-namespace std
+//namespace std
+//{
+//	template <>
+//	struct hash<Urho3D::Vector3d>
+//	{
+//		size_t operator()(const Urho3D::Vector3d& k) const
+//		{
+//			return k.ToHash();
+//		}
+//	};
+//}
+
+namespace eastl
 {
 	template <>
 	struct hash<Urho3D::Vector3d>
 	{
-		size_t operator()(const Urho3D::Vector3d& k) const
+		size_t operator()(const Urho3D::Vector3d& v) const
 		{
-			return k.ToHash();
+			return v.ToHash();
 		}
 	};
-
-	/*bool operator ==(const Urho3D::Vector3d& lhs, const Urho3D::Vector3d& rhs);*/
 }
