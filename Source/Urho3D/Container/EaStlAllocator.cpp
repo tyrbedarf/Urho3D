@@ -14,7 +14,9 @@
 		void* EASTLAlignedAlloc(size_t size, size_t alignment)
 		{
 #ifdef EA_PLATFORM_MICROSOFT
-			return _aligned_malloc(size, alignment);
+			return malloc(size);
+
+			// return _aligned_malloc(size, alignment);
 #else
 			void *p = nullptr;
 			alignment = alignment < sizeof(void *) ? sizeof(void *) : alignment;

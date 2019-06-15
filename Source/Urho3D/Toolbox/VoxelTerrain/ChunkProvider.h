@@ -24,8 +24,7 @@ namespace Urho3D
 		SharedPtr<VoxerSettings> mSettings;
 		SharedPtr<SurfaceData> mSurfaceData;
 
-		// HashMap<Vector3d, Chunk*> mActiveChunks;
-
+		//HashMap<Vector3d, Chunk*> mActiveChunks;
 		eastl::unordered_map<Vector3d, Chunk*> mActiveChunks;
 		std::queue<Chunk*> mObjectPool;
 
