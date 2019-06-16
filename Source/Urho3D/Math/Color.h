@@ -23,6 +23,7 @@
 #pragma once
 
 #include "../Math/Vector4.h"
+#include "../../ThirdParty/EASTL/functional.h"
 
 namespace Urho3D
 {
@@ -233,4 +234,16 @@ protected:
 /// Multiply Color with a scalar.
 inline Color operator *(float lhs, const Color& rhs) { return rhs * lhs; }
 
+}
+
+namespace eastl
+{
+	template <>
+	struct hash<Urho3D::Color>
+	{
+		size_t operator()(const Urho3D::Color& v) const
+		{
+			return v.ToHash();
+		}
+	};
 }

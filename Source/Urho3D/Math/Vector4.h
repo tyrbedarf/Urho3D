@@ -23,6 +23,7 @@
 #pragma once
 
 #include "../Math/Vector3.h"
+#include "../../ThirdParty/EASTL/functional.h"
 
 namespace Urho3D
 {
@@ -248,4 +249,16 @@ inline Vector4 VectorRound(const Vector4& vec) { return Vector4(Round(vec.x_), R
 /// Per-component ceil of 4-vector.
 inline Vector4 VectorCeil(const Vector4& vec) { return Vector4(Ceil(vec.x_), Ceil(vec.y_), Ceil(vec.z_), Ceil(vec.w_)); }
 
+}
+
+namespace eastl
+{
+	template <>
+	struct hash<Urho3D::Vector4>
+	{
+		size_t operator()(const Urho3D::Vector4& v) const
+		{
+			return v.ToHash();
+		}
+	};
 }

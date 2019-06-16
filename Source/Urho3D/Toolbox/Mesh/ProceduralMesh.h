@@ -19,8 +19,10 @@
 #include "../../Graphics/Model.h"
 #include "../../Graphics/Geometry.h"
 #include "../../IO/Log.h"
-#include "../../Container/HashMap.h"
-#include <vector>
+
+#include "../../Container/EaStlAllocator.h"
+#include <EASTL/hash_map.h>
+#include <EASTL/vector.h>
 
 #include "SymetricMatrix.h"
 
@@ -139,37 +141,37 @@ namespace Urho3D
 		/// Clear mesh data.
 		void Clear()
 		{
-			triangles.Clear();
-			vertices.Clear();
-			refs.Clear();
-			VertexIndices.Clear();
+			triangles.clear();
+			vertices.clear();
+			refs.clear();
+			VertexIndices.clear();
 		}
 
 		size_t GetVertexCount() const
 		{
-			return vertices.Size();
+			return vertices.size();
 		}
 
 	private:
 		// Todo: Change to pointers?
-		Vector<Triangle> triangles;
-		Vector<Vertex> vertices;
-		Vector<VTRef> refs;
+		eastl::vector<Triangle> triangles;
+		eastl::vector<Vertex> vertices;
+		eastl::vector<VTRef> refs;
 
-		Vector<Vector3> planes;
+		eastl::vector<Vector3> planes;
 
 		/// Note: The key is the position a vertex had, when it
 		/// was first inserted. The actual position might change.
 		/// (using get_index and set_vertex for example)
-		HashMap<Vector3, size_t> VertexIndices;
+		eastl::hash_map<Vector3, size_t> VertexIndices;
 
 		/// Check if a triangle flips when this edge is removed
-		bool Flipped(Vector3 p, int i0, int i1, Vertex &v0, Vertex &v1, std::vector<int> &deleted);
+		bool Flipped(Vector3 p, int i0, int i1, Vertex &v0, Vertex &v1, eastl::vector<int> &deleted);
 
-		void UpdateUvs(int i0, const Vertex &v, const Vector3 &p, std::vector<int> &deleted);
+		void UpdateUvs(int i0, const Vertex &v, const Vector3 &p, eastl::vector<int> &deleted);
 
 		/// Update triangle connections and edge error after a edge is collapsed
-		void UpdateTriangles(int i0, Vertex &v, std::vector<int> &deleted, int &deleted_triangles);
+		void UpdateTriangles(int i0, Vertex &v, eastl::vector<int> &deleted, int &deleted_triangles);
 
 		/// compact triangles, compute edge error and build reference list
 		void UpdateMesh(int iteration);

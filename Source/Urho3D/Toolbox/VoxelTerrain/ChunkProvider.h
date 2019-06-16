@@ -3,13 +3,12 @@
 #include <queue>
 
 #include <EASTL/unordered_map.h>
+#include <EASTL/queue.h>
 
 #include "../../Math/Vector3d.h"
 #include "../../Math/Vector3i.h"
 #include "../../Core/Object.h"
 #include "../../Core/WorkQueue.h"
-#include "../../Container/Vector.h"
-#include "../../Container/HashMap.h"
 
 #include "VoxerSettings.h"
 #include "Chunk.h"
@@ -26,7 +25,7 @@ namespace Urho3D
 
 		//HashMap<Vector3d, Chunk*> mActiveChunks;
 		eastl::unordered_map<Vector3d, Chunk*> mActiveChunks;
-		std::queue<Chunk*> mObjectPool;
+		eastl::queue<Chunk*> mObjectPool;
 
 		std::atomic<int>* mInitialing;
 		std::atomic<int>* mMeshing;

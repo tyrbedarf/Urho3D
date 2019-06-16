@@ -82,7 +82,7 @@ namespace Urho3D
 
 		mMeshInGame.store(0);
 
-		mNeighborhood.Clear();
+		mNeighborhood.clear();
 		mMesh->Clear();
 
 		Voxel mLastVoxel = Voxel::GetAir();
@@ -99,21 +99,21 @@ namespace Urho3D
 			return;
 		}
 
-		auto it = mNeighborhood.Find(hash);
-		if (it == mNeighborhood.End());
+		auto it = mNeighborhood.find(hash);
+		if (it == mNeighborhood.end());
 		{
 			mNeighborhood[hash] = c;
 		}
 
 		/// Did our status change from border to internal chunk?
 		/// Than make sure we can remesh.
-		if (IsBorderChunk() && mNeighborhood.Size() >= 26 && Initialized())
+		if (IsBorderChunk() && mNeighborhood.size() >= 26 && Initialized())
 		{
 			mMeshing.store(0);
 			mMeshed.store(0);
 		}
 
-		SetIsBorderChunk(mNeighborhood.Size() < 26);
+		SetIsBorderChunk(mNeighborhood.size() < 26);
 	}
 
 	void Chunk::Initialize()
@@ -179,9 +179,9 @@ namespace Urho3D
 		bool createMesh = true;
 		if (isAir)
 		{
-			for (auto it = mNeighborhood.Begin(); it != mNeighborhood.End(); it++)
+			for (auto it = mNeighborhood.begin(); it != mNeighborhood.end(); it++)
 			{
-				if (!it->second_->isAir)
+				if (!it->second->isAir)
 				{
 					createMesh = false;
 					break;
@@ -197,24 +197,21 @@ namespace Urho3D
 			}
 
 			Stats->AddEmptyChunksSkipped();
-			URHO3D_LOGDEBUG("Empty chunk surrounded by empty chunks.");
 
 			return;
 		}
 
-		/*String st = (isSolid ? "yes" : "no");
-		URHO3D_LOGDEBUG(String("Is solid? ") + st);*/
-
 		/// If all surrounding chunks are solid, dont bother creating a mesh.
 		createMesh = false;
-		for (auto it = mNeighborhood.Begin(); it != mNeighborhood.End(); it++)
+		for (auto it = mNeighborhood.begin(); it != mNeighborhood.end(); it++)
 		{
-			if (!it->second_->isSolid)
+			if (!it->second->isSolid)
 			{
 				createMesh = true;
 				break;
 			}
 		}
+
 		if (!createMesh)
 		{
 			if (mMeshed.exchange(1) != 0)
@@ -223,7 +220,6 @@ namespace Urho3D
 			}
 
 			Stats->AddSolidChunksSkipped();
-			URHO3D_LOGDEBUG("Surrounded by solid chunks only");
 
 			return;
 		}
@@ -242,15 +238,15 @@ namespace Urho3D
 				{
 					std::tie(cube_index, move_vertex) = GetCube(x, y, z, false);
 
-					/// Key of the vertex. Essentially the position inside the chunk.
-					Vector3i pos(x, y, z);
+					/// Create the position, which is used as a key for each vertex and
+					/// the final position in case the vertex of this cube is placed right in the middle.
+					Vector3 position = Vector3(x, y, z) * mVoxelSize;
+					Vector3 pos_as_key = position + vertexOffset;
 
-					/// Make sure the vertex is generated.
-					Vector3 actual_pos = (Vector3(x, y, z) * mVoxelSize) + vertexOffset;
-
-					/// Than calculate the actual position and update the node position;
-					/// node_position += PointTable[cube_index];
-					mMesh->GetIndex(actual_pos);
+					/// Then calculate the actual position and update the node position;
+					auto node_position = move_vertex == 0 ? pos_as_key : mSurfaceData->PointTable[cube_index] + position;
+					auto node = mMesh->GetIndex(pos_as_key);
+					mMesh->SetVertex(node, node_position);
 
 					/// Tells us, which edges are being cut by the surface.
 					/// This controlls which planes are being created.
@@ -259,6 +255,9 @@ namespace Urho3D
 					{
 						continue;
 					}
+
+					/// Key of the vertex.
+					Vector3i pos(x, y, z);
 
 					/// For each side we need two triangles, plus one material.
 					for (int i = 0;
@@ -362,15 +361,15 @@ namespace Urho3D
 				z1 = z >= mVoxelLayout.z ? 1 : z1;
 
 				auto hash = GetNeighborHash(x1, y1, z1);
-				auto it = mNeighborhood.Find(hash);
+				auto it = mNeighborhood.find(hash);
 
-				if (it == mNeighborhood.End())
+				if (it == mNeighborhood.end())
 				{
 					URHO3D_LOGERROR("Could not find a neighboring chunk.");
 					return;
 				}
 
-				it->second_->Set(data, neighborPos.x, neighborPos.y, neighborPos.z);
+				it->second->Set(data, neighborPos.x, neighborPos.y, neighborPos.z);
 				return;
 			}
 
@@ -423,18 +422,18 @@ namespace Urho3D
 			z1 = z >= mVoxelLayout.z ? 1 : z1;
 
 			auto hash = GetNeighborHash(x1, y1, z1);
-			auto it = mNeighborhood.Find(hash);
-			if (it == mNeighborhood.End())
+			auto it = mNeighborhood.find(hash);
+			if (it == mNeighborhood.end())
 			{
 				return std::tuple<Voxel&, bool>(Voxel::GetAir(), false);
 			}
 
-			if (it->second_ == nullptr)
+			if (it->second == nullptr)
 			{
 				return std::tuple<Voxel&, bool>(Voxel::GetAir(), false);
 			}
 
-			return it->second_->Get(pos.x, pos.y, pos.z, safe);
+			return it->second->Get(pos.x, pos.y, pos.z, safe);
 		}
 
 		return std::tuple<Voxel&, bool>(mData[index], true);

@@ -24,6 +24,7 @@
 
 #include "../Container/Str.h"
 #include "../Math/MathDefs.h"
+#include "../../ThirdParty/EASTL/functional.h"
 
 namespace Urho3D
 {
@@ -327,6 +328,9 @@ public:
     /// Return whether is NaN.
     bool IsNaN() const { return Urho3D::IsNaN(x_) || Urho3D::IsNaN(y_); }
 
+	/// Return hash value for HashSet & HashMap.
+	unsigned ToHash() const { return (unsigned)x_ * 31 + (unsigned)y_; }
+
     /// Return normalized to unit length.
     Vector2 Normalized() const
     {
@@ -411,4 +415,25 @@ inline float StableRandom(const Vector2& seed) { return Fract(Sin(seed.DotProduc
 /// Return a random value from [0, 1) from scalar seed.
 inline float StableRandom(float seed) { return StableRandom(Vector2(seed, seed)); }
 
+}
+
+namespace eastl
+{
+	template <>
+	struct hash<Urho3D::Vector2>
+	{
+		size_t operator()(const Urho3D::Vector2& k) const
+		{
+			return k.ToHash();
+		}
+	};
+
+	template <>
+	struct hash<Urho3D::IntVector2>
+	{
+		size_t operator()(const Urho3D::IntVector2& k) const
+		{
+			return k.ToHash();
+		}
+	};
 }

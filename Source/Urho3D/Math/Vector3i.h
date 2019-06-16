@@ -3,6 +3,8 @@
 #include <string>
 #include <sstream>
 
+#include "../../ThirdParty/EASTL/functional.h"
+
 namespace Urho3D
 {
     struct Vector3i
@@ -140,7 +142,7 @@ namespace Urho3D
 	};
 }
 
-namespace std
+namespace eastl
 {
 	template <>
 	struct hash<Urho3D::Vector3i>

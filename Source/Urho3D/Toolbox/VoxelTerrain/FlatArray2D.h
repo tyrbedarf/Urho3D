@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../Container/Vector.h"
+#include <EASTL/vector.h>
 
 namespace Urho3D
 {
@@ -8,7 +8,7 @@ namespace Urho3D
 	class FlatArray2D
 	{
 	protected:
-		Vector<T> Data;
+		eastl::vector<T> Data;
 		int Width;
 		int Height;
 
@@ -25,7 +25,7 @@ namespace Urho3D
 
 		FlatArray2D(int width, int height, T def)
 		{
-			Data.Resize(width * height);
+			Data.resize(width * height);
 			Width = width;
 			Height = height;
 

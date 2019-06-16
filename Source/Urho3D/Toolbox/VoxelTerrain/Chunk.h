@@ -2,13 +2,13 @@
 
 #include "../../Container/EaStlAllocator.h"
 #include <EASTL/vector.h>
+#include <EASTL/hash_map.h>
 
 #include "VoxerStatistics.h"
 #include "../../Helper/Vector3Helper.h"
 #include "../../Math/SimplexNoise.h"
 #include "../../Core/Object.h"
 #include "../../Toolbox/Mesh/ProceduralMesh.h"
-#include "../../Container/HashMap.h"
 
 #include "SurfaceData.h"
 
@@ -29,28 +29,13 @@ namespace Urho3D
 		static VoxerStatistics* Stats;
 
 	protected:
-		/*const int VoxelCubeSize = 8;
-		const Vector3i VoxelCube[8] =
-		{
-			Vector3i(0, 0, 0),
-			Vector3i(1, 0, 0),
-			Vector3i(0, 1, 0),
-			Vector3i(0, 0, 1),
-
-			Vector3i(1, 0, 1),
-			Vector3i(1, 1, 0),
-			Vector3i(0, 1, 1),
-			Vector3i(1, 1, 1),
-		};*/
-
 		double mInitMarker;
 		float mVoxelSize;
 		Vector3d mWorldPosition;
 
-		HashMap<int, Chunk*> mNeighborhood;
-
-		//Vector<Voxel> mData;
+		eastl::hash_map<int, Chunk*> mNeighborhood;
 		eastl::vector<Voxel> mData;
+
 		Vector3i mVoxelLayout;
 
 		Voxel mLastVoxel;

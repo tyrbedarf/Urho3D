@@ -124,18 +124,6 @@ namespace Urho3D
 	bool operator ==(const Urho3D::Vector3d& lhs, const Urho3D::Vector3d& rhs);
 }
 
-//namespace std
-//{
-//	template <>
-//	struct hash<Urho3D::Vector3d>
-//	{
-//		size_t operator()(const Urho3D::Vector3d& k) const
-//		{
-//			return k.ToHash();
-//		}
-//	};
-//}
-
 namespace eastl
 {
 	template <>

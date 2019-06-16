@@ -376,49 +376,7 @@ namespace Urho3D
 			InitFaces();
 			InitCubeToFaceLookup();
 			InitEdges();
-
-			/// Prepare chunk iteration data.
-			/*CubeIndices.Resize(GetArrayCount(VoxelLayout) * 32);
-			CubeOutsideChunk.Resize(GetArrayCount(VoxelLayout));
-			int no_cubes = 0;
-			for (int x = 0; x < VoxelLayout.x; x++)
-			{
-				for (int y = 0; y < VoxelLayout.y; y++)
-				{
-					for (int z = 0; z < VoxelLayout.z; z++)
-					{
-						int index = no_cubes * 32;
-						Vector3i chunk_pos(x, y, z);
-
-						bool outside = false;
-						for (int i = 0; i < VoxelCubeSize; i++)
-						{
-							auto pos = chunk_pos + VoxelCube[i];
-							int start_index = (i * 4) + index;
-
-							CubeIndices[start_index + 0] = pos.x;
-							CubeIndices[start_index + 1] = pos.y;
-							CubeIndices[start_index + 2] = pos.z;
-
-							CubeIndices[start_index + 3] = GetIndexFromVector(VoxelLayout, pos);
-
-							if (pos.x >= VoxelLayout.x || pos.y >= VoxelLayout.y || pos.z >= VoxelLayout.z)
-							{
-								outside = true;
-							}
-
-							if (pos.x < 0|| pos.y < 0 || pos.z < 0)
-							{
-								outside = true;
-							}
-						}
-
-						CubeOutsideChunk[no_cubes] = outside;
-
-						no_cubes++;
-					}
-				}
-			}*/
+			InitPointTable();
 		}
 	};
 }

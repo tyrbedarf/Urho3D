@@ -24,6 +24,7 @@
 
 #include "../Math/Vector2.h"
 #include "../Math/MathDefs.h"
+#include "../../ThirdParty/EASTL/functional.h"
 
 namespace Urho3D
 {
@@ -548,6 +549,27 @@ inline IntVector3 VectorMax(const IntVector3& lhs, const IntVector3& rhs) { retu
 
 /// Return a random value from [0, 1) from 3-vector seed.
 inline float StableRandom(const Vector3& seed) { return StableRandom(Vector2(StableRandom(Vector2(seed.x_, seed.y_)), seed.z_)); }
+}
+
+namespace eastl
+{
+	template <>
+	struct hash<Urho3D::Vector3>
+	{
+		size_t operator()(const Urho3D::Vector3& k) const
+		{
+			return k.ToHash();
+		}
+	};
+
+	template <>
+	struct hash<Urho3D::IntVector3>
+	{
+		size_t operator()(const Urho3D::IntVector3& k) const
+		{
+			return k.ToHash();
+		}
+	};
 }
 
 

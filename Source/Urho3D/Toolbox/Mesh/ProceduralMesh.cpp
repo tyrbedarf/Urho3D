@@ -58,12 +58,12 @@ namespace Urho3D
 	ProceduralMesh::ProceduralMesh(Context* context_) : Object(context_)
 	{
 		// Prepare Planes to project uv onto surface.
-		planes.Push(Vector3::UP);
-		planes.Push(Vector3::DOWN);
-		planes.Push(Vector3::RIGHT);
-		planes.Push(Vector3::LEFT);
-		planes.Push(Vector3::FORWARD);
-		planes.Push(Vector3::BACK);
+		planes.push_back(Vector3::UP);
+		planes.push_back(Vector3::DOWN);
+		planes.push_back(Vector3::RIGHT);
+		planes.push_back(Vector3::LEFT);
+		planes.push_back(Vector3::FORWARD);
+		planes.push_back(Vector3::BACK);
 	}
 
 	void ProceduralMesh::AddTriangle(Vector3 a, Vector3 b, Vector3 c)
@@ -118,7 +118,7 @@ namespace Urho3D
 		t.uvs[1] = Vector3(uv2.x_, uv2.y_);
 		t.uvs[2] = Vector3(uv3.x_, uv3.y_);
 
-		triangles.Push(t);
+		triangles.push_back(t);
 	}
 
 	void ProceduralMesh::FromModel(Model* model, unsigned int index, unsigned int lod, bool verbose)
@@ -207,20 +207,20 @@ namespace Urho3D
 
 	int ProceduralMesh::GetIndex(Vector3 v)
 	{
-		auto it = VertexIndices.Find(v);
-		if (it != VertexIndices.End())
+		auto it = VertexIndices.find(v);
+		if (it != VertexIndices.end())
 		{
-			assert(it->second_ < vertices.Size());
-			return it->second_;
+			assert(it->second < vertices.size());
+			return it->second;
 		}
 
-		size_t r = vertices.Size();
+		size_t r = vertices.size();
 		Vertex vert;
 		vert.p = v;
 		vert.tstart = r;
-		vertices.Push(vert);
+		vertices.push_back(vert);
 
-		VertexIndices.Insert(Pair<Vector3, size_t>(v, r));
+		VertexIndices.insert(eastl::pair<Vector3, size_t>(v, r));
 
 		return r;
 	}
@@ -248,7 +248,7 @@ namespace Urho3D
 		PODVector<float> vertexData; // (vertices.Size() * vertexSize);
 		PODVector<unsigned short> indexData;
 
-		for (int i = 0; i < triangles.Size(); i++)
+		for (int i = 0; i < triangles.size(); i++)
 		{
 			Triangle t = triangles[i];
 			if (t.deleted)
@@ -329,7 +329,7 @@ namespace Urho3D
 			vertexData.Push(0.0f);
 		}
 
-		if (vertices.Size() < 1 || indexData.Size() < 1)
+		if (vertices.size() < 1 || indexData.Size() < 1)
 		{
 			return nullptr;
 		}
@@ -429,7 +429,7 @@ namespace Urho3D
 		int plane = 0;
 		float max = std::numeric_limits<float>::lowest();
 
-		for (int i = 0; i < planes.Size(); i++)
+		for (int i = 0; i < planes.size(); i++)
 		{
 			float dot = planes[i].Dot(normal);
 
@@ -536,29 +536,29 @@ namespace Urho3D
 
 		t.attr = Attributes::NORMAL | Attributes::TEXCOORD;
 
-		triangles.Push(t);
+		triangles.push_back(t);
 	}
 	void ProceduralMesh::SimplifyMesh(
 		float target_count_percentage,
 		double agressiveness,
 		bool verbose)
 	{
-		int target_count = (int) (vertices.Size() * target_count_percentage);
+		int target_count = (int) (vertices.size() * target_count_percentage);
 		SimplifyMesh(target_count, agressiveness, verbose);
 	}
 
 	void ProceduralMesh::SimplifyMesh(int target_count, double agressiveness, bool verbose)
 	{
 		// init
-		loopi(0, triangles.Size())
+		loopi(0, triangles.size())
 		{
 			triangles[i].deleted = 0;
 		}
 
 		// main iteration loop
 		int deleted_triangles = 0;
-		std::vector<int> deleted0, deleted1;
-		int triangle_count = triangles.Size();
+		eastl::vector<int> deleted0, deleted1;
+		int triangle_count = triangles.size();
 
 		for (int iteration = 0; iteration < 100; iteration++)
 		{
@@ -571,7 +571,7 @@ namespace Urho3D
 			}
 
 			// clear dirty flag
-			loopi(0, triangles.Size()) triangles[i].dirty = 0;
+			loopi(0, triangles.size()) triangles[i].dirty = 0;
 
 			//
 			// All triangles with edges below the threshold will be removed
@@ -591,7 +591,7 @@ namespace Urho3D
 			}
 
 			// remove vertices & mark deleted triangles
-			loopi(0, triangles.Size())
+			loopi(0, triangles.size())
 			{
 				Triangle &t = triangles[i];
 				if (t.err[3] > threshold) continue;
@@ -626,12 +626,12 @@ namespace Urho3D
 					// not flipped, so remove edge
 					v0.p = p;
 					v0.q = v1.q + v0.q;
-					int tstart = refs.Size();
+					int tstart = refs.size();
 
 					UpdateTriangles(i0, v0, deleted0, deleted_triangles);
 					UpdateTriangles(i0, v1, deleted1, deleted_triangles);
 
-					int tcount = refs.Size() - tstart;
+					int tcount = refs.size() - tstart;
 
 					if (tcount <= v0.tcount)
 					{
@@ -659,15 +659,15 @@ namespace Urho3D
 		// init
 		if (verbose)
 		{
-			URHO3D_LOGDEBUGF("Before. Vertices: %d Triangles: %d", vertices.Size(), triangles.Size());
+			URHO3D_LOGDEBUGF("Before. Vertices: %d Triangles: %d", vertices.size(), triangles.size());
 		}
 
-		loopi(0, triangles.Size()) triangles[i].deleted = 0;
+		loopi(0, triangles.size()) triangles[i].deleted = 0;
 
 		// main iteration loop
 		int deleted_triangles = 0;
-		std::vector<int> deleted0, deleted1;
-		int triangle_count = triangles.Size();
+		eastl::vector<int> deleted0, deleted1;
+		int triangle_count = triangles.size();
 
 		for (int iteration = 0; iteration < maxIterations; iteration++)
 		{
@@ -675,7 +675,7 @@ namespace Urho3D
 			UpdateMesh(iteration);
 
 			// clear dirty flag
-			loopi(0, triangles.Size()) triangles[i].dirty = 0;
+			loopi(0, triangles.size()) triangles[i].dirty = 0;
 
 			// All triangles with edges below the threshold will be removed
 			//
@@ -688,7 +688,7 @@ namespace Urho3D
 			}
 
 			// remove vertices & mark deleted triangles
-			loopi(0, triangles.Size())
+			loopi(0, triangles.size())
 			{
 				Triangle &t = triangles[i];
 				if (t.err[3] > threshold) continue;
@@ -731,12 +731,12 @@ namespace Urho3D
 					// not flipped, so remove edge
 					v0.p = p;
 					v0.q = v1.q + v0.q;
-					int tstart = refs.Size();
+					int tstart = refs.size();
 
 					UpdateTriangles(i0, v0, deleted0, deleted_triangles);
 					UpdateTriangles(i0, v1, deleted1, deleted_triangles);
 
-					int tcount = refs.Size() - tstart;
+					int tcount = refs.size() - tstart;
 
 					if (tcount <= v0.tcount)
 					{
@@ -761,7 +761,7 @@ namespace Urho3D
 
 		if (verbose)
 		{
-			URHO3D_LOGDEBUGF("After. Vertices: %d Triangles: %d", vertices.Size(), triangles.Size());
+			URHO3D_LOGDEBUGF("After. Vertices: %d Triangles: %d", vertices.size(), triangles.size());
 		}
 	}
 
@@ -771,7 +771,7 @@ namespace Urho3D
 		int i1,
 		Vertex &v0,
 		Vertex &v1,
-		std::vector<int> &deleted)
+		eastl::vector<int> &deleted)
 	{
 		loopk(0, v0.tcount)
 		{
@@ -808,7 +808,7 @@ namespace Urho3D
 		int i0,
 		const Vertex &v,
 		const Vector3 &p,
-		std::vector<int> &deleted)
+		eastl::vector<int> &deleted)
 	{
 		loopk(0, v.tcount)
 		{
@@ -826,7 +826,7 @@ namespace Urho3D
 	void ProceduralMesh::UpdateTriangles(
 		int i0,
 		Vertex &v,
-		std::vector<int> &deleted,
+		eastl::vector<int> &deleted,
 		int &deleted_triangles)
 	{
 		Vector3 p;
@@ -850,7 +850,7 @@ namespace Urho3D
 			t.err[1] = CalculateError(t.v[1], t.v[2], p);
 			t.err[2] = CalculateError(t.v[2], t.v[0], p);
 			t.err[3] = fmin(t.err[0], fmin(t.err[1], t.err[2]));
-			refs.Push(r);
+			refs.push_back(r);
 		}
 	}
 
@@ -859,29 +859,29 @@ namespace Urho3D
 		if (iteration > 0) // compact triangles
 		{
 			int dst = 0;
-			loopi(0, triangles.Size())
+			loopi(0, triangles.size())
 				if (!triangles[i].deleted)
 				{
 					triangles[dst++] = triangles[i];
 				}
-			triangles.Resize(dst);
+			triangles.resize(dst);
 		}
 
 		// Init Reference ID list
-		loopi(0, vertices.Size())
+		loopi(0, vertices.size())
 		{
 			vertices[i].tstart = 0;
 			vertices[i].tcount = 0;
 		}
 
-		loopi(0, triangles.Size())
+		loopi(0, triangles.size())
 		{
 			Triangle &t = triangles[i];
 			loopj(0, 3) vertices[t.v[j]].tcount++;
 		}
 
 		int tstart = 0;
-		loopi(0, vertices.Size())
+		loopi(0, vertices.size())
 		{
 			Vertex &v = vertices[i];
 			v.tstart = tstart;
@@ -890,8 +890,8 @@ namespace Urho3D
 		}
 
 		// Write References
-		refs.Resize(triangles.Size() * 3);
-		loopi(0, triangles.Size())
+		refs.resize(triangles.size() * 3);
+		loopi(0, triangles.size())
 		{
 			Triangle &t = triangles[i];
 			loopj(0, 3)
@@ -908,10 +908,10 @@ namespace Urho3D
 		{
 			Vector<int> vcount, vids;
 
-			loopi(0, vertices.Size())
+			loopi(0, vertices.size())
 				vertices[i].border = 0;
 
-			loopi(0, vertices.Size())
+			loopi(0, vertices.size())
 			{
 				Vertex &v = vertices[i];
 				vcount.Clear();
@@ -950,10 +950,10 @@ namespace Urho3D
 		// but mostly improves the result for closed meshes
 		if (iteration == 0)
 		{
-			loopi(0, vertices.Size())
+			loopi(0, vertices.size())
 				vertices[i].q = SymetricMatrix(0.0);
 
-			loopi(0, triangles.Size())
+			loopi(0, triangles.size())
 			{
 				Triangle &t = triangles[i];
 				Vector3 n, p[3];
@@ -969,7 +969,7 @@ namespace Urho3D
 					vertices[t.v[j]].q + SymetricMatrix(n.x_, n.y_, n.z_, -n.DotProduct(p[0]));
 			}
 
-			loopi(0, triangles.Size())
+			loopi(0, triangles.size())
 			{
 				// Calc Edge Error
 				Triangle &t = triangles[i];
@@ -983,12 +983,12 @@ namespace Urho3D
 	void ProceduralMesh::CompactMesh()
 	{
 		int dst = 0;
-		loopi(0, vertices.Size())
+		loopi(0, vertices.size())
 		{
 			vertices[i].tcount = 0;
 		}
 
-		loopi(0, triangles.Size())
+		loopi(0, triangles.size())
 			if (!triangles[i].deleted)
 			{
 				Triangle &t = triangles[i];
@@ -996,9 +996,9 @@ namespace Urho3D
 				loopj(0, 3) vertices[t.v[j]].tcount = 1;
 			}
 
-		triangles.Resize(dst);
+		triangles.resize(dst);
 		dst = 0;
-		loopi(0, vertices.Size())
+		loopi(0, vertices.size())
 			if (vertices[i].tcount)
 			{
 				vertices[i].tstart = dst;
@@ -1006,13 +1006,13 @@ namespace Urho3D
 				dst++;
 			}
 
-		loopi(0, triangles.Size())
+		loopi(0, triangles.size())
 		{
 			Triangle &t = triangles[i];
 			loopj(0, 3)t.v[j] = vertices[t.v[j]].tstart;
 		}
 
-		vertices.Resize(dst);
+		vertices.resize(dst);
 	}
 
 	double ProceduralMesh::VertexError(SymetricMatrix q, double x, double y, double z)

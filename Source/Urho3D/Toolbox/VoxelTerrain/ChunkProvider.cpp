@@ -1,8 +1,9 @@
 #include "ChunkProvider.h"
 
 #include <array>
-#include "../../Core/Timer.h"
+#include <EASTL/vector.h>
 
+#include "../../Core/Timer.h"
 #include "../../Core/Profiler.h"
 
 namespace Urho3D
@@ -132,7 +133,7 @@ namespace Urho3D
 		}
 
 		Sort(Workload.Begin(), Workload.End(), chunkOrder);
-		std::vector<Chunk*> init_tasks;
+		eastl::vector<Chunk*> init_tasks;
 		for (int i = 0; i < Workload.Size(); i++)
 		{
 			/// Setup neighborhood for each chunk
@@ -226,7 +227,7 @@ namespace Urho3D
 		/// the view range.
 		double maxDist = mSettings->GetDistToDestroy();
 
-		std::vector<Vector3d> keys;
+		eastl::vector<Vector3d> keys;
 		for (auto it = mActiveChunks.begin();
 			it != mActiveChunks.end();
 			++it)
