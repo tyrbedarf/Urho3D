@@ -6,8 +6,9 @@
 #include "../../Core/WorkQueue.h"
 #include "../../Graphics/Octree.h"
 #include "../../Resource/ResourceCache.h"
-#include "../../Container/Vector.h"
-#include "../../Container/HashMap.h"
+#include "../../Graphics/DebugRenderer.h"
+
+#include <EASTL/hash_map.h>
 
 #include "VoxerSettings.h"
 #include "ChunkProvider.h"
@@ -33,8 +34,9 @@ namespace Urho3D
 		SharedPtr<Node> mRootNode;
 		SharedPtr<Octree> mOctree;
 		SharedPtr<ResourceCache> mResourceCache;
+		SharedPtr<DebugRenderer> mDebugRenderer;
 
-		HashMap<Vector3d, Node*> mSpawnedChunks;
+		eastl::hash_map<Vector3d, Node*> mSpawnedChunks;
 
 		void CreateCamera();
 
@@ -55,7 +57,14 @@ namespace Urho3D
 		void Update(const Vector<Vector3d>& playerPositions);
 
 		ChunkProvider* GetChunkProvider();
+
+		/// TODO: Subscribe to shutdown event in order clean up properly.
 		void Shutdown(StringHash eventType, VariantMap& eventData);
+
+		/// Subscribe to post render update, to draw debug geometry
+		void HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData);
+
+		/// Destroy a single chunk.
 		void DestroyChunk(Chunk* c);
 
 		void SpawnChunk(Chunk* c)

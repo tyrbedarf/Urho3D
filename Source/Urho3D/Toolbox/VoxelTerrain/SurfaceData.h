@@ -264,7 +264,7 @@ namespace Urho3D
 			Vector3 pos(0,0,0);
 			for (int i = 0; i < 8; i++)
 			{
-				if ((cubeindex & (1 << i)) != 0)
+				if ((cubeindex & (1 << i)) > 0)
 				{
 					/* Check edges */
 					for (int j = 0; j < 3; j++)
@@ -357,11 +357,11 @@ namespace Urho3D
 		/// Map each position inside a chunk to a index to avoid doing that calculation during
 		/// chunk iteration, while building the mesh.
 		/// Each cube consists of 8 voxel, each voxel consists of x, y and z position plus the index
-		Vector<int> CubeIndices;
+		//Vector<int> CubeIndices;
 
 		/// Remember which voxel cube has members that are outside the chunk.
 		/// If this is the case we have to access neighboring chunk, which requires extra work.
-		Vector<bool> CubeOutsideChunk;
+		//Vector<bool> CubeOutsideChunk;
 
 
 		SurfaceData(Context* ctx, float voxel_size, Vector3i voxel_layout) :

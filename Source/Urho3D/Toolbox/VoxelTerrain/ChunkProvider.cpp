@@ -5,6 +5,10 @@
 
 #include "../../Core/Timer.h"
 #include "../../Core/Profiler.h"
+#include "../../Engine/Console.h"
+#include "../../Core/CoreEvents.h"
+#include "../../Engine/EngineEvents.h"
+#include "VoxerSystem.h"
 
 namespace Urho3D
 {
@@ -25,6 +29,48 @@ namespace Urho3D
 		mSurfaceData = new SurfaceData(context_, mSettings->GetVoxelSize(), settings->GetVoxelCount());
 
 		Chunk::Stats = new VoxerStatistics();
+
+		mDrawDebugGeometry = false;
+
+		SubscribeToEvents();
+		AddAutoComplete();
+	}
+
+	void ChunkProvider::AddAutoComplete()
+	{
+		auto console = GetSubsystem<Console>();
+		if (console == nullptr)
+		{
+			return;
+		}
+
+		console->SetCommandInterpreter(GetTypeName());
+		console->AddAutoComplete("ToggleDrawDebugGeometry");
+	}
+
+	void ChunkProvider::SubscribeToEvents()
+	{
+		SubscribeToEvent(E_CONSOLECOMMAND, URHO3D_HANDLER(ChunkProvider, HandleConsoleCommand));
+	}
+
+	void ChunkProvider::HandleConsoleCommand(StringHash eventType, VariantMap& eventData)
+	{
+		using namespace ConsoleCommand;
+		if (eventData[P_ID].GetString() == GetTypeName())
+		{
+			auto cmd = eventData[P_COMMAND].GetString();
+			cmd = cmd.Trimmed().ToLower();
+			if (cmd.Empty())
+			{
+				return;
+			}
+
+			if (cmd == "toggledrawdebuggeometry")
+			{
+				ToggleDrawChunkBounds();
+				return;
+			}
+		}
 	}
 
 	void ChunkProvider::Update(const Vector<Vector3d>& playerPositions)
@@ -228,17 +274,18 @@ namespace Urho3D
 		double maxDist = mSettings->GetDistToDestroy();
 
 		eastl::vector<Vector3d> keys;
-		for (auto it = mActiveChunks.begin();
+		/*for (auto it = mActiveChunks.begin();
 			it != mActiveChunks.end();
 			++it)
 		{
 			keys.push_back(it->first);
-		}
+		}*/
 
-		for (int j = 0; j < keys.size(); j++)
+		for (auto it = mActiveChunks.begin(); it != mActiveChunks.end(); it++)
 		{
 			bool destroy = true;
-			auto c = mActiveChunks[keys[j]];
+			auto c = it->second;
+			Vector3d pos = it->second->GetWorldPosition();
 			for (int i = 0; i < playerPositions.Size(); i++)
 			{
 				if (!c->Initialized() || !c->Meshed() || !c->IsMeshInGame())
@@ -248,7 +295,7 @@ namespace Urho3D
 				}
 
 				/// Remove everything that is further away than max distance.
-				auto dist = (keys[j] - playerPositions[i]).SqrMagnitude();
+				auto dist = (pos - playerPositions[i]).SqrMagnitude();
 				if (dist < maxDist)
 				{
 					destroy = false;
@@ -258,8 +305,13 @@ namespace Urho3D
 
 			if (destroy)
 			{
-				DestroyChunk(keys[j]);
+				keys.push_back(c->GetWorldPosition());
 			}
+		}
+
+		for (int i = 0; i < keys.size(); i++)
+		{
+			DestroyChunk(keys[i]);
 		}
 	}
 
@@ -284,9 +336,9 @@ namespace Urho3D
 		return Vector3d(x, y, z);
 	}
 
-	Chunk* ChunkProvider::CreateChunk(Vector3d pos)
+	SharedPtr<Chunk> ChunkProvider::CreateChunk(Vector3d pos)
 	{
-		Chunk* r = nullptr;
+		SharedPtr<Chunk> r = nullptr;
 		auto it = mActiveChunks.find(pos);
 		if (it != mActiveChunks.end())
 		{
@@ -304,13 +356,13 @@ namespace Urho3D
 		}
 
 		r = NewChunk();
-		r->Reset(pos);
-		mActiveChunks.insert(eastl::pair<Vector3d, Chunk*>(pos, r));
+		r->Reset(pos, mSettings->GetChunkDimension());
+		mActiveChunks.insert(eastl::pair<Vector3d, SharedPtr<Chunk>>(pos, r));
 
 		return r;
 	}
 
-	Chunk* ChunkProvider::GetChunk(Vector3d pos)
+	SharedPtr<Chunk> ChunkProvider::GetChunk(Vector3d pos)
 	{
 		auto it = mActiveChunks.find(pos);
 		if (it != mActiveChunks.end())
@@ -345,5 +397,24 @@ namespace Urho3D
 		c->Despawn();
 		mObjectPool.push(c);
 		mActiveChunks.erase(it);
+	}
+
+	void ChunkProvider::DrawChunkBounds(SharedPtr<DebugRenderer> renderer) const
+	{
+		if (!mDrawDebugGeometry)
+		{
+			return;
+		}
+
+		if (renderer == nullptr)
+		{
+			return;
+		}
+
+		for (auto it = mActiveChunks.begin(); it != mActiveChunks.end(); it++)
+		{
+			auto pos = it->second->GetWorldPosition();
+			renderer->AddBoundingBox(it->second->GetBounds(), Color::BLUE);
+		}
 	}
 }

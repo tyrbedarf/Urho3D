@@ -221,7 +221,7 @@ bool Engine::Initialize(const VariantMap& parameters)
     unsigned numThreads = GetParameter(parameters, EP_WORKER_THREADS, true).GetBool() ? GetNumPhysicalCPUs() - 1 : 0;
     if (numThreads)
     {
-        GetSubsystem<WorkQueue>()->CreateThreads(numThreads * 2);
+        GetSubsystem<WorkQueue>()->CreateThreads(numThreads);
 
         URHO3D_LOGINFOF("Created %u worker thread%s", numThreads, numThreads > 1 ? "s" : "");
     }

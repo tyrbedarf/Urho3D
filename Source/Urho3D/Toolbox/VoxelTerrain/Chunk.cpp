@@ -2,6 +2,7 @@
 
 #include "VoxerSystem.h"
 #include <sstream>
+#include <numeric>
 
 namespace Urho3D
 {
@@ -70,7 +71,7 @@ namespace Urho3D
 		return GetIndexFromVector(mVoxelLayout, x, y, z);
 	}
 
-	void Chunk::Reset(Vector3d pos)
+	void Chunk::Reset(Vector3d pos, Vector3d chunk_dim)
 	{
 		mWorldPosition = pos;
 
@@ -88,9 +89,12 @@ namespace Urho3D
 		Voxel mLastVoxel = Voxel::GetAir();
 		isAir = true;
 		isSolid = false;
+
+		mBounds.min_ = Vector3(pos.x, pos.y, pos.z);
+		mBounds.max_ = Vector3(pos.x + chunk_dim.x, pos.y + chunk_dim.y, pos.z + chunk_dim.z);
 	}
 
-	void Chunk::SetNeighbor(int x, int y, int z, Chunk* c)
+	void Chunk::SetNeighbor(int x, int y, int z, SharedPtr<Chunk> c)
 	{
 		auto hash = GetNeighborHash(x, y, z);
 		if (hash == 0)
@@ -236,7 +240,7 @@ namespace Urho3D
 			{
 				for (int z = 0; z < mVoxelLayout.z; z++)
 				{
-					std::tie(cube_index, move_vertex) = GetCube(x, y, z, false);
+					eastl::tie(cube_index, move_vertex) = GetCube(x, y, z, false);
 
 					/// Create the position, which is used as a key for each vertex and
 					/// the final position in case the vertex of this cube is placed right in the middle.
@@ -315,7 +319,7 @@ namespace Urho3D
 
 	/// First one is cube index
 	/// second indicates whether to move a vertex or not.
-	std::tuple<int, int> Chunk::GetCube(int x, int y, int z, bool safe)
+	eastl::tuple<int, int> Chunk::GetCube(int x, int y, int z, bool safe)
 	{
 		int cube_index = 0;
 		int move_vertex = 1;
@@ -326,10 +330,10 @@ namespace Urho3D
 			auto pos = mSurfaceData->VoxelCube[i] + chun_pos;
 			bool found = false;
 			Voxel voxel;
-			std::tie(voxel, found) = Get(pos.x, pos.y, pos.z, safe);
+			eastl::tie(voxel, found) = Get(pos.x, pos.y, pos.z, safe);
 			if (!found)
 			{
-				return std::tuple<int, int>(0, 0);
+				return eastl::tuple<int, int>(0, 0);
 			}
 
 			cube_index |= voxel.IsTransparent() || voxel.IsAir() || voxel.IsModel() ? 0 << i : 1 << i;
@@ -340,7 +344,7 @@ namespace Urho3D
 			move_vertex &= voxel.IsBlock() ? 0 : 1;
 		}
 
-		return std::tuple<int, int>(cube_index, move_vertex);
+		return eastl::tuple<int, int>(cube_index, move_vertex);
 	}
 
 	void Chunk::Set(const Voxel& data, int x, int y, int z, bool safe)
@@ -400,14 +404,14 @@ namespace Urho3D
 		mLastVoxel = v;
 	}
 
-	std::tuple<Voxel&, bool> Chunk::Get(int x, int y, int z, bool safe)
+	eastl::tuple<Voxel&, bool> Chunk::Get(int x, int y, int z, bool safe)
 	{
 		Vector3i pos;
 		auto index = GetIndex(x, y, z, pos);
 
 		if (safe)
 		{
-			return std::tuple<Voxel&, bool>(mData[index], true);
+			return eastl::tuple<Voxel&, bool>(mData[index], true);
 		}
 
 		if (index < 0)
@@ -425,17 +429,17 @@ namespace Urho3D
 			auto it = mNeighborhood.find(hash);
 			if (it == mNeighborhood.end())
 			{
-				return std::tuple<Voxel&, bool>(Voxel::GetAir(), false);
+				return eastl::tuple<Voxel&, bool>(Voxel::GetAir(), false);
 			}
 
 			if (it->second == nullptr)
 			{
-				return std::tuple<Voxel&, bool>(Voxel::GetAir(), false);
+				return eastl::tuple<Voxel&, bool>(Voxel::GetAir(), false);
 			}
 
 			return it->second->Get(pos.x, pos.y, pos.z, safe);
 		}
 
-		return std::tuple<Voxel&, bool>(mData[index], true);
+		return eastl::tuple<Voxel&, bool>(mData[index], true);
 	}
 }

@@ -839,7 +839,7 @@ void Node::AddChild(Node* node, unsigned index)
     node->MarkDirty();
     node->MarkNetworkUpdate();
     // If the child node has components, also mark network update on them to ensure they have a valid NetworkState
-    for (Vector<SharedPtr<Component> >::Iterator i = node->components_.Begin(); i != node->components_.End(); ++i)
+    for (auto i = node->components_.Begin(); i != node->components_.End(); ++i)
         (*i)->MarkNetworkUpdate();
 
     // Send change event
@@ -861,7 +861,7 @@ void Node::RemoveChild(Node* node)
     if (!node)
         return;
 
-    for (Vector<SharedPtr<Node> >::Iterator i = children_.Begin(); i != children_.End(); ++i)
+    for (auto i = children_.Begin(); i != children_.End(); ++i)
     {
         if (*i == node)
         {

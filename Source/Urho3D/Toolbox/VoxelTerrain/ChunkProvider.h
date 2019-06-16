@@ -9,6 +9,8 @@
 #include "../../Math/Vector3i.h"
 #include "../../Core/Object.h"
 #include "../../Core/WorkQueue.h"
+#include "../../Graphics/DebugRenderer.h"
+#include "../../Math/Color.h"
 
 #include "VoxerSettings.h"
 #include "Chunk.h"
@@ -23,14 +25,20 @@ namespace Urho3D
 		SharedPtr<VoxerSettings> mSettings;
 		SharedPtr<SurfaceData> mSurfaceData;
 
-		//HashMap<Vector3d, Chunk*> mActiveChunks;
-		eastl::unordered_map<Vector3d, Chunk*> mActiveChunks;
+		eastl::unordered_map<Vector3d, SharedPtr<Chunk>> mActiveChunks;
 		eastl::queue<Chunk*> mObjectPool;
 
 		std::atomic<int>* mInitialing;
 		std::atomic<int>* mMeshing;
 
 		SharedPtr<WorkQueue> mTaskSystem;
+
+		bool mDrawDebugGeometry;
+
+		/// Console Commands
+		void SubscribeToEvents();
+		void HandleConsoleCommand(StringHash eventType, VariantMap& eventData);
+		void AddAutoComplete();
 
 	public:
 		ChunkProvider(Context* ctx, VoxerSettings* settings);
@@ -57,17 +65,24 @@ namespace Urho3D
 		/// </summary>
 		/// <param name="pos"></param>
 		/// <returns></returns>
-		Chunk* CreateChunk(Vector3d pos);
+		SharedPtr<Chunk> CreateChunk(Vector3d pos);
 
 		/// <summary>
 		/// Just return a chunk, do not create new ones.
 		/// </summary>
 		/// <param name="pos"></param>
 		/// <returns></returns>
-		Chunk* GetChunk(Vector3d pos);
+		SharedPtr<Chunk> GetChunk(Vector3d pos);
 
 		Chunk* NewChunk();
 
 		void DestroyChunk(const Vector3d pos);
+
+		void ToggleDrawChunkBounds()
+		{
+			mDrawDebugGeometry = mDrawDebugGeometry ? false : true;
+		}
+
+		void DrawChunkBounds(SharedPtr<DebugRenderer> renderer) const;
 	};
 }

@@ -7,6 +7,7 @@
 #include "../../Graphics/Material.h"
 #include "../../Core/Profiler.h"
 #include "../../Engine/EngineEvents.h"
+#include "../../Core/CoreEvents.h"
 
 namespace Urho3D
 {
@@ -24,6 +25,7 @@ namespace Urho3D
 		mResourceCache = GetSubsystem<ResourceCache>();
 
 		SubscribeToEvent(E_ENGINE_QUIT, URHO3D_HANDLER(VoxerSystem, Shutdown));
+		SubscribeToEvent(E_POSTRENDERUPDATE, URHO3D_HANDLER(VoxerSystem, HandlePostRenderUpdate));
 	}
 
 	VoxerSystem::~VoxerSystem()
@@ -38,6 +40,7 @@ namespace Urho3D
 		mRootNode->SetName("Chunks");
 
 		mOctree = mScene->CreateComponent<Octree>();
+		mDebugRenderer = mScene->CreateComponent<DebugRenderer>();
 	}
 
 	void VoxerSystem::Update(const Vector<Vector3d>& playerPositions)
@@ -59,8 +62,6 @@ namespace Urho3D
 			auto pos = chunk->GetWorldPosition();
 			auto name = pos.ToString();
 
-			/*URHO3D_LOGDEBUG("Spawning chunk: " + name);*/
-
 			auto planeNode = mScene->CreateChild();
 			planeNode->SetName(name);
 
@@ -73,11 +74,11 @@ namespace Urho3D
 			planeNode->SetRotation(Quaternion::IDENTITY);
 
 			/// Already spawned?
-			auto it = mSpawnedChunks.Find(pos);
-			if (it != mSpawnedChunks.End())
+			auto it = mSpawnedChunks.find(pos);
+			if (it != mSpawnedChunks.end())
 			{
-				mScene->RemoveChild(it->second_);
-				mSpawnedChunks.Erase(it);
+				mScene->RemoveChild(it->second);
+				mSpawnedChunks.erase(it);
 			}
 
 			mSpawnedChunks[pos] = planeNode;
@@ -87,12 +88,11 @@ namespace Urho3D
 		Vector3d v(0.0, 0.0, 0.0);
 		while (mChunksToDespawn.try_dequeue(v))
 		{
-			auto it = mSpawnedChunks.Find(v);
-			if (it != mSpawnedChunks.End())
+			auto it = mSpawnedChunks.find(v);
+			if (it != mSpawnedChunks.end())
 			{
-				/*URHO3D_LOGDEBUG("Despawning chunk: " + it->second->GetName());*/
-				mScene->RemoveChild(it->second_);
-				mSpawnedChunks.Erase(it);
+				mScene->RemoveChild(it->second);
+				mSpawnedChunks.erase(it);
 			}
 		}
 	}
@@ -112,5 +112,10 @@ namespace Urho3D
 	void VoxerSystem::DestroyChunk(Chunk* c)
 	{
 		mChunksToDespawn.enqueue(c->GetWorldPosition());
+	}
+
+	void VoxerSystem::HandlePostRenderUpdate(StringHash eventType, VariantMap& eventData)
+	{
+		mChunkProvider->DrawChunkBounds(mDebugRenderer);
 	}
 }

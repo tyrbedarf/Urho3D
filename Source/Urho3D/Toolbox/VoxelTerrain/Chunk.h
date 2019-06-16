@@ -3,6 +3,7 @@
 #include "../../Container/EaStlAllocator.h"
 #include <EASTL/vector.h>
 #include <EASTL/hash_map.h>
+#include <EASTL/tuple.h>
 
 #include "VoxerStatistics.h"
 #include "../../Helper/Vector3Helper.h"
@@ -33,8 +34,10 @@ namespace Urho3D
 		float mVoxelSize;
 		Vector3d mWorldPosition;
 
-		eastl::hash_map<int, Chunk*> mNeighborhood;
+		eastl::hash_map<int, SharedPtr<Chunk>> mNeighborhood;
 		eastl::vector<Voxel> mData;
+
+		BoundingBox mBounds;
 
 		Vector3i mVoxelLayout;
 
@@ -134,21 +137,21 @@ namespace Urho3D
 			return mBorderChunk.load() > 0;
 		}
 
-		void Reset(Vector3d pos);
+		void Reset(Vector3d pos, Vector3d chunk_dim);
 
-		void SetNeighbor(int x, int y, int z, Chunk* c);
+		void SetNeighbor(int x, int y, int z, SharedPtr<Chunk> c);
+
 		void Initialize();
 		void CreateMesh();
 
 		/// First one is cube index
 		/// second indicates whether to move a vertex or not.
-		std::tuple<int, int> GetCube(int x, int y, int z, bool safe = true);
+		eastl::tuple<int, int> GetCube(int x, int y, int z, bool safe = true);
 
 		void Despawn();
 
 		void Set(const Voxel& data, int x, int y, int z, bool safe = false);
-
-		std::tuple<Voxel&, bool> Get(int x, int y, int z, bool safe = true);
+		eastl::tuple<Voxel&, bool> Get(int x, int y, int z, bool safe = true);
 
 		void HandleVoxelUpdate(Voxel v);
 
@@ -160,6 +163,11 @@ namespace Urho3D
 		SharedPtr<Model> GetModel()
 		{
 			return mMesh->GetModel();
+		}
+
+		BoundingBox& GetBounds()
+		{
+			return mBounds;
 		}
 	};
 }
