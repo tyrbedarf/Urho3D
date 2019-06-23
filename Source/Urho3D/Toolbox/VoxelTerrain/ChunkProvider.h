@@ -25,7 +25,7 @@ namespace Urho3D
 		SharedPtr<VoxerSettings> mSettings;
 		SharedPtr<SurfaceData> mSurfaceData;
 
-		eastl::unordered_map<Vector3d, SharedPtr<Chunk>> mActiveChunks;
+		eastl::unordered_map<Vector3d, Chunk*> mActiveChunks;
 		eastl::queue<Chunk*> mObjectPool;
 
 		std::atomic<int>* mInitialing;
@@ -65,14 +65,14 @@ namespace Urho3D
 		/// </summary>
 		/// <param name="pos"></param>
 		/// <returns></returns>
-		SharedPtr<Chunk> CreateChunk(Vector3d pos);
+		Chunk* CreateChunk(Vector3d pos);
 
 		/// <summary>
 		/// Just return a chunk, do not create new ones.
 		/// </summary>
 		/// <param name="pos"></param>
 		/// <returns></returns>
-		SharedPtr<Chunk> GetChunk(Vector3d pos);
+		Chunk* GetChunk(Vector3d pos);
 
 		Chunk* NewChunk();
 

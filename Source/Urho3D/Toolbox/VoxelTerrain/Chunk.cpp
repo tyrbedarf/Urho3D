@@ -94,7 +94,7 @@ namespace Urho3D
 		mBounds.max_ = Vector3(pos.x + chunk_dim.x, pos.y + chunk_dim.y, pos.z + chunk_dim.z);
 	}
 
-	void Chunk::SetNeighbor(int x, int y, int z, SharedPtr<Chunk> c)
+	void Chunk::SetNeighbor(int x, int y, int z, Chunk* c)
 	{
 		auto hash = GetNeighborHash(x, y, z);
 		if (hash == 0)
@@ -234,11 +234,14 @@ namespace Urho3D
 		/// By default every vertex is right in the middle of the voxel cube.
 		Vector3 vertexOffset(mVoxelSize * 0.5f, mVoxelSize * 0.5f, mVoxelSize * 0.5f);
 
-		for (int x = 0; x < mVoxelLayout.x; x++)
+		/// Calculate the first row of neighboring chunks as well in order to
+		/// get the node positions right.
+		/// Dont create geometry, if we are working with data from neighboring chunks.
+		for (int x = -1; x < mVoxelLayout.x + 1; x++)
 		{
-			for (int y = 0; y < mVoxelLayout.y; y++)
+			for (int y = -1; y < mVoxelLayout.y + 1; y++)
 			{
-				for (int z = 0; z < mVoxelLayout.z; z++)
+				for (int z = -1; z < mVoxelLayout.z + 1; z++)
 				{
 					eastl::tie(cube_index, move_vertex) = GetCube(x, y, z, false);
 
@@ -255,7 +258,8 @@ namespace Urho3D
 					/// Tells us, which edges are being cut by the surface.
 					/// This controlls which planes are being created.
 					int plane_index = cube_index & 15;
-					if (plane_index == 0 || plane_index == 15)
+					bool no_geometry = x >= mVoxelLayout.x || y >= mVoxelLayout.y || z >= mVoxelLayout.z || x < 0 || y < 0 || z < 0;
+					if (plane_index == 0 || plane_index == 15 || no_geometry)
 					{
 						continue;
 					}
@@ -355,14 +359,14 @@ namespace Urho3D
 			auto index = GetIndex(x, y, z, neighborPos);
 			if (index < 0)
 			{
-				auto x1 = x < 0 ? -1 : 0;
-				x1 = x >= mVoxelLayout.x ? 1 : x1;
+				auto x1 = x > 0 ? 0 : 1;
+				x1 = x <= mVoxelLayout.x ? -1 : x1;
 
-				auto y1 = y < 0 ? -1 : 0;
-				y1 = y >= mVoxelLayout.y ? 1 : y1;
+				auto y1 = y > 0 ? 0 : 1;
+				y1 = y <= mVoxelLayout.y ? -1 : y1;
 
-				auto z1 = z < 0 ? -1 : 0;
-				z1 = z >= mVoxelLayout.z ? 1 : z1;
+				auto z1 = z > 0 ? 0 : 1;
+				z1 = z <= mVoxelLayout.z ? -1 : z1;
 
 				auto hash = GetNeighborHash(x1, y1, z1);
 				auto it = mNeighborhood.find(hash);
@@ -441,5 +445,32 @@ namespace Urho3D
 		}
 
 		return eastl::tuple<Voxel&, bool>(mData[index], true);
+	}
+
+	bool Chunk::CanDespawn()
+	{
+		if (!Initialized() || !Meshed())
+		{
+			return false;
+		}
+
+		/// Make sure all neighboring chunks are fully initialized as well,
+		/// other wise we might end up with destroyed chunks in our neighborhood,
+		/// when chunks are being removed while this chunk is beeing meshed.
+		for (auto it = mNeighborhood.begin(); it != mNeighborhood.end(); it++)
+		{
+			if (it->second == nullptr)
+			{
+				continue;
+			}
+
+			if (!it->second->Initialized() || !it->second->Meshed())
+			{
+				return false;
+			}
+		}
+
+		return true;
+
 	}
 }

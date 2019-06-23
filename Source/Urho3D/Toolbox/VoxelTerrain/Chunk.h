@@ -34,7 +34,7 @@ namespace Urho3D
 		float mVoxelSize;
 		Vector3d mWorldPosition;
 
-		eastl::hash_map<int, SharedPtr<Chunk>> mNeighborhood;
+		eastl::hash_map<int, Chunk*> mNeighborhood;
 		eastl::vector<Voxel> mData;
 
 		BoundingBox mBounds;
@@ -139,7 +139,7 @@ namespace Urho3D
 
 		void Reset(Vector3d pos, Vector3d chunk_dim);
 
-		void SetNeighbor(int x, int y, int z, SharedPtr<Chunk> c);
+		void SetNeighbor(int x, int y, int z, Chunk* c);
 
 		void Initialize();
 		void CreateMesh();
@@ -148,17 +148,14 @@ namespace Urho3D
 		/// second indicates whether to move a vertex or not.
 		eastl::tuple<int, int> GetCube(int x, int y, int z, bool safe = true);
 
+		/// Returns true, if the chunk can be removed.
+		bool CanDespawn();
 		void Despawn();
 
 		void Set(const Voxel& data, int x, int y, int z, bool safe = false);
 		eastl::tuple<Voxel&, bool> Get(int x, int y, int z, bool safe = true);
 
 		void HandleVoxelUpdate(Voxel v);
-
-		bool CanExtractSurface() const
-		{
-			return false;
-		}
 
 		SharedPtr<Model> GetModel()
 		{

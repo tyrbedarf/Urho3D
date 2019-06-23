@@ -264,7 +264,7 @@ namespace Urho3D
 			Vector3 pos(0,0,0);
 			for (int i = 0; i < 8; i++)
 			{
-				if ((cubeindex & (1 << i)) > 0)
+				if ((cubeindex & (1 << i)) != 0)
 				{
 					/* Check edges */
 					for (int j = 0; j < 3; j++)

@@ -274,13 +274,6 @@ namespace Urho3D
 		double maxDist = mSettings->GetDistToDestroy();
 
 		eastl::vector<Vector3d> keys;
-		/*for (auto it = mActiveChunks.begin();
-			it != mActiveChunks.end();
-			++it)
-		{
-			keys.push_back(it->first);
-		}*/
-
 		for (auto it = mActiveChunks.begin(); it != mActiveChunks.end(); it++)
 		{
 			bool destroy = true;
@@ -288,7 +281,7 @@ namespace Urho3D
 			Vector3d pos = it->second->GetWorldPosition();
 			for (int i = 0; i < playerPositions.Size(); i++)
 			{
-				if (!c->Initialized() || !c->Meshed() || !c->IsMeshInGame())
+				if (!c->CanDespawn())
 				{
 					destroy = false;
 					break;
@@ -336,9 +329,9 @@ namespace Urho3D
 		return Vector3d(x, y, z);
 	}
 
-	SharedPtr<Chunk> ChunkProvider::CreateChunk(Vector3d pos)
+	Chunk* ChunkProvider::CreateChunk(Vector3d pos)
 	{
-		SharedPtr<Chunk> r = nullptr;
+		Chunk* r = nullptr;
 		auto it = mActiveChunks.find(pos);
 		if (it != mActiveChunks.end())
 		{
@@ -357,12 +350,12 @@ namespace Urho3D
 
 		r = NewChunk();
 		r->Reset(pos, mSettings->GetChunkDimension());
-		mActiveChunks.insert(eastl::pair<Vector3d, SharedPtr<Chunk>>(pos, r));
+		mActiveChunks.insert(eastl::pair<Vector3d, Chunk*>(pos, r));
 
 		return r;
 	}
 
-	SharedPtr<Chunk> ChunkProvider::GetChunk(Vector3d pos)
+	Chunk* ChunkProvider::GetChunk(Vector3d pos)
 	{
 		auto it = mActiveChunks.find(pos);
 		if (it != mActiveChunks.end())
